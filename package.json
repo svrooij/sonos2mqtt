@@ -1,0 +1,27 @@
+{
+  "name": "sonos2mqtt",
+  "private": true,
+  "version": "0.0.1",
+  "description": " controll your sonos via mqtt",
+  "main": "index.js",
+  "bin": {
+    "sonos2mqtt": "index.js"
+  },
+  "preferGlobal": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "debug": "^2.6.8",
+    "ip": "^1.1.4",
+    "mqtt": "^2.11.0",
+    "request": "^2.81.0",
+    "sonos": "^0.14.1",
+    "underscore": "^1.8.3",
+    "upnp-client": "0.0.1",
+    "xml2js": "^0.4.17",
+    "xml2json": "^0.11.0",
+    "yalm": "^4.0.2",
+    "yargs": "^6.6.0"
+  }
+}
