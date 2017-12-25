@@ -106,7 +106,7 @@ function createListener (dev) {
           data.val = track.album
           mqtt.publish(config.name + '/status/' + device.name + '/album', JSON.stringify(data), {retain: false})
 
-          data.val = 'http://' + device.sonos.host + ':' + device.sonos.port + track.albumArtURL
+          data.val = track.albumArtURL
           mqtt.publish(config.name + '/status/' + device.name + '/url', JSON.stringify(data), {retain: false})
         })
         mqtt.publish(config.name + '/listener/1', '', {retain: false})
