@@ -97,17 +97,18 @@ function createListener (dev) {
           }
           log.debug('TRACK', track)
 
-          data.val = track.title
-          mqtt.publish(config.name + '/status/' + device.name + '/title', JSON.stringify(data), {retain: false})
+          publishCurrentTrack(device.name, track)
+          // data.val = track.title
+          // mqtt.publish(config.name + '/status/' + device.name + '/title', JSON.stringify(data), {retain: false})
 
-          data.val = track.artist
-          mqtt.publish(config.name + '/status/' + device.name + '/artist', JSON.stringify(data), {retain: false})
+          // data.val = track.artist
+          // mqtt.publish(config.name + '/status/' + device.name + '/artist', JSON.stringify(data), {retain: false})
 
-          data.val = track.album
-          mqtt.publish(config.name + '/status/' + device.name + '/album', JSON.stringify(data), {retain: false})
+          // data.val = track.album
+          // mqtt.publish(config.name + '/status/' + device.name + '/album', JSON.stringify(data), {retain: false})
 
-          data.val = track.albumArtURL
-          mqtt.publish(config.name + '/status/' + device.name + '/url', JSON.stringify(data), {retain: false})
+          // data.val = track.albumArtURL
+          // mqtt.publish(config.name + '/status/' + device.name + '/url', JSON.stringify(data), {retain: false})
         })
         mqtt.publish(config.name + '/listener/1', '', {retain: false})
       }
@@ -428,5 +429,34 @@ function setCommand (device, command, payload) {
       })
 
       break
+  }
+}
+
+function publishCurrentTrack (deviceName, track) {
+  let data = {
+    ts: Date.now(),
+    name: deviceName
+  }
+
+  if (config.publishDistinct) {
+    data.val = track.title
+    mqtt.publish(config.name + '/status/' + deviceName + '/title', JSON.stringify(data), {retain: false})
+
+    data.val = track.artist
+    mqtt.publish(config.name + '/status/' + deviceName + '/artist', JSON.stringify(data), {retain: false})
+
+    data.val = track.album
+    mqtt.publish(config.name + '/status/' + deviceName + '/album', JSON.stringify(data), {retain: false})
+
+    data.val = track.albumArtURL
+    mqtt.publish(config.name + '/status/' + deviceName + '/albumart', JSON.stringify(data), {retain: false})
+  } else {
+    data.val = {
+      title: track.title,
+      artist: track.artist,
+      album: track.album,
+      albumArt: track.albumArtURL
+    }
+    mqtt.publish(config.name + '/status/' + deviceName + '/track', JSON.stringify(data), {retain: false})
   }
 }
