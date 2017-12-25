@@ -17,8 +17,11 @@ var devices = []
 var listener = []
 var hosts = []
 
+log.setLevel(config.logging)
+log._info(pkg.name + ' ' + pkg.version + ' starting')
+
 search.on('DeviceAvailable', function (device) {
-  log.info('Start searching for Sonos devices')
+  log.debug('Start searching for Sonos devices')
 
   var host = {}
   host.ip = device.host
@@ -191,10 +194,10 @@ function createListener (dev) {
   return listenerObj
 }
 
-log.setLevel(config.verbosity)
+// log.setLevel(config.verbosity)
 
-log.info(pkg.name + ' ' + pkg.version + ' starting')
-log.info('mqtt trying to connect', config.url)
+// log.info(pkg.name + ' ' + pkg.version + ' starting')
+// log.info('mqtt trying to connect', config.url)
 
 var mqtt = Mqtt.connect(config.url, {will: {topic: config.name + '/connected', payload: '0', retain: true}})
 
@@ -226,7 +229,8 @@ mqtt.on('message', function (topic, payload) {
   try {
     payload = JSON.parse(payload.toString())
   } catch (e) {
-    payload = ''
+    log.error('Error parsing payload', e)
+    payload = null
   }
 
   log.info('mqtt <', topic, payload)
@@ -268,7 +272,7 @@ function getCommand (device, command, payload) {
         }
         var data = {}
         data.val = JSON.parse(parser.toJson(res.CurrentAlarmList)).Alarms.Alarm
-        log.info(data.val)
+        // log.debug('Current alarms', data.val)
         mqtt.publish(config.name + '/status/alarmlist', JSON.stringify(data), {retain: false})
       })
       break
@@ -323,10 +327,15 @@ function setCommand (device, command, payload) {
           log.error('Error getting volume', err)
           return
         }
-        var newVolume = parseInt(payload.val) + vol
-        log.info('vol1 ' + vol)
-        log.info('vol2 ' + parseInt(payload.val))
-        log.info('vol ' + newVolume)
+        var increment = 5
+        if (payload && payload.val) {
+          var tempIncrement = parseInt(payload.val)
+          if (tempIncrement > 0 && tempIncrement < 100) {
+            increment = tempIncrement
+          }
+        }
+        var newVolume = vol + increment
+        log.info('Old volume %d, increment %d, new volume %d', vol, increment, newVolume)
         if (newVolume > 100) {
           newVolume = 100
         }
@@ -347,11 +356,15 @@ function setCommand (device, command, payload) {
           log.error('Error getting volume ', err)
           return
         }
-        var newVolume = vol - parseInt(payload.val)
-
-        if (newVolume < 0) {
-          newVolume = 0
+        var decrement = 5
+        if (payload && payload.val) {
+          var tempDecrement = parseInt(payload.val)
+          if (tempDecrement > 0 && tempDecrement < 100) {
+            decrement = tempDecrement
+          }
         }
+        var newVolume = vol - decrement
+        log.info('Old volume %d, decrement %d, new volume %d', vol, decrement, newVolume)
 
         device.setVolume(newVolume, function (err, res) {
           log.debug([err, res])
