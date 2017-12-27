@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
-var pkg = require('./package.json')
+var pkg = require('../package.json')
 var log = require('yalm')
 var config = require('./config.js')
 var parser = require('xml2json')
 var Mqtt = require('mqtt')
 
 var s = require('sonos')
-var Listener = require('./node_modules/sonos/lib/events/listener.js')
 
 var mqttConnected
 
@@ -59,10 +58,10 @@ function createListener (dev) {
   var listenerObj = {}
   var device = dev
 // TODO: improve multiple listeners
-  device.listener1 = new Listener(device.sonos, {'interface': 'public'})
-  device.listener2 = new Listener(device.sonos, {'interface': 'public'})
-  device.listener3 = new Listener(device.sonos, {'interface': 'public'})
-  device.listener4 = new Listener(device.sonos, {'interface': 'public'})
+  device.listener1 = new s.Listener(device.sonos, {'interface': 'public'})
+  device.listener2 = new s.Listener(device.sonos, {'interface': 'public'})
+  device.listener3 = new s.Listener(device.sonos, {'interface': 'public'})
+  device.listener4 = new s.Listener(device.sonos, {'interface': 'public'})
 
   device.listener1.listen(function (err) {
     if (err) throw err
