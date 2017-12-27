@@ -1,8 +1,8 @@
 {
   "name": "sonos2mqtt",
   "private": true,
-  "version": "0.0.1",
-  "description": " controll your sonos via mqtt",
+  "version": "0.0.0-development",
+  "description": "A smarthome bridge between your sonos system and a mqtt server.",
   "main": "index.js",
   "bin": {
     "sonos2mqtt": "index.js"
