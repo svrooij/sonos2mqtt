@@ -1,30 +1,38 @@
 {
   "name": "sonos2mqtt",
-  "private": true,
   "version": "0.0.0-development",
   "description": "A smarthome bridge between your sonos system and a mqtt server.",
   "main": "index.js",
+  "license": "MIT",
+  "author": "Stephan van Rooij <github@svrooij.nl> (https://svrooij.nl)",
   "bin": {
     "sonos2mqtt": "index.js"
   },
   "preferGlobal": true,
   "scripts": {
-    "test": "standard && exit 0"
+    "test": "standard && exit 0",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "debug": "^2.6.8",
-    "ip": "^1.1.4",
     "mqtt": "^2.15.0",
-    "request": "^2.83.0",
     "sonos": "^0.19.0",
-    "underscore": "^1.8.3",
-    "upnp-client": "0.0.1",
-    "xml2js": "^0.4.19",
     "xml2json": "^0.11.0",
     "yalm": "^4.1.0",
     "yargs": "^10.0.3"
   },
   "devDependencies": {
-    "standard": "*"
-  }
+    "pre-commit": "^1.2.2",
+    "standard": "*",
+    "semantic-release": "^11.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/svrooij/sonos2mqtt.git"
+  },
+  "bugs": {
+    "url": "https://github.com/svrooij/sonos2mqtt/issues"
+  },
+  "pre-commit": [
+    "test"
+  ]
 }
