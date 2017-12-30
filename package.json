@@ -25,6 +25,6 @@
     "yargs": "^10.0.3"
   },
   "devDependencies": {
-    "standard": "^10.0.3"
+    "standard": "*"
   }
 }

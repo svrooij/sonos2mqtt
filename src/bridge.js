@@ -3,13 +3,12 @@
 const pkg = require('../package.json')
 const log = require('yalm')
 const config = require('./config.js')
-const parser = require('xml2json')
+// const parser = require('xml2json')
 const mqtt = require('mqtt')
 const s = require('sonos')
 
 let mqttClient
 let search
-let hosts = []
 let devices = []
 
 function start () {
@@ -29,8 +28,8 @@ function start () {
 
   mqttClient = mqtt.connect(config.url, mqttOptions)
 
-  mqttClient.on('connect', () =>{
-    log.info('Connected to mqtt %s',config.url)
+  mqttClient.on('connect', () => {
+    log.info('Connected to mqtt %s', config.url)
     mqttClient.subscribe(config.name + '/set/+/+')
   })
 
@@ -52,10 +51,10 @@ function start () {
 
   // Start searching for devices
   log.info('Start searching for Sonos players')
-  search = s.search()
+  search = s.search({timeout: 4000})
   search.on('DeviceAvailable', function (device, model) {
     log.debug('Found device (%s) with IP: %s', model, device.host)
-    
+
     device.getZoneAttrs(function (err, attrs) {
       if (err) {
         log.error('Get Zone error ', err)
@@ -64,35 +63,24 @@ function start () {
       // log.info('Found: ' + host.name + ' with IP: ' + host.ip)
       log.info('Found player (%s): %s with IP: %s', model, attrs.CurrentZoneName, device.host)
       device.name = attrs.CurrentZoneName
-      //hosts.push(host)
-      addDevice(device);
+      // hosts.push(host)
+      addDevice(device)
     })
-
+  })
+  search.on('timeout', function () {
+    publishConnectionStatus()
   })
 
-  setTimeout(function () {
-    log.info('Stop searching for devices')
-    search.destroy()
-    publishConnectionStatus()
-  }, 5000)
-
-  process.on('SIGINT', function() {
-    log.info('Shutting down listeners, please wait');
+  process.on('SIGINT', function () {
+    log.info('Shutting down listeners, please wait')
     devices.forEach(device => {
-      device.listener1.removeService(device.listener1.AVid,function(err,success){
-        if(err) {
-          log.error('Error unsubscribing %s from %s',device.listener1.AVid,device.name)
+      device.stopListening((err, success) => {
+        if (err) {
+          log.error('Error shutting down listner %j', err)
           return
         }
-        log.debug('Succesfully unsubscribed for AVTransport from %s',device.name)
-      })
 
-      device.listener1.removeService(device.listener1.RCid,function(err,success){
-        if(err) {
-          log.error('Error unsubscribing %s from %s',device.listener1.RCid,device.name)
-          return
-        }
-        log.debug('Succesfully unsubscribed for RenderingControl from %s',device.name)
+        log.info('Listener shutdown successfully')
       })
     })
     setTimeout(function () {
@@ -521,11 +509,9 @@ function start () {
 //   }
 // }
 
-
-
 function publishConnectionStatus () {
   let status = '1'
-  if(devices.length > 0) { status = '2' }
+  if (devices.length > 0) { status = '2' }
   mqttClient.publish(config.name + '/connected', status, {
     qos: 0,
     retain: true
@@ -534,113 +520,41 @@ function publishConnectionStatus () {
 
 function addDevice (device) {
   // Add a listerner to this device
-  device.listener1 = new s.Listener(device)
-  device.listener1.listen(function(err){
-    if (err) throw err
-
-    // Attach event listener to SonosListener
-    device.listener1.on('serviceEvent', function (endpoint, sid, data){
-      log.debug('Received event from %s (%s)', device.name, endpoint)
-      // log.debug('Received event from %s (%s)\n%s',device.name, endpoint, JSON.stringify(data))
-
-      switch (endpoint) {
-        case '/MediaRenderer/AVTransport/Event':
-          getAndPublishCurrentState(device)
-          getAndPublishCurrentTrack(device)
-          
-          break;
-        
-        case '/MediaRenderer/RenderingControl/Event':
-          getAndPublishVolume(device)
-          break;
-      
-        default:
-          log.error('Received unexpected event %s from %s',endpoint, device.name)
-          break;
-      }
-    })
-
-
-    // Listen for AVTransportEvents (for song change, play-state)
-    device.listener1.addService('/MediaRenderer/AVTransport/Event', function (error, sid) {
-      if (error) throw err
-      log.debug('AV, with subscription id %s', sid)
-      device.listener1.AVid = sid
-    })
-
-    // Listen for RenderingControlEvents (for volume, mute events)
-    device.listener1.addService('/MediaRenderer/RenderingControl/Event', function (error, sid) {
-      if (error) throw err
-      log.debug('RC, with subscription id %s', sid)
-      device.listener1.RCid = sid
-    })
-
-    
+  device.on('TrackChanged', track => {
+    publishCurrentTrack(device, track)
+  })
+  device.on('StateChanged', state => {
+    publishState(device, state)
+  })
+  device.on('Muted', muted => {
+    publishMuted(device, muted)
+  })
+  device.on('VolumeChanged', volume => {
+    publishVolume(device, volume)
   })
 
   devices.push(device)
-
 }
 
-function getAndPublishVolume(device){
-  
-  device.getVolume(function (err,volume) {
-    if(err){
-      log.error('Error getting volume from %s, %s', device.name,err)
-      return
-    }
-    if(device.lastVolume != volume) {
-      publishData(config.name + '/status/' + device.name + '/volume', volume, device.name, true)
-      device.lastVolume = volume
-    }
-    
-  })
-
-  device.getMuted(function (err,muted) {
-    if(err){
-      log.error('Error getting muted from %s, %s', device.name,err)
-      return
-    }
-    if(device.lastMuted != muted){
-      publishData(config.name + '/status/' + device.name + '/muted', muted, device.name, true)
-      device.lastState = muted
-    }
-    
-  })
+function publishVolume (device, volume) {
+  publishData(config.name + '/status/' + device.name + '/volume', volume, device.name, true)
 }
 
-function getAndPublishCurrentState(device){
-  device.getCurrentState(function(err,state){
-    if(err){
-      log.error('Error getting state from %s, %s', device.name,err)
-      return
-    }
-    if(device.lastState != state && state != 'transitioning') {
-      publishData(config.name + '/status/' + device.name + '/state', state, device.name, true)
-      device.lastState = state
-    }
-    
-  })
+function publishMuted (device, muted) {
+  publishData(config.name + '/status/' + device.name + '/muted', muted, device.name, true)
 }
 
-function getAndPublishCurrentTrack (device) {
-  device.currentTrack(function(err,track){
-    if(err){
-      log.error('Error getting track from %s, %s', device.name,err)
-      return
-    }
-    publishCurrentTrack(device, track)
-  })
+function publishState (device, state) {
+  publishData(config.name + '/status/' + device.name + '/state', state, device.name, true)
 }
 
 function publishCurrentTrack (device, track) {
-  log.debug("Last track on %s %s", device.name, JSON.stringify(track))
+  log.debug('Last track on %s %s', device.name, JSON.stringify(track))
   if (config.publishDistinct) {
     publishData(config.name + '/status/' + device.name + '/title', track.title, device.name)
     publishData(config.name + '/status/' + device.name + '/artist', track.artist, device.name)
     publishData(config.name + '/status/' + device.name + '/album', track.album, device.name)
     publishData(config.name + '/status/' + device.name + '/albumart', track.albumArtURL, device.name)
-
   } else {
     let val = (track && track.title) ? {
       title: track.title,
@@ -648,18 +562,17 @@ function publishCurrentTrack (device, track) {
       album: track.album,
       albumArt: track.albumArtURL
     } : null
-    if(device.lastTrack != val){
+    if (device.lastTrack !== val) {
       publishData(config.name + '/status/' + device.name + '/track', val, device.name)
       device.lastTrack = val
     }
-    
   }
 }
 
 function publishData (topic, dataVal, name = null, retain = false) {
-  if (mqttClient.connected){
+  if (mqttClient.connected) {
     let data = null
-    if(dataVal != null) {
+    if (dataVal != null) {
       data = {
         ts: new Date(),
         name: name,
@@ -673,8 +586,8 @@ function publishData (topic, dataVal, name = null, retain = false) {
   }
 }
 
-function IsNumeric (val) {
-  return Number(parseFloat(val)) === val
-}
+// function IsNumeric (val) {
+//   return Number(parseFloat(val)) === val
+// }
 
 start()
