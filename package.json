@@ -8,6 +8,12 @@
   "bin": {
     "sonos2mqtt": "index.js"
   },
+  "keywords": [
+    "sonos",
+    "mqtt-smarthome",
+    "mqtt",
+    "music control"
+  ],
   "preferGlobal": true,
   "scripts": {
     "test": "standard && exit 0",
