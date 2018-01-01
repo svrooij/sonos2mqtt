@@ -10,6 +10,8 @@ This node.js application is a bridge between the Sonos and a mqtt server. The st
 
 It's intended as a building block in heterogenous smart home environments where an MQTT message broker is used as the centralized message bus. See [MQTT Smarthome on Github](https://github.com/mqtt-smarthome/mqtt-smarthome) for a rationale and architectural overview.
 
+Check out the other bridges in the [software list](https://github.com/mqtt-smarthome/mqtt-smarthome/blob/master/Software.md)
+
 ## Installation
 
 Using sonos2mqtt is really easy, but it requires at least [Node.js](https://nodejs.org/) v6 or higher. (This app is tested against v6, v8 and v9).
@@ -20,11 +22,13 @@ Using sonos2mqtt is really easy, but it requires at least [Node.js](https://node
 
 ```bash
 sonos2mqtt 0.0.0-development
+A smarthome bridge between your sonos system and a mqtt server.
+
 Usage: sonos2mqtt [options]
 
 Options:
-  -v, --verbosity         possible values: "error", "warn", "info", "debug"
-                                                               [default: "info"]
+  -v, --verbosity         Verbosity level
+                   [choices: "error", "warn", "info", "debug"] [default: "info"]
   -n, --name              instance name. used as mqtt client id and as prefix
                           for connected topic                 [default: "sonos"]
   -u, --url               mqtt broker url. See
@@ -32,8 +36,8 @@ Options:
                                                    [default: "mqtt://127.0.0.1"]
   -d, --publish-distinct  Publish distinct track states
                                                       [boolean] [default: false]
-  -h, --help              Show help
-  --version               Show version number
+  -h, --help              Show help                                    [boolean]
+  --version               Show version number                          [boolean]
 ```
 
 ### MQTT Url
@@ -77,7 +81,7 @@ By default you can subscribe to the following subtopics `state` (retained), `vol
 
 You can control sonos by sending an empty message on these topics. The topic format is like `sonos/set/room_name/command` for instance `sonos/set/Office/next`.
 
-Commands:
+Speaker commands:
 
 * `next` - Play the next song
 * `previous` - Play the previous song
@@ -91,6 +95,14 @@ Commands:
 * `unmute` - Unmute the volume
 * `sleep` (payload requires number) - Set a sleeptimer for x amount of minutes (from payload)
 
+### Generic commands
+
+There are also some genir commands not tied to a specific speaker. These generic commands should be send to `sonos/cmd/command` like `sonos/cmd/pauseall`.
+
+Generic commands:
+
+* `pauseall` - Pause all speakers know to the bridge.
+* `listalarms` - This will fetch all the current alarms and sends them to `sonos/alarms`.
 
 ## Use [PM2](http://pm2.keymetrics.io) to run in background
 
