@@ -2,6 +2,7 @@
 
 [![npm](https://img.shields.io/npm/v/sonos2mqtt.svg?style=flat-square)](https://www.npmjs.com/package/sonos2mqtt)
 [![travis](https://img.shields.io/travis/svrooij/sonos2mqtt.svg?style=flat-square)](https://travis-ci.org/svrooij/sonos2mqtt)
+[![mqtt-smarthome](https://img.shields.io/badge/mqtt-smarthome-blue.svg?style=flat-square)](https://github.com/mqtt-smarthome/mqtt-smarthome)
 [![Support me on Patreon][badge_patreon]][patreon]
 [![PayPal][badge_paypal_donate]][paypal-donations]
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
