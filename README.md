@@ -15,7 +15,7 @@ Check out the other bridges in the [software list](https://github.com/mqtt-smart
 
 ## Installation
 
-Using sonos2mqtt is really easy, but it requires at least [Node.js](https://nodejs.org/) v6 or higher. (This app is tested against v6, v8 and v9).
+Using sonos2mqtt is really easy, but it requires at least [Node.js](https://nodejs.org/) v6 or higher. (This app is tested against v8 and v9).
 
 `sudo npm install -g sonos2mqtt`
 
@@ -95,6 +95,9 @@ Speaker commands:
 * `mute` - Mute the volume
 * `unmute` - Unmute the volume
 * `sleep` (payload requires number) - Set a sleeptimer for x amount of minutes (from payload)
+* `notify` - Play a **notification** on this device :tada: (and revert to current state) see [parameters](https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosplaynotificationoptions)
+* `queue` - add a song to the queue, payload should be json string or uri. See [parameters](https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosqueueoptions-positioninqueue)
+* `setavtransporturi` - See [parameters](https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonossetavtransporturioptions)
 
 ### Generic commands
 
@@ -104,18 +107,35 @@ Generic commands:
 
 * `pauseall` - Pause all speakers know to the bridge.
 * `listalarms` - This will fetch all the current alarms and sends them to `sonos/alarms`.
+* `setalarm` - This allows you to set/unset an alarm. Requires json object with `id` and `enabled`
+* `notify` - Play a notification on all devices (and revert to current state) see [parameters](https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosplaynotificationoptions)
+
+#### Notification sample
+
+To play a notification on all devices you send the following json string to `sonos/cmd/notify`
+
+```json
+{
+  "uri": "https://archive.org/download/Doorbell_1/doorbell.mp3",
+  "volume": 10
+}
+```
 
 ## Use [PM2](http://pm2.keymetrics.io) to run in background
 
 If everything works as expected, you should make the app run in the background automatically. Personally I use PM2 for this. And they have a great [guide for this](http://pm2.keymetrics.io/docs/usage/quick-start/).
 
-## Special thanks
+## Node-sonos
 
-The latest version of this bridge is inspired on [hue2mqtt.js](https://github.com/hobbyquaker/hue2mqtt.js) by [Sabastian Raff](https://github.com/hobbyquaker). That was a great sample on how to create a globally installed, command-line, something2mqtt bridge.
+This library depends on [node-sonos](https://github.com/bencevans/node-sonos/) that I just completly promistified. All other libraries using node-sonos should also be able to implemented all the nice features included there. Like **notifications** which is the coolest new addition for **sonos2mqtt**!
 
 ## Beer
 
 This bridge and [my work](https://github.com/bencevans/node-sonos/pull/195) on the sonos library took me quite some time, so I invite everyone using this bridge to [Buy me a beer](https://svrooij.nl/buy-me-a-beer/).
+
+## Special thanks
+
+The latest version of this bridge is inspired on [hue2mqtt.js](https://github.com/hobbyquaker/hue2mqtt.js) by [Sabastian Raff](https://github.com/hobbyquaker). That was a great sample on how to create a globally installed, command-line, something2mqtt bridge.
 
 [badge_paypal_donate]: https://svrooij.nl/badges/paypal_donate.svg
 [badge_patreon]: https://svrooij.nl/badges/patreon.svg
