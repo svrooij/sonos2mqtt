@@ -20,8 +20,8 @@
     "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "mqtt": "^2.15.2",
-    "sonos": "^1.0.2",
+    "mqtt": "^2.15.3",
+    "sonos": "^1.1.0",
     "yalm": "^4.1.0",
     "yargs": "^11.0.0"
   },

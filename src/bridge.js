@@ -134,6 +134,8 @@ async function handleDeviceCommand (device, command, payload) {
       return device.pause()
     case 'play':
       return device.play()
+    case 'toggle':
+      return device.togglePlayback()
     case 'previous':
       return device.previous()
     case 'stop':
@@ -304,10 +306,6 @@ function publishCurrentTrack (device, track) {
     } : null
 
     publishData(config.name + '/status/' + device.name + '/track', val, device.name)
-    // if (device.lastTrack !== val) {
-    //   publishData(config.name + '/status/' + device.name + '/track', val, device.name)
-    //   device.lastTrack = val
-    // }
   }
 }
 
