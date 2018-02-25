@@ -15,7 +15,7 @@ Check out the other bridges in the [software list](https://github.com/mqtt-smart
 
 ## Installation
 
-Using sonos2mqtt is really easy, but it requires at least [Node.js](https://nodejs.org/) v6 or higher. (This app is tested against v8 and v9).
+Using sonos2mqtt is really easy, but it requires at least [Node.js](https://nodejs.org/) v8 or higher, because of it's async usage. (This app is tested against v8 and v9).
 
 `sudo npm install -g sonos2mqtt`
 
@@ -88,6 +88,7 @@ Speaker commands:
 * `previous` - Play the previous song
 * `pause` - Pause playing
 * `play` - Resume playback
+* `toggle` - Toggle between `pause` and `play`
 * `stop` - Stop playback (you better use pause!)
 * `volume` (payload requires number) - Set the volume to certain level between 0 and 100
 * `volumeup` (payload number optional) - Increse the volume by number from payload or by 5
