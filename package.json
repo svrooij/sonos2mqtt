@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "pre-commit": "^1.2.2",
-    "semantic-release": "^12.4.1",
+    "semantic-release": "^15.1.4",
     "standard": "^11.0.1"
   },
   "repository": {
