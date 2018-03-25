@@ -186,7 +186,7 @@ async function handleDeviceCommand (device, command, payload) {
   }
 }
 
- // This function is used by 'handleDeviceCommand' for handeling the volume up/down commands
+// This function is used by 'handleDeviceCommand' for handeling the volume up/down commands
 async function handleVolumeCommand (device, payload, modifier) {
   let change = 5
   if (IsNumeric(payload)) {
