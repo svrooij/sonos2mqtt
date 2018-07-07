@@ -178,8 +178,15 @@ async function handleDeviceCommand (device, command, payload) {
     // ----------------- Possibly the coolest feature of this library, play a notification and revert back to old state see https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosplaynotificationoptions for parameters
     case 'notify':
       return device.playNotification(ConvertToObjectIfPossible(payload))
+    // ----------------- This is an advanced feature to set the playback url
     case 'setavtransporturi':
       return device.setAVTransportURI(ConvertToObjectIfPossible(payload))
+    case 'joingroup':
+      return device.joinGroup(payload)
+    case 'leavegroup':
+      return device.becomeCoordinatorOfStandaloneGroup()
+    case 'playmode':
+      return device.setPlayMode(payload)
     default:
       log.debug('Command %s not yet supported', command)
       break
@@ -212,7 +219,7 @@ async function handleGenericCommand (command, payload) {
     case 'listalarms':
       return listAlarms()
     case 'setalarm':
-      return setalarm(payload)
+      return setalarm(ConvertToObjectIfPossible(payload))
     // ------------------ Control all devices
     case 'pauseall':
       const pauseall = async function (device) {
@@ -315,7 +322,7 @@ function publishData (topic, dataVal, name = null, retain = false) {
     let data = null
     if (dataVal != null) {
       data = {
-        ts: new Date(),
+        ts: Date.now(),
         name: name,
         val: dataVal
       }

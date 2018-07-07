@@ -99,6 +99,9 @@ Speaker commands:
 * `notify` - Play a **notification** on this device :tada: (and revert to current state) see [parameters](https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosplaynotificationoptions)
 * `queue` - add a song to the queue, payload should be json string or uri. See [parameters](https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosqueueoptions-positioninqueue)
 * `setavtransporturi` - See [parameters](https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonossetavtransporturioptions)
+* `joingroup` - Join a group by device name, payload should be a string with the name of the deivce to join.
+* `leavegroup` - Leave a group.
+* `playmode` - Set the playmode,payload should be *NORMAL*, *REPEAT_ALL*, *SHUFFLE* or *SHUFFLE_NOREPEAT*.
 
 ### Generic commands
 
