@@ -56,7 +56,7 @@ function start () {
 
   // Start searching for devices
   log.info('Start searching for Sonos players')
-  search = s.DeviceDiscovery({timeout: 4000})
+  search = s.DeviceDiscovery({ timeout: 4000 })
   search.on('DeviceAvailable', async (device, model) => {
     log.debug('Found device (%s) with IP: %s', model, device.host)
 
@@ -243,7 +243,7 @@ async function handleGenericCommand (command, payload) {
 async function listAlarms () {
   return devices[0].alarmClockService().ListAlarms().then(alarms => {
     log.debug('Got alarms %j', alarms)
-    mqttClient.publish(config.name + '/alarms', JSON.stringify(alarms), {retain: false})
+    mqttClient.publish(config.name + '/alarms', JSON.stringify(alarms), { retain: false })
   })
 }
 async function setalarm (payload) {
@@ -327,7 +327,7 @@ function publishData (topic, dataVal, name = null, retain = false) {
         val: dataVal
       }
     }
-    mqttClient.publish(topic, JSON.stringify(data), {retain: retain})
+    mqttClient.publish(topic, JSON.stringify(data), { retain: retain })
     log.debug('Published to %s', topic)
   } else {
     log.debug('Couldn\'t publish to %s because not connected', topic)
