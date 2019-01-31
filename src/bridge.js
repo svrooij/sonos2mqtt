@@ -99,7 +99,7 @@ async function handleIncomingMessage (topic, payload) {
 
   // Commands for devices
   if (parts[1] === 'set' && parts.length === 4) {
-    let device = devices.find((device) => { return device.name.toLowerCase() === parts[2] })
+    let device = devices.find((device) => { return device.name.toLowerCase() === parts[2].toLowerCase() })
     if (device) {
       return handleDeviceCommand(device, parts[3], payload)
         .then(result => {
