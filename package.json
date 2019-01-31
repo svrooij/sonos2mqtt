@@ -4,7 +4,7 @@
   "description": "A smarthome bridge between your sonos system and a mqtt server.",
   "main": "index.js",
   "license": "MIT",
-  "author": "Matthias Burgfried forked from Stephan van Rooij <github@svrooij.nl> (https://svrooij.nl)",
+  "author": "Stephan van Rooij <github@svrooij.nl> (https://svrooij.nl)",
   "bin": {
     "sonos2mqtt": "index.js"
   },
@@ -32,10 +32,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/matthias-schulz/sonos2mqtt.gitt"
+    "url": "https://github.com/svrooij/sonos2mqtt.git"
   },
   "bugs": {
-    "url": "https://github.com/matthias-schulz/sonos2mqtt/issues"
+    "url": "https://github.com/svrooij/sonos2mqtt/issues"
   },
   "pre-commit": [
     "test"
