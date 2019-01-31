@@ -181,6 +181,8 @@ async function handleDeviceCommand (device, command, payload) {
     // ----------------- This is an advanced feature to set the playback url
     case 'setavtransporturi':
       return device.setAVTransportURI(ConvertToObjectIfPossible(payload))
+    case 'radio':
+      return handleRadioCommand(device, ConvertToObjectIfPossible(payload))
     case 'joingroup':
       return device.joinGroup(payload)
     case 'leavegroup':
@@ -191,6 +193,13 @@ async function handleDeviceCommand (device, command, payload) {
       log.debug('Command %s not yet supported', command)
       break
   }
+}
+
+// This function is used by 'handleDeviceCommand' for handeling Tunein
+async function handleRadioCommand (device, payload) {
+  return device.playTuneinRadio(payload.stationId, payload.stationTitle).then(success => {
+    log.info('Radio station changed %s', payload.stationTitle)
+  }).catch(err => { log.error('Error occurred %j', err) })
 }
 
 // This function is used by 'handleDeviceCommand' for handeling the volume up/down commands
