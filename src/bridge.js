@@ -215,10 +215,13 @@ async function handleVolumeCommand (device, payload, modifier) {
       }
     }
   }
+  log.info('Change %j', change)
 
   return device.getVolume()
     .then(vol => {
+      log.info('Old volume %j', vol)
       let tempVol = vol + (change * modifier)
+      log.info('New volume %j', tempVol)
       if (tempVol > 100) {
         return 100
       }
@@ -227,7 +230,7 @@ async function handleVolumeCommand (device, payload, modifier) {
       }
       return tempVol
     })
-    .then(device.setVolume)
+    .then(vol => { return device.setVolume(vol) })
     .then(result => {
       log.info('Volume changed %d', (change * modifier))
     })
