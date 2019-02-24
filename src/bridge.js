@@ -204,16 +204,28 @@ async function handleRadioCommand (device, payload) {
 
 // This function is used by 'handleDeviceCommand' for handeling the volume up/down commands
 async function handleVolumeCommand (device, payload, modifier) {
+  log.info('Handle volume %s', payload)
+  log.info('Handle modifier %j', modifier)
   let change = 5
-  if (IsNumeric(payload)) {
-    let tempIncrement = parseInt(payload)
-    if (tempIncrement > 0 && tempIncrement < 100) {
-      change = tempIncrement
+  if (payload !== null) {
+    if (IsNumeric(payload)) {
+      let tempIncrement = parseInt(payload)
+      if (tempIncrement > 0 && tempIncrement < 100) {
+        change = tempIncrement
+      }
     }
   }
+
   return device.getVolume()
     .then(vol => {
-      return vol + (change * modifier)
+      let tempVol = vol + (change * modifier)
+      if (tempVol > 100) {
+        return 100
+      }
+      if (tempVol < 0) {
+        return 0
+      }
+      return tempVol
     })
     .then(device.setVolume)
     .then(result => {
