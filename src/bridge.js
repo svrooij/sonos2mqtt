@@ -99,7 +99,7 @@ async function handleIncomingMessage (topic, payload) {
 
   // Commands for devices
   if (parts[1] === 'set' && parts.length === 4) {
-    let device = devices.find((device) => { return device.name.toLowerCase() === parts[2] })
+    let device = devices.find((device) => { return device.name.toLowerCase() === parts[2].toLowerCase() })
     if (device) {
       return handleDeviceCommand(device, parts[3], payload)
         .then(result => {
@@ -181,6 +181,8 @@ async function handleDeviceCommand (device, command, payload) {
     // ----------------- This is an advanced feature to set the playback url
     case 'setavtransporturi':
       return device.setAVTransportURI(ConvertToObjectIfPossible(payload))
+    case 'radio':
+      return handleRadioCommand(device, ConvertToObjectIfPossible(payload))
     case 'joingroup':
       return device.joinGroup(payload)
     case 'leavegroup':
@@ -193,20 +195,37 @@ async function handleDeviceCommand (device, command, payload) {
   }
 }
 
+// This function is used by 'handleDeviceCommand' for handeling Tunein
+async function handleRadioCommand (device, payload) {
+  return device.playTuneinRadio(payload.stationId, payload.stationTitle).then(success => {
+    log.info('Radio station changed %s', payload.stationTitle)
+  }).catch(err => { log.error('Error occurred %j', err) })
+}
+
 // This function is used by 'handleDeviceCommand' for handeling the volume up/down commands
 async function handleVolumeCommand (device, payload, modifier) {
   let change = 5
-  if (IsNumeric(payload)) {
-    let tempIncrement = parseInt(payload)
-    if (tempIncrement > 0 && tempIncrement < 100) {
-      change = tempIncrement
+  if (payload !== null) {
+    if (IsNumeric(payload)) {
+      let tempIncrement = parseInt(payload)
+      if (tempIncrement > 0 && tempIncrement < 100) {
+        change = tempIncrement
+      }
     }
   }
+
   return device.getVolume()
     .then(vol => {
-      return vol + (change * modifier)
+      let tempVol = vol + (change * modifier)
+      if (tempVol > 100) {
+        return 100
+      }
+      if (tempVol < 0) {
+        return 0
+      }
+      return tempVol
     })
-    .then(device.setVolume)
+    .then(vol => { return device.setVolume(vol) })
     .then(result => {
       log.info('Volume changed %d', (change * modifier))
     })
