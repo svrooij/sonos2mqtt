@@ -22,7 +22,7 @@ Using sonos2mqtt is really easy, but it requires at least [Node.js](https://node
 ## Usage
 
 ```bash
-sonos2mqtt 0.0.0-development
+sonos2mqtt 1.4.4
 A smarthome bridge between your sonos system and a mqtt server.
 
 Usage: sonos2mqtt [options]
