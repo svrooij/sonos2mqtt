@@ -100,7 +100,7 @@ async function handleIncomingMessage (topic, payload) {
 
   // Commands for devices
   if (parts[1] === 'set' && parts.length === 4) {
-    const device = devices.find((device) => { return device.name.toLowerCase() === parts[2].toLowerCase() })
+    const device = devices.find((device) => { return device.name === parts[2].toLowerCase() })
     if (device) {
       return handleDeviceCommand(device, parts[3], payload)
         .then(result => {
@@ -190,6 +190,15 @@ async function handleDeviceCommand (device, command, payload) {
       return device.becomeCoordinatorOfStandaloneGroup()
     case 'playmode':
       return device.setPlayMode(payload)
+    case 'command':
+      const commandData = ConvertToObjectIfPossible(payload)
+      log.debug('OneCommand endpoint %j', commandData)
+      if (commandData.cmd) {
+        return handleDeviceCommand(device, commandData.cmd, commandData.val)
+      } else {
+        log.warning('Command not set in payload')
+        break
+      }
     default:
       log.debug('Command %s not yet supported', command)
       break
@@ -249,10 +258,10 @@ async function handleGenericCommand (command, payload) {
     // ------------------ Play a notification on all devices, see https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosplaynotificationoptions for parameters
     case 'notify':
       const parsedPayload = ConvertToObjectIfPossible(payload)
-      const notifyAll = async function (device) {
+      const notify = async function (device) {
         await device.playNotification(parsedPayload)
       }
-      return Promise.all(devices.map(notifyAll))
+      return Promise.all(devices.map(notify))
     default:
       log.error('Command %s isn\' implemented', command)
       break

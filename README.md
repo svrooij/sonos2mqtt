@@ -102,6 +102,7 @@ Speaker commands:
 * `joingroup` - Join a group by device name, payload should be a string with the name of the deivce to join.
 * `leavegroup` - Leave a group.
 * `playmode` - Set the playmode,payload should be *NORMAL*, *REPEAT_ALL*, *SHUFFLE* or *SHUFFLE_NOREPEAT*.
+* `command` - One topic for all [commands](https://github.com/svrooij/sonos2mqtt/issues/21). Payload like `{"cmd":"volumeup"}` or `{"cmd":"volume", "val":10}` for commands that need a payload.
 
 ### Generic commands
 
