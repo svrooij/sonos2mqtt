@@ -8,7 +8,7 @@ const s = require('sonos')
 
 let mqttClient
 let search
-let devices = []
+const devices = []
 
 function start () {
   log.setLevel(config.verbosity)
@@ -62,8 +62,9 @@ function start () {
 
     device.getZoneAttrs()
       .then(attrs => {
-        log.info('Found player (%s): %s with IP: %s', model, attrs.CurrentZoneName, device.host)
-        device.name = attrs.CurrentZoneName
+        const name = attrs.CurrentZoneName.toLowerCase().replace(' ', '-')
+        log.info('Found player (%s): %s with IP: %s', model, name, device.host)
+        device.name = name
         // hosts.push(host)
         addDevice(device)
       })
