@@ -90,6 +90,8 @@ Speaker commands:
 * `play` - Resume playback
 * `toggle` - Toggle between `pause` and `play`
 * `stop` - Stop playback (you better use pause!)
+* `selecttrack` (payload requires number) - Select an other track in the queue.
+* `seek` - Skip to position in track, payload needs a relative time like `0:03:45` to skip to 3 min, 45 sec.
 * `volume` (payload requires number) - Set the volume to certain level between 0 and 100
 * `volumeup` (payload number optional) - Increse the volume by number from payload or by 5
 * `volumedown` (payload number optional) - Decrese the volume by number from payload or by 5

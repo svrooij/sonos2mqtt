@@ -141,6 +141,15 @@ async function handleDeviceCommand (device, command, payload) {
       return device.previous()
     case 'stop':
       return device.stop()
+    case 'selecttrack':
+      if (IsNumeric(payload)) {
+        return device.selectTrack(parseInt(payload))
+      } else {
+        log.error('Payload isn\'t a number')
+        break
+      }
+    case 'seek':
+      return device.avTransportService().Seek({ InstanceID: 0, Unit: 'REL_TIME', Target: payload })
     // ------------------ Volume commands
     case 'volume':
       if (IsNumeric(payload)) {
