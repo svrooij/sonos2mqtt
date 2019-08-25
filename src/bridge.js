@@ -99,7 +99,7 @@ async function handleIncomingMessage (topic, payload) {
 
   // Commands for devices
   if (parts[1] === 'set' && parts.length === 4) {
-    let device = devices.find((device) => { return device.name.toLowerCase() === parts[2].toLowerCase() })
+    const device = devices.find((device) => { return device.name.toLowerCase() === parts[2].toLowerCase() })
     if (device) {
       return handleDeviceCommand(device, parts[3], payload)
         .then(result => {
@@ -207,7 +207,7 @@ async function handleVolumeCommand (device, payload, modifier) {
   let change = 5
   if (payload !== null) {
     if (IsNumeric(payload)) {
-      let tempIncrement = parseInt(payload)
+      const tempIncrement = parseInt(payload)
       if (tempIncrement > 0 && tempIncrement < 100) {
         change = tempIncrement
       }
@@ -216,7 +216,7 @@ async function handleVolumeCommand (device, payload, modifier) {
 
   return device.getVolume()
     .then(vol => {
-      let tempVol = vol + (change * modifier)
+      const tempVol = vol + (change * modifier)
       if (tempVol > 100) {
         return 100
       }
@@ -324,7 +324,7 @@ function publishCurrentTrack (device, track) {
     publishData(config.name + '/status/' + device.name + '/album', track.album, device.name)
     publishData(config.name + '/status/' + device.name + '/albumart', track.albumArtURI, device.name)
   } else {
-    let val = (track && track.title) ? {
+    const val = (track && track.title) ? {
       title: track.title,
       artist: track.artist,
       album: track.album,
