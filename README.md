@@ -125,6 +125,11 @@ To play a notification on all devices you send the following json string to `son
 }
 ```
 
+## Run a MQTT server in docker
+
+If your want to test this library it's best to create a mqtt server just for testing. This can easily be done with the followinf docker command:
+`docker run -it -p 1883:1883 -p 9001:9001 eclipse-mosquitto`
+
 ## Use [PM2](http://pm2.keymetrics.io) to run in background
 
 If everything works as expected, you should make the app run in the background automatically. Personally I use PM2 for this. And they have a great [guide for this](http://pm2.keymetrics.io/docs/usage/quick-start/).
