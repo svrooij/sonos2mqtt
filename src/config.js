@@ -7,18 +7,18 @@ var config = require('yargs')
   .describe('d', 'Publish distinct track states')
   .describe('h', 'show help')
   .alias({
-    'h': 'help',
-    'n': 'name',
-    'u': 'url',
-    'v': 'verbosity',
-    'd': 'publish-distinct'
+    h: 'help',
+    n: 'name',
+    u: 'url',
+    v: 'verbosity',
+    d: 'publish-distinct'
   })
   .boolean('d')
   .default({
-    'u': 'mqtt://127.0.0.1',
-    'n': 'sonos',
-    'v': 'info',
-    'd': false
+    u: 'mqtt://127.0.0.1',
+    n: 'sonos',
+    v: 'info',
+    d: false
   })
   .choices('v', ['error', 'warn', 'info', 'debug'])
   .wrap(80)

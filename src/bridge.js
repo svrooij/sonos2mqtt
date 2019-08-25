@@ -8,7 +8,7 @@ const s = require('sonos')
 
 let mqttClient
 let search
-let devices = []
+const devices = []
 
 function start () {
   log.setLevel(config.verbosity)
@@ -62,8 +62,9 @@ function start () {
 
     device.getZoneAttrs()
       .then(attrs => {
-        log.info('Found player (%s): %s with IP: %s', model, attrs.CurrentZoneName, device.host)
-        device.name = attrs.CurrentZoneName
+        const name = attrs.CurrentZoneName.toLowerCase().replace(' ', '-')
+        log.info('Found player (%s): %s with IP: %s', model, name, device.host)
+        device.name = name
         // hosts.push(host)
         addDevice(device)
       })
@@ -99,7 +100,7 @@ async function handleIncomingMessage (topic, payload) {
 
   // Commands for devices
   if (parts[1] === 'set' && parts.length === 4) {
-    let device = devices.find((device) => { return device.name.toLowerCase() === parts[2].toLowerCase() })
+    const device = devices.find((device) => { return device.name === parts[2].toLowerCase() })
     if (device) {
       return handleDeviceCommand(device, parts[3], payload)
         .then(result => {
@@ -140,6 +141,15 @@ async function handleDeviceCommand (device, command, payload) {
       return device.previous()
     case 'stop':
       return device.stop()
+    case 'selecttrack':
+      if (IsNumeric(payload)) {
+        return device.selectTrack(parseInt(payload))
+      } else {
+        log.error('Payload isn\'t a number')
+        break
+      }
+    case 'seek':
+      return device.avTransportService().Seek({ InstanceID: 0, Unit: 'REL_TIME', Target: payload })
     // ------------------ Volume commands
     case 'volume':
       if (IsNumeric(payload)) {
@@ -189,6 +199,15 @@ async function handleDeviceCommand (device, command, payload) {
       return device.becomeCoordinatorOfStandaloneGroup()
     case 'playmode':
       return device.setPlayMode(payload)
+    case 'command':
+      const commandData = ConvertToObjectIfPossible(payload)
+      log.debug('OneCommand endpoint %j', commandData)
+      if (commandData.cmd) {
+        return handleDeviceCommand(device, commandData.cmd, commandData.val)
+      } else {
+        log.warning('Command not set in payload')
+        break
+      }
     default:
       log.debug('Command %s not yet supported', command)
       break
@@ -207,7 +226,7 @@ async function handleVolumeCommand (device, payload, modifier) {
   let change = 5
   if (payload !== null) {
     if (IsNumeric(payload)) {
-      let tempIncrement = parseInt(payload)
+      const tempIncrement = parseInt(payload)
       if (tempIncrement > 0 && tempIncrement < 100) {
         change = tempIncrement
       }
@@ -216,7 +235,7 @@ async function handleVolumeCommand (device, payload, modifier) {
 
   return device.getVolume()
     .then(vol => {
-      let tempVol = vol + (change * modifier)
+      const tempVol = vol + (change * modifier)
       if (tempVol > 100) {
         return 100
       }
@@ -248,10 +267,10 @@ async function handleGenericCommand (command, payload) {
     // ------------------ Play a notification on all devices, see https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosplaynotificationoptions for parameters
     case 'notify':
       const parsedPayload = ConvertToObjectIfPossible(payload)
-      const notifyAll = async function (device) {
+      const notify = async function (device) {
         await device.playNotification(parsedPayload)
       }
-      return Promise.all(devices.map(notifyAll))
+      return Promise.all(devices.map(notify))
     default:
       log.error('Command %s isn\' implemented', command)
       break
@@ -324,7 +343,7 @@ function publishCurrentTrack (device, track) {
     publishData(config.name + '/status/' + device.name + '/album', track.album, device.name)
     publishData(config.name + '/status/' + device.name + '/albumart', track.albumArtURI, device.name)
   } else {
-    let val = (track && track.title) ? {
+    const val = (track && track.title) ? {
       title: track.title,
       artist: track.artist,
       album: track.album,
