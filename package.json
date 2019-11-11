@@ -20,15 +20,15 @@
     "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "mqtt": "^2.18.8",
-    "sonos": "^1.12.3",
+    "mqtt": "^3.0.0",
+    "@svrooij/sonos": "^0.0.3",
     "yalm": "^4.1.0",
-    "yargs": "^14.0.0"
+    "yargs": "^14.2.0"
   },
   "devDependencies": {
     "pre-commit": "1.2.2",
     "semantic-release": "15.13.30",
-    "standard": "13.1.0"
+    "standard": "14.3.1"
   },
   "repository": {
     "type": "git",

@@ -4,10 +4,10 @@ const pkg = require('../package.json')
 const log = require('yalm')
 const config = require('./config.js')
 const mqtt = require('mqtt')
-const s = require('sonos')
+const SonosManager = require('@svrooij/sonos').SonosManager
+const SonosEvents = require('@svrooij/sonos').SonosEvents
 
 let mqttClient
-let search
 const devices = []
 
 function start () {
@@ -51,43 +51,43 @@ function start () {
     log.info('mqtt reconnect')
   })
 
-  log.debug('Starting event server')
-  s.Listener.startListener()
-
   // Start searching for devices
   log.info('Start searching for Sonos players')
-  search = s.DeviceDiscovery({ timeout: 4000 })
-  search.on('DeviceAvailable', async (device, model) => {
-    log.debug('Found device (%s) with IP: %s', model, device.host)
+  const sonosManager = new SonosManager()
+  sonosManager.InitializeWithDiscovery()
+    .then(success => {
+      if (success) {
+        sonosManager.Devices.forEach(d => addDevice(d))
+        publishConnectionStatus()
+      } else {
+        log.info('No devices found')
+      }
+    })
+  // search = s.DeviceDiscovery({ timeout: 4000 })
+  // search.on('DeviceAvailable', async (device, model) => {
+  //   log.debug('Found device (%s) with IP: %s', model, device.host)
 
-    device.getZoneAttrs()
-      .then(attrs => {
-        const name = attrs.CurrentZoneName.toLowerCase().replace(' ', '-')
-        log.info('Found player (%s): %s with IP: %s', model, name, device.host)
-        device.name = name
-        // hosts.push(host)
-        addDevice(device)
-      })
-      .catch(err => {
-        log.error('Get Zone error ', err)
-      })
-  })
-  search.on('timeout', () => {
-    publishConnectionStatus()
-    s.Listener.on('AlarmClock', listAlarms)
-  })
+  //   device.getZoneAttrs()
+  //     .then(attrs => {
+  //       const name = attrs.CurrentZoneName.toLowerCase().replace(' ', '-')
+  //       log.info('Found player (%s): %s with IP: %s', model, name, device.host)
+  //       device.name = name
+  //       // hosts.push(host)
+  //       addDevice(device)
+  //     })
+  //     .catch(err => {
+  //       log.error('Get Zone error ', err)
+  //     })
+  // })
+  // search.on('timeout', () => {
+  //   publishConnectionStatus()
+  //   s.Listener.on('AlarmClock', listAlarms)
+  // })
 
   process.on('SIGINT', async () => {
     log.info('Shutting down listeners, please wait')
-    return s.Listener.stopListener()
-      .then(result => {
-        log.info('Listener shutdown successfully')
-        process.exit()
-      })
-      .catch(err => {
-        log.error('Error shutting down listner %j', err)
-        process.exit()
-      })
+    devices.forEach(d => cancelSubscriptions(d))
+    setTimeout(() => { process.exit(0) }, 3000)
   })
 }
 
@@ -100,14 +100,14 @@ async function handleIncomingMessage (topic, payload) {
 
   // Commands for devices
   if (parts[1] === 'set' && parts.length === 4) {
-    const device = devices.find((device) => { return device.name === parts[2].toLowerCase() })
+    const device = devices.find((device) => { return cleanName(device.Name) === parts[2].toLowerCase() })
     if (device) {
       return handleDeviceCommand(device, parts[3], payload)
         .then(result => {
-          log.debug('Executed %s for %s result: %j', parts[3], device.name, result)
+          log.debug('Executed %s for %s result: %j', parts[3], device.Name, result)
         })
         .catch(err => {
-          log.error('Error executing %s for %s %j', parts[3], device.name, err)
+          log.error('Error executing %s for %s %j', parts[3], device.Name, err)
         })
     } else {
       log.error('Device with name %s not found', parts[2])
@@ -126,36 +126,37 @@ async function handleIncomingMessage (topic, payload) {
 // This function is called when a device command is recognized by 'handleIncomingMessage'
 async function handleDeviceCommand (device, command, payload) {
   log.debug('Incoming device command %s for %s payload %s', command, device.name, payload)
+  let commandData
   switch (command) {
     // ------------------ Playback commands
     case 'next':
-      return device.next()
+      return device.Next()
     case 'pause':
     case 'pauze':
-      return device.pause()
+      return device.Pause()
     case 'play':
-      return device.play()
-    case 'toggle':
+      return device.Play()
+    case 'toggle': // TODO Toggle playback support
       return device.togglePlayback()
     case 'previous':
-      return device.previous()
+      return device.Previous()
     case 'stop':
-      return device.stop()
+      return device.Stop()
     case 'selecttrack':
       if (IsNumeric(payload)) {
-        return device.selectTrack(parseInt(payload))
+        return device.SeeKTrack(parseInt(payload))
       } else {
         log.error('Payload isn\'t a number')
         break
       }
     case 'seek':
-      return device.avTransportService().Seek({ InstanceID: 0, Unit: 'REL_TIME', Target: payload })
+      return device.SeekPosition(payload)
     // ------------------ Volume commands
     case 'volume':
       if (IsNumeric(payload)) {
         var vol = parseInt(payload)
         if (vol >= 0 && vol <= 100) {
-          return device.setVolume(vol)
+          return device.RenderingControlService.SetVolume({ InstanceID: 0, Channel: 'Master', DesiredVolume: vol })
         }
       } else {
         log.error('Payload for setting volume is not numeric')
@@ -166,15 +167,15 @@ async function handleDeviceCommand (device, command, payload) {
     case 'volumedown':
       return handleVolumeCommand(device, payload, -1)
     case 'mute':
-      return device.setMuted(true)
+      return device.RenderingControlService.SetMute({ InstanceID: 0, Channel: 'Master', DesiredMute: true })
     case 'unmute':
-      return device.setMuted(false)
+      return device.RenderingControlService.SetMute({ InstanceID: 0, Channel: 'Master', DesiredMute: false })
     // ------------------ Sleeptimer
     case 'sleep':
       if (IsNumeric(payload)) {
         var minutes = parseInt(payload)
         if (minutes > 0 && minutes < 1000) {
-          return device.configureSleepTimer(minutes).then(result => {
+          return device.AVTransportService.ConfigureSleepTimer({ InstanceID: 0, NewSleepTimerDuration: minutes.toString() }).then(result => {
             log.debug('Sleeptimer set %j', result)
           })
         }
@@ -194,13 +195,13 @@ async function handleDeviceCommand (device, command, payload) {
     case 'radio':
       return handleRadioCommand(device, ConvertToObjectIfPossible(payload))
     case 'joingroup':
-      return device.joinGroup(payload)
+      return device.JoinGroup(payload)
     case 'leavegroup':
-      return device.becomeCoordinatorOfStandaloneGroup()
+      return device.AVTransportService.BecomeCoordinatorOfStandaloneGroup()
     case 'playmode':
       return device.setPlayMode(payload)
     case 'command':
-      const commandData = ConvertToObjectIfPossible(payload)
+      commandData = ConvertToObjectIfPossible(payload)
       log.debug('OneCommand endpoint %j', commandData)
       if (commandData.cmd) {
         return handleDeviceCommand(device, commandData.cmd, commandData.val)
@@ -233,25 +234,16 @@ async function handleVolumeCommand (device, payload, modifier) {
     }
   }
 
-  return device.getVolume()
-    .then(vol => {
-      const tempVol = vol + (change * modifier)
-      if (tempVol > 100) {
-        return 100
-      }
-      if (tempVol < 0) {
-        return 0
-      }
-      return tempVol
-    })
-    .then(vol => { return device.setVolume(vol) })
+  return device.RenderingControlService.SetRelativeVolume({ InstanceID: 0, Channel: 'Master', Adjustment: (change * modifier) })
     .then(result => {
-      log.info('Volume changed %d', (change * modifier))
+      log.info('Volume changed %d to %d', (change * modifier), result.NewVolume)
+      return result.NewVolume
     })
 }
 
 // This function is called when a generic command is recognized by 'handleIncomingMessages'
 async function handleGenericCommand (command, payload) {
+  let parsedPayload
   switch (command) {
     // ------------------ Alarms
     case 'listalarms':
@@ -260,17 +252,11 @@ async function handleGenericCommand (command, payload) {
       return setalarm(ConvertToObjectIfPossible(payload))
     // ------------------ Control all devices
     case 'pauseall':
-      const pauseall = async function (device) {
-        await device.pause()
-      }
-      return Promise.all(devices.map(pauseall))
+      return Promise.all(devices.map(d => d.Pause()))
     // ------------------ Play a notification on all devices, see https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosplaynotificationoptions for parameters
     case 'notify':
-      const parsedPayload = ConvertToObjectIfPossible(payload)
-      const notify = async function (device) {
-        await device.playNotification(parsedPayload)
-      }
-      return Promise.all(devices.map(notify))
+      parsedPayload = ConvertToObjectIfPossible(payload)
+      return Promise.all(devices.map(d => d.PlayNotification(parsedPayload)))
     default:
       log.error('Command %s isn\' implemented', command)
       break
@@ -301,56 +287,78 @@ function publishConnectionStatus () {
 }
 
 // This function is called by the device discovery, used to setup listening for certain events.
-function addDevice (device) {
+async function addDevice (device) {
+  await device.LoadDeviceData()
   // Start listening for those events!
-  device.on('CurrentTrack', track => {
-    publishCurrentTrack(device, track)
+  device.Events.on(SonosEvents.CurrentTrack, trackUri => {
+    publishTrackUri(device, trackUri)
   })
-  device.on('PlayState', state => {
+  device.Events.on(SonosEvents.CurrentTrackMetadata, metadata => {
+    publishCurrentTrack(device, metadata)
+  })
+  device.Events.on(SonosEvents.CurrentTransportState, state => {
     publishState(device, state)
   })
-  device.on('Muted', muted => {
+  device.Events.on(SonosEvents.Mute, muted => {
     publishMuted(device, muted)
   })
-  device.on('Volume', volume => {
+  device.Events.on(SonosEvents.Volume, volume => {
     publishVolume(device, volume)
   })
 
   devices.push(device)
 }
 
+function cancelSubscriptions (device) {
+  device.Event.removeAllListeners(SonosEvents.CurrentTrack)
+  device.Event.removeAllListeners(SonosEvents.CurrentTrackMetadata)
+  device.Event.removeAllListeners(SonosEvents.CurrentTransportState)
+  device.Event.removeAllListeners(SonosEvents.Mute)
+  device.Event.removeAllListeners(SonosEvents.Volume)
+}
+
+function cleanName (name) {
+  return name.toLowerCase().replace(/\s/g, '-')
+}
+
 // Used by event handler
 function publishVolume (device, volume) {
-  publishData(config.name + '/status/' + device.name + '/volume', volume, device.name, true)
+  publishData(`${config.name}/status/${cleanName(device.Name)}/volume`, volume, cleanName(device.Name), true)
 }
 
 // Used by event handler
 function publishMuted (device, muted) {
-  publishData(config.name + '/status/' + device.name + '/muted', muted, device.name, true)
+  publishData(`${config.name}/status/${cleanName(device.Name)}/muted`, muted, cleanName(device.Name), true)
 }
 
 // Used by event handler
 function publishState (device, state) {
-  publishData(config.name + '/status/' + device.name + '/state', state, device.name, true)
+  publishData(`${config.name}/status/${cleanName(device.Name)}/state`, state, cleanName(device.Name), true)
+}
+
+function publishTrackUri (device, trackUri) {
+  publishData(`${config.name}/status/${cleanName(device.Name)}/trackUri`, trackUri, device.Name)
 }
 
 // Used by event handler
 function publishCurrentTrack (device, track) {
-  log.debug('New track data for %s %j', device.name, track)
+  log.debug('New track data for %s %j', device.Name, track)
   if (config.publishDistinct) {
-    publishData(config.name + '/status/' + device.name + '/title', track.title, device.name)
-    publishData(config.name + '/status/' + device.name + '/artist', track.artist, device.name)
-    publishData(config.name + '/status/' + device.name + '/album', track.album, device.name)
-    publishData(config.name + '/status/' + device.name + '/albumart', track.albumArtURI, device.name)
+    publishData(`${config.name}/status/${cleanName(device.Name)}/title`, track.Title, device.Name)
+    publishData(`${config.name}/status/${cleanName(device.Name)}/artist`, track.Artist, device.Name)
+    publishData(`${config.name}/status/${cleanName(device.Name)}/album`, track.Album, device.Name)
+    publishData(`${config.name}/status/${cleanName(device.Name)}/albumart`, track.AlbumArtURI, device.Name)
+    publishData(`${config.name}/status/${cleanName(device.Name)}/trackUri`, track.TrackUri, device.Name)
   } else {
-    const val = (track && track.title) ? {
-      title: track.title,
-      artist: track.artist,
-      album: track.album,
-      albumArt: track.albumArtURI
+    const val = (track && track.Title) ? {
+      title: track.Title,
+      artist: track.Artist,
+      album: track.Album,
+      albumArt: track.AlbumArtURI,
+      trackUri: track.TrackUri
     } : null
 
-    publishData(config.name + '/status/' + device.name + '/track', val, device.name)
+    publishData(`${config.name}/status/${cleanName(device.Name)}/track`, val, device.name)
   }
 }
 
