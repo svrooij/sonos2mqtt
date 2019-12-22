@@ -12,6 +12,25 @@ It's intended as a building block in heterogenous smart home environments where 
 
 Check out the other bridges in the [software list](https://github.com/mqtt-smarthome/mqtt-smarthome/blob/master/Software.md)
 
+## Run in docker
+
+You can run **sonos2mqtt** in docker, but you'll need to remember the following. This library depends on receiving events from your sonos speakers, the events are required. Every setting of this library can also be set with environment variables prefixed with `SONOS2MQTT_`.
+
+1. Create an `.env` file with the following settings.
+2. Set the required values.
+3. Run `docker run --env-file .env -p 6329:6329 svrooij/sonos2mqtt`
+
+```Shell
+# Set the IP of one known sonos speaker (device discovery doesnt always work inside docker.)
+SONOS2MQTT_DEVICE=192.168.x.x
+# Set the mqtt connection string
+SONOS2MQTT_MQTT=mqtt://ip_or_host_of_mqtt
+# Set the IP of the docker host (so node-sonos-ts knows where the events should be send to)
+SONOS_LISTENER_HOST=192.168.x.x
+# Set text-to-speech endpoint (optional)
+# SONOS_TTS_ENDPOINT=https://tts.server.com/api/generate
+```
+
 ## Installation
 
 Using sonos2mqtt is really easy, but it requires at least [Node.js](https://nodejs.org/) v8 or higher, because of it's async usage. (This app is tested against v10 and v12).
@@ -21,7 +40,7 @@ Using sonos2mqtt is really easy, but it requires at least [Node.js](https://node
 ## Usage
 
 ```bash
-sonos2mqtt 1.4.4
+sonos2mqtt 0.0.0-development
 A smarthome bridge between your sonos system and a mqtt server.
 
 Usage: sonos2mqtt [options]
@@ -29,14 +48,16 @@ Usage: sonos2mqtt [options]
 Options:
   -v, --verbosity         Verbosity level
                    [choices: "error", "warn", "info", "debug"] [default: "info"]
-  -n, --name              instance name. used as mqtt client id and as prefix
+  -i, --name              instance name. used as mqtt client id and as prefix
                           for connected topic                 [default: "sonos"]
-  -u, --url               mqtt broker url. See
+  --mqtt                  mqtt broker url. See
                           https://github.com/mqttjs/MQTT.js#connect-using-a-url
                                                    [default: "mqtt://127.0.0.1"]
   -d, --publish-distinct  Publish distinct track states
                                                       [boolean] [default: false]
   -h, --help              Show help                                    [boolean]
+  --tts-lang              Default TTS language                [default: "en-US"]
+  --device                Start with one known IP instead of device discovery.
   --version               Show version number                          [boolean]
 ```
 
@@ -97,33 +118,57 @@ Speaker commands:
 * `mute` - Mute the volume
 * `unmute` - Unmute the volume
 * `sleep` (payload requires number) - Set a sleeptimer for x amount of minutes (from payload)
-* `notify` - Play a **notification** on this device :tada: (and revert to current state) see [parameters](https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosplaynotificationoptions)
-* `queue` - add a song to the queue, payload should be json string or uri. See [parameters](https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosqueueoptions-positioninqueue)
-* `setavtransporturi` - See [parameters](https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonossetavtransporturioptions)
+* `notify` - Play a **notification** on this device :tada: (and revert to current state) see [notifications](#notifications)
+* `speak` - Generate text-to-speech file and play as notification :tada: (and revert to current state) see [text-to-speech](#text-to-speech)
+* `queue` - add a song to the queue, should be an (sonos supported) uri.
+* `setavtransporturi` - Set the current playback uri.
 * `joingroup` - Join a group by device name, payload should be a string with the name of the deivce to join.
 * `leavegroup` - Leave a group.
 * `playmode` - Set the playmode,payload should be *NORMAL*, *REPEAT_ALL*, *SHUFFLE* or *SHUFFLE_NOREPEAT*.
 * `command` - One topic for all [commands](https://github.com/svrooij/sonos2mqtt/issues/21). Payload like `{"cmd":"volumeup"}` or `{"cmd":"volume", "val":10}` for commands that need a payload.
+* `adv-command` - Same as `command` but sends the command to the Sonos library, see [commands](https://github.com/svrooij/node-sonos-ts#commands)
 
 ### Generic commands
 
-There are also some genir commands not tied to a specific speaker. These generic commands should be send to `sonos/cmd/command` like `sonos/cmd/pauseall`.
+There are also some generic commands not tied to a specific speaker. These generic commands should be send to `sonos/cmd/command` like `sonos/cmd/pauseall`.
 
 Generic commands:
 
 * `pauseall` - Pause all speakers known to the bridge.
 * `listalarms` - This will fetch all the current alarms and sends them to `sonos/alarms`.
 * `setalarm` - This allows you to set/unset an alarm. Requires json object with `id` and `enabled`
-* `notify` - Play a notification on all devices (and revert to current state) see [parameters](https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosplaynotificationoptions)
+* `notify` - Play a notification on all devices (and revert to current state) see [notifications](#notifications)
 
-#### Notification sample
+#### Notifications
 
 To play a notification on all devices you send the following json string to `sonos/cmd/notify`
 
 ```json
 {
-  "uri": "https://archive.org/download/Doorbell_1/doorbell.mp3",
-  "volume": 10
+  "trackUri": "https://cdn.smartersoft-group.com/various/pull-bell-short.mp3", // Can be any uri sonos understands
+  // trackUri: 'https://cdn.smartersoft-group.com/various/someone-at-the-door.mp3', // Cached text-to-speech file.
+  "onlyWhenPlaying": false, // make sure that it only plays when you're listening to music. So it won't play when you're sleeping.
+  "timeout": 10, // If the events don't work (to see when it stops playing) or if you turned on a stream, it will revert back after this amount of seconds.
+  "volume": 8
+}
+```
+
+#### Text-to-speech
+
+You can have your sonos speaker speak, which is a pretty cool feature. But you'll need some extra work. You'll need a text-to-speech endpoint as described [here](https://github.com/svrooij/node-sonos-ts#text-to-speech). You have two options either host your own [server](https://github.com/svrooij/node-sonos-tts-polly) or become a [sponsor][link_sponsor] and get access to my personal hosted TTS server.
+
+Either way you'll have yourself a text-to-speech endpoint. This can be set in the environment as `SONOS_TTS_ENDPOINT` or you'll have to supply it with every request.
+
+Have a speaker speak by sending the following to `sonos/set/device_name/speak`.
+
+```json
+{
+  "text": "Someone at the front-door", // The text you want spoken.
+  "endpoint": "https://your.tts.endpoint/api/generate", // Endpoint is required if not set in Environment
+  "lang": "en-US", // (optional) Specify the language, or set the default in the config.
+  "gender": "male", // (optional) Specify the gender (see supported voices of endpoint.)
+  "volume": 50, // (optional) If you want a different volume for the notification
+  "onlyWhenPlaying": false // (optional) make sure that it only plays when you're listening to music. So it won't play when you're sleeping.
 }
 ```
 
@@ -136,9 +181,9 @@ If your want to test this library it's best to create a mqtt server just for tes
 
 If everything works as expected, you should make the app run in the background automatically. Personally I use PM2 for this. And they have a great [guide for this](http://pm2.keymetrics.io/docs/usage/quick-start/).
 
-## Node-sonos
+## Node-sonos-ts
 
-This library depends on [node-sonos-ts](https://github.com/svrooij/node-sonos-ts/) which I also developed. All other libraries using node-sonos-ts should also be able to implemented all the nice features included there. Like **notifications** which is the coolest new addition for **sonos2mqtt**!
+This library depends on [node-sonos-ts](https://github.com/svrooij/node-sonos-ts/) which I also developed. All other libraries using node-sonos-ts should also be able to implemented all the nice features included there. Like **notifications**  or **text-to-speech** which are the coolest new additions for **sonos2mqtt**!
 
 ## Beer or Coffee
 

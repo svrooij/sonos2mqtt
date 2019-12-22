@@ -52,9 +52,13 @@ function start () {
   })
 
   // Start searching for devices
-  log.info('Start searching for Sonos players')
+  log.debug('Current config %o', config)
+  if (config.device) log.info('Start from device %s', config.device)
+  else log.info('Start searching for devices')
   const sonosManager = new SonosManager()
-  sonosManager.InitializeWithDiscovery()
+  // Pick the right initialization function.
+  const initialize = config.device ? sonosManager.InitializeFromDevice(config.device) : sonosManager.InitializeWithDiscovery(10)
+  initialize
     .then(success => {
       if (success) {
         sonosManager.Devices.forEach(d => addDevice(d))
@@ -63,31 +67,15 @@ function start () {
         log.info('No devices found')
       }
     })
-  // search = s.DeviceDiscovery({ timeout: 4000 })
-  // search.on('DeviceAvailable', async (device, model) => {
-  //   log.debug('Found device (%s) with IP: %s', model, device.host)
-
-  //   device.getZoneAttrs()
-  //     .then(attrs => {
-  //       const name = attrs.CurrentZoneName.toLowerCase().replace(' ', '-')
-  //       log.info('Found player (%s): %s with IP: %s', model, name, device.host)
-  //       device.name = name
-  //       // hosts.push(host)
-  //       addDevice(device)
-  //     })
-  //     .catch(err => {
-  //       log.error('Get Zone error ', err)
-  //     })
-  // })
-  // search.on('timeout', () => {
-  //   publishConnectionStatus()
-  //   s.Listener.on('AlarmClock', listAlarms)
-  // })
+    .catch(err => {
+      log.error('Error in device discovery %o', err)
+      process.exit(300)
+    })
 
   process.on('SIGINT', async () => {
     log.info('Shutting down listeners, please wait')
     devices.forEach(d => cancelSubscriptions(d))
-    setTimeout(() => { process.exit(0) }, 3000)
+    setTimeout(() => { process.exit(0) }, 800)
   })
 }
 
@@ -126,7 +114,7 @@ async function handleIncomingMessage (topic, payload) {
 // This function is called when a device command is recognized by 'handleIncomingMessage'
 async function handleDeviceCommand (device, command, payload) {
   log.debug('Incoming device command %s for %s payload %s', command, device.name, payload)
-  let commandData
+  const parsedPayload = ConvertToObjectIfPossible(payload)
   switch (command) {
     // ------------------ Playback commands
     case 'next':
@@ -136,8 +124,8 @@ async function handleDeviceCommand (device, command, payload) {
       return device.Pause()
     case 'play':
       return device.Play()
-    case 'toggle': // TODO Toggle playback support
-      return device.togglePlayback()
+    case 'toggle':
+      return device.TogglePlayback()
     case 'previous':
       return device.Previous()
     case 'stop':
@@ -185,26 +173,38 @@ async function handleDeviceCommand (device, command, payload) {
       break
     // ------------------ Queue a song to play next accepts string or json object
     case 'queue':
-      return device.queue(ConvertToObjectIfPossible(payload))
+      return typeof parsedPayload === 'string' ? device.AddUriToQueue(parsedPayload) : device.AddUriToQueue(parsedPayload.trackUri, parsedPayload.positionInQueue, parsedPayload.enqueueAsNext)
     // ----------------- Possibly the coolest feature of this library, play a notification and revert back to old state see https://github.com/bencevans/node-sonos/blob/master/docs/sonos.md#sonossonosplaynotificationoptions for parameters
     case 'notify':
-      return device.playNotification(ConvertToObjectIfPossible(payload))
+      return device.PlayNotification(parsedPayload)
     // ----------------- This is an advanced feature to set the playback url
+    case 'speak':
+      if (parsedPayload.endpoint === undefined && process.env.SONOS_TTS_ENDPOINT === undefined) {
+        log.warning('Either specify the endpoint in the payload or set env SONOS_TTS_ENDPOINT')
+        break
+      }
+      if (parsedPayload.lang === undefined) parsedPayload.lang = config['tts-lang']
+      return device.PlayTTS(parsedPayload)
     case 'setavtransporturi':
-      return device.setAVTransportURI(ConvertToObjectIfPossible(payload))
-    case 'radio':
-      return handleRadioCommand(device, ConvertToObjectIfPossible(payload))
+      return device.SetAVTransportURI(payload)
     case 'joingroup':
       return device.JoinGroup(payload)
     case 'leavegroup':
       return device.AVTransportService.BecomeCoordinatorOfStandaloneGroup()
     case 'playmode':
-      return device.setPlayMode(payload)
+      return device.AVTransportService.SetPlayMode({ InstanceID: 0, NewPlayMode: payload })
     case 'command':
-      commandData = ConvertToObjectIfPossible(payload)
-      log.debug('OneCommand endpoint %j', commandData)
-      if (commandData.cmd) {
-        return handleDeviceCommand(device, commandData.cmd, commandData.val)
+      log.debug('OneCommand endpoint %j', parsedPayload)
+      if (parsedPayload.cmd) {
+        return handleDeviceCommand(device, parsedPayload.cmd, parsedPayload.val)
+      } else {
+        log.warning('Command not set in payload')
+        break
+      }
+    case 'adv-command':
+      // This is a command send to the sonos lib directly, see https://github.com/svrooij/node-sonos-ts#commands
+      if (parsedPayload.cmd) {
+        return device.ExecuteCommand(parsedPayload.cmd, parsedPayload.val)
       } else {
         log.warning('Command not set in payload')
         break
@@ -213,13 +213,6 @@ async function handleDeviceCommand (device, command, payload) {
       log.debug('Command %s not yet supported', command)
       break
   }
-}
-
-// This function is used by 'handleDeviceCommand' for handeling Tunein
-async function handleRadioCommand (device, payload) {
-  return device.playTuneinRadio(payload.stationId, payload.stationTitle).then(success => {
-    log.info('Radio station changed %s', payload.stationTitle)
-  }).catch(err => { log.error('Error occurred %j', err) })
 }
 
 // This function is used by 'handleDeviceCommand' for handeling the volume up/down commands
@@ -236,7 +229,7 @@ async function handleVolumeCommand (device, payload, modifier) {
 
   return device.RenderingControlService.SetRelativeVolume({ InstanceID: 0, Channel: 'Master', Adjustment: (change * modifier) })
     .then(result => {
-      log.info('Volume changed %d to %d', (change * modifier), result.NewVolume)
+      log.info('Volume changed with %d to %d', (change * modifier), result.NewVolume)
       return result.NewVolume
     })
 }
@@ -265,7 +258,7 @@ async function handleGenericCommand (command, payload) {
 
 // Loading the alarms and publishing them to 'sonos/alarms'
 async function listAlarms () {
-  return devices[0].alarmClockService().ListAlarms().then(alarms => {
+  return devices[0].AlarmList().then(alarms => {
     log.debug('Got alarms %j', alarms)
     mqttClient.publish(config.name + '/alarms', JSON.stringify(alarms), { retain: false })
   })
@@ -273,7 +266,7 @@ async function listAlarms () {
 async function setalarm (payload) {
   payload = ConvertToObjectIfPossible(payload)
   if (payload.id && payload.enabled) {
-    return devices[0].alarmClockService().SetAlarm(payload.id, payload.enabled)
+    return devices[0].AlarmPatch({ ID: payload.id, Enabled: payload.enabled === true })
   }
 }
 
@@ -287,8 +280,8 @@ function publishConnectionStatus () {
 }
 
 // This function is called by the device discovery, used to setup listening for certain events.
-async function addDevice (device) {
-  await device.LoadDeviceData()
+function addDevice (device) {
+  log.info('Add device %s %s', device.Name, device.host)
   // Start listening for those events!
   device.Events.on(SonosEvents.CurrentTrack, trackUri => {
     publishTrackUri(device, trackUri)
@@ -296,7 +289,7 @@ async function addDevice (device) {
   device.Events.on(SonosEvents.CurrentTrackMetadata, metadata => {
     publishCurrentTrack(device, metadata)
   })
-  device.Events.on(SonosEvents.CurrentTransportState, state => {
+  device.Events.on(SonosEvents.CurrentTransportStateSimple, state => {
     publishState(device, state)
   })
   device.Events.on(SonosEvents.Mute, muted => {
@@ -306,15 +299,19 @@ async function addDevice (device) {
     publishVolume(device, volume)
   })
 
+  device.Events.on(SonosEvents.GroupName, groupName => {
+    publishData(`${config.name}/status/${cleanName(device.Name)}/group`, groupName, cleanName(device.Name), true)
+  })
+
   devices.push(device)
 }
 
 function cancelSubscriptions (device) {
-  device.Event.removeAllListeners(SonosEvents.CurrentTrack)
-  device.Event.removeAllListeners(SonosEvents.CurrentTrackMetadata)
-  device.Event.removeAllListeners(SonosEvents.CurrentTransportState)
-  device.Event.removeAllListeners(SonosEvents.Mute)
-  device.Event.removeAllListeners(SonosEvents.Volume)
+  device.Events.removeAllListeners(SonosEvents.CurrentTrack)
+  device.Events.removeAllListeners(SonosEvents.CurrentTrackMetadata)
+  device.Events.removeAllListeners(SonosEvents.CurrentTransportState)
+  device.Events.removeAllListeners(SonosEvents.Mute)
+  device.Events.removeAllListeners(SonosEvents.Volume)
 }
 
 function cleanName (name) {
