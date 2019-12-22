@@ -1,0 +1,7 @@
+node_modules
+npm-debug.log
+.editorconfig
+.gitignore
+.travis.yml
+renovate.json
+.github
