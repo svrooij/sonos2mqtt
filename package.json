@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "mqtt": "^3.0.0",
-    "@svrooij/sonos": "^1.0.1",
+    "@svrooij/sonos": "^1.1.0",
     "yalm": "^4.1.0",
     "yargs": "^15.0.2"
   },

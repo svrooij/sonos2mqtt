@@ -15,6 +15,9 @@ function start () {
   log.info(pkg.name + ' ' + pkg.version + ' starting')
 
   // MQTT Stuff
+  log.info('Parsing url %s', config.mqtt)
+  const url = new URL(config.mqtt)
+
   // Define the will message (is send on disconnect).
   const mqttOptions = {
     will: {
@@ -22,13 +25,19 @@ function start () {
       message: 0,
       qos: 0,
       retain: true
-    }
+    },
+    port: url.port,
+    protocol: url.protocol,
+    host: url.hostname,
+    username: url.username,
+    password: url.password,
+    keepalive: 10000
   }
 
-  mqttClient = mqtt.connect(config.url, mqttOptions)
+  mqttClient = mqtt.connect(mqttOptions)
 
   mqttClient.on('connect', () => {
-    log.info('Connected to mqtt %s', config.url)
+    log.info('Connected to mqtt %s', config.mqtt)
     mqttClient.subscribe(config.name + '/set/+/+')
     mqttClient.subscribe(config.name + '/cmd/+')
   })
