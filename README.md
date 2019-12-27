@@ -131,7 +131,7 @@ You can control sonos by sending an empty message on these topics. The topic for
 |-------|-|-----------|-------|
 |`next`|:fast_forward:|Go to next song in queue| |
 |`previous`|:rewind:|Go to previous song in queue| |
-|`pause`|`||`|Pause playback| |
+|`pause`||Pause playback| |
 |`play`|:arrow_forward:|Start playback| |
 |`toggle`||Toggle between pause and play| |
 |`stop`|:no_entry_sign:|Stop Playback| |
@@ -157,12 +157,11 @@ You can control sonos by sending an empty message on these topics. The topic for
 
 To play a short music file as a notification send the following payload to `sonos/set/device_name/notify` or to `sonos/cmd/notify` to play it on all devices.
 
-```JSON with Comments
+```JSON
 {
-  "trackUri": "https://cdn.smartersoft-group.com/various/pull-bell-short.mp3", // Can be any uri sonos understands
-  // trackUri: 'https://cdn.smartersoft-group.com/various/someone-at-the-door.mp3', // Cached text-to-speech file.
-  "onlyWhenPlaying": false, // make sure that it only plays when you're listening to music. So it won't play when you're sleeping.
-  "timeout": 10, // If the events don't work (to see when it stops playing) or if you turned on a stream, it will revert back after this amount of seconds.
+  "trackUri": "https://cdn.smartersoft-group.com/various/pull-bell-short.mp3",
+  "onlyWhenPlaying": false,
+  "timeout": 10,
   "volume": 8
 }
 ```
@@ -173,27 +172,27 @@ You can have your sonos speaker prononce some notification text, which is a pret
 
 Either way you'll have yourself a text-to-speech endpoint. This can be set in the environment as `SONOS_TTS_ENDPOINT` or you'll have to supply it with every request.
 
-Have a speaker speak by sending the following to `sonos/set/device_name/speak`.
+Have a speaker speak by sending the following to `sonos/set/device_name/speak`. Endpoint is optional (if set in environment), lang is options if set in config, gender, volume & onlyWhenPlaying are always optional.
 
-```JSON with Comments
+```JSON
 {
-  "text": "Someone at the front-door", // The text you want spoken.
-  "endpoint": "https://your.tts.endpoint/api/generate", // Endpoint is required if not set in Environment
-  "lang": "en-US", // (optional) Specify the language, or set the default in the config.
-  "gender": "male", // (optional) Specify the gender (see supported voices of endpoint.)
-  "volume": 50, // (optional) If you want a different volume for the notification
-  "onlyWhenPlaying": false // (optional) make sure that it only plays when you're listening to music. So it won't play when you're sleeping.
+  "text": "Someone at the front-door",
+  "endpoint": "https://your.tts.endpoint/api/generate",
+  "lang": "en-US",
+  "gender": "male",
+  "volume": 50,
+  "onlyWhenPlaying": false
 }
 ```
 
 #### Command
 
-Someone [suggested](https://github.com/svrooij/sonos2mqtt/issues/21) to create one endpoint to send all commands to. So you can also send one of the commands above to the `sonos/set/kitchen/command` topic with the following json payload:
+Someone [suggested](https://github.com/svrooij/sonos2mqtt/issues/21) to create one endpoint to send all commands to. So you can also send one of the commands above to the `sonos/set/kitchen/command` topic with the following json payload. cmd is always required to be one of the commands, val is optional.
 
-```JSON with Comments
+```JSON
 {
-  "cmd":"volume", // Required command name
-  "val":10 // optional payload
+  "cmd":"volume",
+  "val":10
 }
 ```
 
