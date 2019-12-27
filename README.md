@@ -1,9 +1,11 @@
 # Sonos2mqtt
 
 [![npm](https://img.shields.io/npm/v/sonos2mqtt.svg?style=flat-square)](https://www.npmjs.com/package/sonos2mqtt)
+[![docker pulls][badge_docker]][link_docker]
+[![Support me on Github][badge_sponsor]][link_sponsor]
+[![github issues][badge_issues]][link_issues]
 [![travis](https://img.shields.io/travis/svrooij/sonos2mqtt.svg?style=flat-square)](https://travis-ci.org/svrooij/sonos2mqtt)
 [![mqtt-smarthome](https://img.shields.io/badge/mqtt-smarthome-blue.svg?style=flat-square)](https://github.com/mqtt-smarthome/mqtt-smarthome)
-[![Support me on Github][badge_sponsor]][link_sponsor]
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
 
 This node.js application is a bridge between the Sonos and a mqtt server. The status of all your sonos devices will be published to mqtt and you can control the sonos speakers over mqtt.
@@ -96,7 +98,7 @@ The status of each speaker will be published to `sonos/status/speaker_name/subto
 * `name` The name of the speaker
 * `ts` Timestamp of this message
 
-By default you can subscribe to the following subtopics `state` (retained), `volume` (retained), `muted` (retaind) and `track`/`trackUri` (not retained) but if you wish to have separate topics for the track values you can specify the `-d` or `--publish-distinct` parameter and you will get the `artist`, `title`, `album`, `trackUri` and `albumart` topics.
+By default you can subscribe to the following subtopics `coordinator` (retained), `state` (retained), `volume` (retained), `muted` (retaind) and `track`/`trackUri` (not retained) but if you wish to have separate topics for the track values you can specify the `-d` or `--publish-distinct` parameter and you will get the `artist`, `title`, `album`, `trackUri` and `albumart` topics.
 
 ### Controlling sonos
 
@@ -194,4 +196,8 @@ This bridge and the [sonos package](https://github.com/svrooij/node-sonos-ts) to
 The latest version of this bridge is inspired on [hue2mqtt.js](https://github.com/hobbyquaker/hue2mqtt.js) by [Sabastian Raff](https://github.com/hobbyquaker). That was a great sample on how to create a globally installed, command-line, something2mqtt bridge.
 
 [badge_sponsor]: https://img.shields.io/badge/Sponsor-on%20Github-red
+[badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt
+[badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt
 [link_sponsor]: https://github.com/sponsors/svrooij
+[link_issues]: https://github.com/svrooij/sonos2mqtt/issues
+[link_docker]: https://hub.docker.com/r/svrooij/sonos2mqtt

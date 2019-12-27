@@ -312,6 +312,10 @@ function addDevice (device) {
     publishData(`${config.name}/status/${cleanName(device.Name)}/group`, groupName, cleanName(device.Name), true)
   })
 
+  device.Events.on(SonosEvents.Coordinator, coordinator => {
+    publishData(`${config.name}/status/${cleanName(device.Name)}/coordinator`, coordinator, cleanName(device.Name), true)
+  })
+
   devices.push(device)
 }
 
@@ -353,14 +357,14 @@ function publishCurrentTrack (device, track) {
     publishData(`${config.name}/status/${cleanName(device.Name)}/title`, track.Title, device.Name)
     publishData(`${config.name}/status/${cleanName(device.Name)}/artist`, track.Artist, device.Name)
     publishData(`${config.name}/status/${cleanName(device.Name)}/album`, track.Album, device.Name)
-    publishData(`${config.name}/status/${cleanName(device.Name)}/albumart`, track.AlbumArtURI, device.Name)
+    publishData(`${config.name}/status/${cleanName(device.Name)}/albumart`, track.AlbumArtUri, device.Name)
     publishData(`${config.name}/status/${cleanName(device.Name)}/trackUri`, track.TrackUri, device.Name)
   } else {
     const val = (track && track.Title) ? {
       title: track.Title,
       artist: track.Artist,
       album: track.Album,
-      albumArt: track.AlbumArtURI,
+      albumArt: track.AlbumArtUri,
       trackUri: track.TrackUri
     } : null
 
