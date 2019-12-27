@@ -312,6 +312,10 @@ function addDevice (device) {
     publishData(`${config.name}/status/${cleanName(device.Name)}/group`, groupName, cleanName(device.Name), true)
   })
 
+  device.Events.on(SonosEvents.Coordinator, coordinator => {
+    publishData(`${config.name}/status/${cleanName(device.Name)}/coordinator`, coordinator, cleanName(device.Name), true)
+  })
+
   devices.push(device)
 }
 
