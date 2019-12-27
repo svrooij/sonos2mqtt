@@ -67,16 +67,11 @@ Options:
 
 Use the MQTT url to connect to your specific mqtt server. Check out [mqtt.connect](https://github.com/mqttjs/MQTT.js#connect) for the full description.
 
-```txt
-Connection without port (port 1883 gets used)
-[protocol]://[address] (eg. mqtt://127.0.0.1)
-
-Connection with port
-[protocol]://[address]:[port] (eg. mqtt://127.0.0.1:1883)
-
-Secure connection with username/password and port
-[protocol]://[username]:[password]@[address]:[port] (eg. mqtts://myuser:secretpassword@127.0.0.1:8883)
-```
+|Situation|Sample|
+|---------|------|
+|Default|`mqtt://127.0.0.1`|
+|Other host (192.168.0.3) and port (1800)| `mqtt://192.168.0.3:1800`|
+|Username and password|`mqtt://myuser:the_secret_password:192.168.0.3:1800`|
 
 ## Topics
 
@@ -92,11 +87,39 @@ This bridge uses the `sonos/connected` topic to send retained connection message
 
 ### Status messages
 
-The status of each speaker will be published to `sonos/status/speaker_name/subtopic` as a JSON object containing the following fields.
+The status of each speaker will be published to `sonos/status/speaker_name/subtopic` as a JSON object containing the following fields. This sample uses `sonos` as prefix and the device `Kitchen`. Each event will contain json in the following form.
 
 * `val` The value for this subtopic
 * `name` The name of the speaker
 * `ts` Timestamp of this message
+
+The sample value is what is in the `val` property of the json in the body.
+
+|Topic|Description|Retained|Sample value|
+|-----|-----------|--------|------------|
+|`sonos/status/kitchen/coordinator`|When the coordinator (group leader managing the music) of the group changes|Yes|`RINCON_00000000000001400`|
+|`sonos/status/kitchen/group`|Groupname|Yes|`Kitchen` (for a single group) or `Kitchen + 3` (if multiple devices are in the group)|
+|`sonos/status/kitchen/muted`|Is the volume muted|Yes|`false` or `true`|
+|`sonos/status/kitchen/state`|Changes in playback state|Yes|`PLAYING` or `STOPPED`|
+|`sonos/status/kitchen/track`|Current track metadata|No|See below|
+|`sonos/status/kitchen/trackUri`|Current track uri|No|`x-sonos-spotify:spotify%3atrack%3a30cW9fD87IgbYFl8o0lUze?sid=9&amp;flags=8224&amp;sn=7`|
+|`sonos/status/kitchen/volume`|The current volume|Yes|`30` (0 to 100)|
+
+Track topic data sample
+
+```JSON with Comments
+{
+  "ts" : 1577456567766, //Timestamp
+  "name" : "Keuken", // Name of speaker (not cleaned)
+  "val" : {
+    "title" : "Home (feat. Bonn)",
+    "artist" : "Martin Garrix",
+    "album" : "Home (feat. Bonn)",
+    "albumArt" : "http://192.168.0.53:1400/getaa?s=1&u=x-sonos-spotify:spotify:track:4aTtHoSBB0CuQGA6vXBNyp%3fsid%3d9%26flags%3d8224%26sn%3d7",
+    "trackUri" : "x-sonos-spotify:spotify:track:4aTtHoSBB0CuQGA6vXBNyp?sid=9&flags=8224&sn=7"
+  }
+}
+```
 
 By default you can subscribe to the following subtopics `coordinator` (retained), `state` (retained), `volume` (retained), `muted` (retaind) and `track`/`trackUri` (not retained) but if you wish to have separate topics for the track values you can specify the `-d` or `--publish-distinct` parameter and you will get the `artist`, `title`, `album`, `trackUri` and `albumart` topics.
 
@@ -104,31 +127,74 @@ By default you can subscribe to the following subtopics `coordinator` (retained)
 
 You can control sonos by sending an empty message on these topics. The topic format is like `sonos/set/room_name/command` for instance `sonos/set/Office/next`.
 
-Speaker commands:
+|Command| |Description|Payload|
+|-------|-|-----------|-------|
+|`next`|:fast_forward:|Go to next song in queue| |
+|`previous`|:rewind:|Go to previous song in queue| |
+|`pause`||Pause playback| |
+|`play`|:arrow_forward:|Start playback| |
+|`toggle`||Toggle between pause and play| |
+|`stop`|:no_entry_sign:|Stop Playback| |
+|`selecttrack`||Select another track in the current queue|number|
+|`seek`|:clock330:|Seek in the current track|Time like `0:02:45`|
+|`queue`|:heavy_plus_sign:|Add a song to the queue|Track uri|
+|`playmode`|:twisted_rightwards_arrows:|Change the playmode, when using queue|`NORMAL`, `REPEAT_ALL`, `SHUFFLE` or `SHUFFLE_NOREPEAT`.|
+|`setavtransporturi`|:abcd:|Set the current playback uri, for advanced cases.|playback or track uri (check out the trackUri topic to find the required value)|
+|`volume`|:speaker:|Set the volume to a value|number (between 1 and 100)|
+|`volumeup`|:heavy_plus_sign:|Increase volume with 5 or number|optional number|
+|`volumedown`|:heavy_minus_sign:|Decrease volume with 5 or number|optional number|
+|`mute`|:speaker:|Mute the volume| |
+|`unmute`|:mute:|Unmute the volume| |
+|`sleep`|:zzz:|Set a sleeptimer for x minutes|number|
+|`joingroup`||Join another group by name|name of other device|
+|`leavegroup`||Remove current device from the group it's in| |
+|`notify`|:bell:|Play a notification sound and restore playback|see [notifications](#notifications)|
+|`speak`|:speech_balloon:|Generate text-to-speech file and play as notification :tada:|see [text-to-speech](#text-to-speech)|
+|`command`|:cop:|Execute one of the commands above|See [command](#command)|
+|`adv-command`|:guardsman:|Execute a command in [node-sonos-ts](https://github.com/svrooij/node-sonos-ts#commands)|See [all commands](https://github.com/svrooij/node-sonos-ts#commands)|
 
-* `next` - Play the next song
-* `previous` - Play the previous song
-* `pause` - Pause playing
-* `play` - Resume playback
-* `toggle` - Toggle between `pause` and `play`
-* `stop` - Stop playback (you better use pause!)
-* `selecttrack` (payload requires number) - Select an other track in the queue.
-* `seek` - Skip to position in track, payload needs a relative time like `0:03:45` to skip to 3 min, 45 sec.
-* `volume` (payload requires number) - Set the volume to certain level between 0 and 100
-* `volumeup` (payload number optional) - Increse the volume by number from payload or by 5
-* `volumedown` (payload number optional) - Decrese the volume by number from payload or by 5
-* `mute` - Mute the volume
-* `unmute` - Unmute the volume
-* `sleep` (payload requires number) - Set a sleeptimer for x amount of minutes (from payload)
-* `notify` - Play a **notification** on this device :tada: (and revert to current state) see [notifications](#notifications)
-* `speak` - Generate text-to-speech file and play as notification :tada: (and revert to current state) see [text-to-speech](#text-to-speech)
-* `queue` - add a song to the queue, should be an (sonos supported) uri.
-* `setavtransporturi` - Set the current playback uri.
-* `joingroup` - Join a group by device name, payload should be a string with the name of the deivce to join.
-* `leavegroup` - Leave a group.
-* `playmode` - Set the playmode,payload should be *NORMAL*, *REPEAT_ALL*, *SHUFFLE* or *SHUFFLE_NOREPEAT*.
-* `command` - One topic for all [commands](https://github.com/svrooij/sonos2mqtt/issues/21). Payload like `{"cmd":"volumeup"}` or `{"cmd":"volume", "val":10}` for commands that need a payload.
-* `adv-command` - Same as `command` but sends the command to the Sonos library, see [commands](https://github.com/svrooij/node-sonos-ts#commands)
+#### Notifications
+
+To play a short music file as a notification send the following payload to `sonos/set/device_name/notify` or to `sonos/cmd/notify` to play it on all devices.
+
+```JSON
+{
+  "trackUri": "https://cdn.smartersoft-group.com/various/pull-bell-short.mp3",
+  "onlyWhenPlaying": false,
+  "timeout": 10,
+  "volume": 8
+}
+```
+
+#### Text-to-speech
+
+You can have your sonos speaker prononce some notification text, which is a pretty cool feature. But you'll need some extra work. You'll need a text-to-speech endpoint as described [here](https://github.com/svrooij/node-sonos-ts#text-to-speech). You have two options either host your own [server](https://github.com/svrooij/node-sonos-tts-polly) or become a [sponsor][link_sponsor] and get access to my personal hosted TTS server.
+
+Either way you'll have yourself a text-to-speech endpoint. This can be set in the environment as `SONOS_TTS_ENDPOINT` or you'll have to supply it with every request.
+
+Have a speaker speak by sending the following to `sonos/set/device_name/speak`. Endpoint is optional (if set in environment), lang is options if set in config, gender, volume & onlyWhenPlaying are always optional.
+
+```JSON
+{
+  "text": "Someone at the front-door",
+  "endpoint": "https://your.tts.endpoint/api/generate",
+  "lang": "en-US",
+  "gender": "male",
+  "volume": 50,
+  "onlyWhenPlaying": false
+}
+```
+
+#### Command
+
+Someone [suggested](https://github.com/svrooij/sonos2mqtt/issues/21) to create one endpoint to send all commands to. So you can also send one of the commands above to the `sonos/set/kitchen/command` topic with the following json payload. cmd is always required to be one of the commands, val is optional.
+
+```JSON
+{
+  "cmd":"volume",
+  "val":10
+}
+```
 
 ### Generic commands
 
@@ -136,43 +202,12 @@ There are also some generic commands not tied to a specific speaker. These gener
 
 Generic commands:
 
-* `pauseall` - Pause all speakers known to the bridge.
-* `listalarms` - This will fetch all the current alarms and sends them to `sonos/alarms`.
-* `setalarm` - This allows you to set/unset an alarm. Requires json object with `id` and `enabled`
-* `notify` - Play a notification on all devices (and revert to current state) see [notifications](#notifications)
-
-#### Notifications
-
-To play a notification on all devices you send the following json string to `sonos/cmd/notify`
-
-```json
-{
-  "trackUri": "https://cdn.smartersoft-group.com/various/pull-bell-short.mp3", // Can be any uri sonos understands
-  // trackUri: 'https://cdn.smartersoft-group.com/various/someone-at-the-door.mp3', // Cached text-to-speech file.
-  "onlyWhenPlaying": false, // make sure that it only plays when you're listening to music. So it won't play when you're sleeping.
-  "timeout": 10, // If the events don't work (to see when it stops playing) or if you turned on a stream, it will revert back after this amount of seconds.
-  "volume": 8
-}
-```
-
-#### Text-to-speech
-
-You can have your sonos speaker speak, which is a pretty cool feature. But you'll need some extra work. You'll need a text-to-speech endpoint as described [here](https://github.com/svrooij/node-sonos-ts#text-to-speech). You have two options either host your own [server](https://github.com/svrooij/node-sonos-tts-polly) or become a [sponsor][link_sponsor] and get access to my personal hosted TTS server.
-
-Either way you'll have yourself a text-to-speech endpoint. This can be set in the environment as `SONOS_TTS_ENDPOINT` or you'll have to supply it with every request.
-
-Have a speaker speak by sending the following to `sonos/set/device_name/speak`.
-
-```json
-{
-  "text": "Someone at the front-door", // The text you want spoken.
-  "endpoint": "https://your.tts.endpoint/api/generate", // Endpoint is required if not set in Environment
-  "lang": "en-US", // (optional) Specify the language, or set the default in the config.
-  "gender": "male", // (optional) Specify the gender (see supported voices of endpoint.)
-  "volume": 50, // (optional) If you want a different volume for the notification
-  "onlyWhenPlaying": false // (optional) make sure that it only plays when you're listening to music. So it won't play when you're sleeping.
-}
-```
+|Global command|Description|Payload|
+|--------------|-----------|-------|
+|`pauseall`|Pause all your speakers| |
+|`listalarms`|Load and send all your alarms to `sonos/alarms`| |
+|`setalarm`|Enable(/disable) an existing alarm.|JSON `{"id":30,"enabled":true}`|
+|`notify`|Play a notification on all speakers.|JSON see [notifications](#notifications)|
 
 ## Run a MQTT server in docker
 
