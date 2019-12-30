@@ -7,6 +7,7 @@ var config = require('yargs')
   .describe('d', 'Publish distinct track states')
   .describe('h', 'show help')
   .describe('tts-lang', 'Default TTS language')
+  .describe('tts-endpoint', 'Default endpoint for text-to-speech')
   .describe('device', 'Start with one known IP instead of device discovery.')
   .alias({
     h: 'help',
