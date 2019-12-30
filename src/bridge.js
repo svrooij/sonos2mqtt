@@ -188,11 +188,12 @@ async function handleDeviceCommand (device, command, payload) {
       return device.PlayNotification(parsedPayload)
     // ----------------- This is an advanced feature to set the playback url
     case 'speak':
-      if (parsedPayload.endpoint === undefined && process.env.SONOS_TTS_ENDPOINT === undefined) {
-        log.warning('Either specify the endpoint in the payload or set env SONOS_TTS_ENDPOINT')
+      if (parsedPayload.endpoint === undefined && config['tts-endpoint'] === undefined && process.env.SONOS_TTS_ENDPOINT === undefined) {
+        log.warning('Either specify the endpoint in the payload, the config or set env SONOS_TTS_ENDPOINT')
         break
       }
       if (parsedPayload.lang === undefined) parsedPayload.lang = config['tts-lang']
+      if (parsedPayload.endpoint === undefined && config['tts-endpoint'] !== undefined) parsedPayload.endpoint = config['tts-endpoint']
       return device.PlayTTS(parsedPayload)
     case 'setavtransporturi':
       return device.SetAVTransportURI(payload)
