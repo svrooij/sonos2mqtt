@@ -23,7 +23,7 @@
     "mqtt": "3.0.0",
     "@svrooij/sonos": "1.1.2",
     "yalm": "4.1.0",
-    "yargs": "15.0.2"
+    "yargs": "15.1.0"
   },
   "devDependencies": {
     "pre-commit": "1.2.2",
