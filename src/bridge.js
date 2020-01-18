@@ -271,11 +271,11 @@ async function listAlarms () {
   return devices[0].AlarmList().then(alarms => {
     log.debug('Got alarms %j', alarms)
     mqttClient.publish(config.name + '/alarms', JSON.stringify(alarms), { retain: false })
+    return true
   })
 }
 async function setalarm (payload) {
-  payload = ConvertToObjectIfPossible(payload)
-  if (payload.id && payload.enabled) {
+  if (payload.id !== null && payload.enabled !== null) {
     return devices[0].AlarmPatch({ ID: payload.id, Enabled: payload.enabled === true })
   }
 }
