@@ -1,4 +1,4 @@
-name: buildx
+name: Docker build and push
 
 on:
   release:
@@ -23,7 +23,7 @@ jobs:
       -
         name: Docker login
         run:
-          docker login -u ${{ secrets.REGISTRY_USERNAME }} -p ${{ secrets.REGISTRY_PASSWORD }}
+          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
       -
         name: Run Buildx
         run: |
