@@ -1,9 +1,8 @@
 name: buildx
 
 on:
-  push:
-    branches: master
-    tags:
+  release:
+    types: [published]
 
 jobs:
   buildx:
