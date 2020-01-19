@@ -16,7 +16,9 @@ Check out the other bridges in the [software list](https://github.com/mqtt-smart
 
 ## Run in docker
 
-You can run **sonos2mqtt** in docker, but you'll need to remember the following. This library depends on receiving events from your sonos speakers, the events are required. Every setting of this library can also be set with environment variables prefixed with `SONOS2MQTT_`.
+**sonos2mqtt** is available in the [docker hub](https://hub.docker.com/r/svrooij/sonos2mqtt), since 19-01-2020 we produce a single multi-architecture image for you to use, `amd64`, `arm64`, `armv7` and `i386` are supported. This means you can run sonos2mqtt in docker on almost any device.
+
+Every setting of this library can be set with environment variables prefixed with `SONOS2MQTT_`.
 
 1. Create an `.env` file with the following settings.
 2. Set the required values.
@@ -33,7 +35,39 @@ SONOS_LISTENER_HOST=192.168.x.x
 # SONOS_TTS_ENDPOINT=https://tts.server.com/api/generate
 ```
 
-## Installation
+This app makes heavy use of events, so you'll have to make sure they still work. That is why you need to expose the listening port (`6329`), changing the port will cause problems. The library will automaticcally subscribe to events from the sonos device, but because you're running in docker it cannot figure out the IP by itself. You set the IP of the docker host in the `SONOS_LISTENER_HOST` environment variable. This is how the events flow.
+
+```plain
+================              ===============              ==============
+| Sonos Device |  == HTTP =>  | Docker host |  == HTTP =>  | sonos2mqtt |
+================              ===============              ==============
+```
+
+### Docker-compose
+
+```yaml
+version: "3.7"
+services:
+  sonos:
+    image: svrooij/sonos2mqtt
+    restart: unless-stopped
+    ports:
+      - "6329:6329"
+    environment:
+      - SONOS2MQTT_DEVICE=192.168.50.4 # Service discovery doesn't work very well inside docker, so start with one device.
+      - SONOS2MQTT_MQTT=mqtt://emqx:1883 # EMQX is a nice mqtt broker
+      - SONOS_LISTENER_HOST=192.168.50.44 # Docker host IP
+    depends_on:
+      - emqx
+  emqx:
+    image: emqx/emqx
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "18083:18083"
+```
+
+## Local installation
 
 Using sonos2mqtt is really easy, but it requires at least [Node.js](https://nodejs.org/) v8 or higher, because of it's async usage. (This app is tested against v10 and v12).
 
@@ -71,7 +105,7 @@ Use the MQTT url to connect to your specific mqtt server. Check out [mqtt.connec
 |---------|------|
 |Default|`mqtt://127.0.0.1`|
 |Other host (192.168.0.3) and port (1800)| `mqtt://192.168.0.3:1800`|
-|Username and password|`mqtt://myuser:the_secret_password:192.168.0.3:1800`|
+|Username and password|`mqtt://myuser:the_secret_password@192.168.0.3:1800`|
 
 ## Topics
 
@@ -109,8 +143,8 @@ Track topic data sample
 
 ```JSON with Comments
 {
-  "ts" : 1577456567766, //Timestamp
-  "name" : "Keuken", // Name of speaker (not cleaned)
+  "ts" : 1577456567766,
+  "name" : "Keuken",
   "val" : {
     "title" : "Home (feat. Bonn)",
     "artist" : "Martin Garrix",
@@ -211,12 +245,12 @@ Generic commands:
 
 ## Run a MQTT server in docker
 
-If your want to test this library it's best to create a mqtt server just for testing. This can easily be done with the followinf docker command:
+If your want to test this library it's best to create a mqtt server just for testing. This can easily be done with the following docker command:
 `docker run -it -p 1883:1883 -p 9001:9001 eclipse-mosquitto`
 
 ## Use [PM2](http://pm2.keymetrics.io) to run in background
 
-If everything works as expected, you should make the app run in the background automatically. Personally I use PM2 for this. And they have a great [guide for this](http://pm2.keymetrics.io/docs/usage/quick-start/).
+The preferred method of running Sonos2Mqtt is in Docker, but you can always run in on the device itself. PM2 is a nice tool to run and log scripts in the background.And they have a great [guide for this](http://pm2.keymetrics.io/docs/usage/quick-start/).
 
 ## Node-sonos-ts
 
