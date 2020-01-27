@@ -4,5 +4,5 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm ci --only=production
 COPY . .
-EXPOSE 6326
+EXPOSE 6329
 CMD ["node", "./index.js"]
