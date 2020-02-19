@@ -21,7 +21,8 @@ var config = require('yargs')
     i: 'sonos',
     v: 'info',
     d: false,
-    'tts-lang': 'en-US'
+    'tts-lang': 'en-US',
+    'tts-endpoint': undefined
   })
   .choices('v', ['error', 'warn', 'info', 'debug'])
   .wrap(80)

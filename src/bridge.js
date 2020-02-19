@@ -14,6 +14,10 @@ function start () {
   log.setLevel(config.verbosity)
   log.info(pkg.name + ' ' + pkg.version + ' starting')
 
+  if (config['tts-endpoint'] !== undefined && process.env.SONOS_TTS_ENDPOINT === undefined) {
+    process.env.SONOS_TTS_ENDPOINT = config['tts-endpoint']
+  }
+
   // MQTT Stuff
   log.info('Parsing url %s', config.mqtt)
   const url = new URL(config.mqtt)
