@@ -31,5 +31,5 @@ jobs:
             --platform linux/386,linux/amd64,linux/arm/v7,linux/arm64 \
             --push \
             -t $GITHUB_REPOSITORY:latest \
-            -t $GITHUB_REPOSITORY:$GITHUB_REF \
+            -t $GITHUB_REPOSITORY:$(echo $GITHUB_REF | cut -d'/' -f3) \
             .
