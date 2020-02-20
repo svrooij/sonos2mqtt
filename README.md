@@ -57,8 +57,24 @@ services:
       - SONOS2MQTT_DEVICE=192.168.50.4 # Service discovery doesn't work very well inside docker, so start with one device.
       - SONOS2MQTT_MQTT=mqtt://emqx:1883 # EMQX is a nice mqtt broker
       - SONOS_LISTENER_HOST=192.168.50.44 # Docker host IP
+      - SONOS_TTS_ENDPOINT=http://sonos-tts:5601/api/generate # If you deployed the TTS with the same docker-compose
     depends_on:
       - emqx
+
+# You can skip the TTS server if you want. See https://github.com/svrooij/node-sonos-ts#text-to-speech
+# Set the amazon keys to your own
+# Set the SONOS_TTS_CACHE_URI to http://[ip_of_docker_host]:5601/cache
+  sonos-tts:
+    image: svrooij/sonos-tts-polly
+    ports:
+      - "5601:5601"
+    environment:
+      - SONOS_TTS_AMAZON_KEY=your_key_id_here
+      - SONOS_TTS_AMAZON_SECRET=your_secret_access_token_here
+      - SONOS_TTS_AMAZON_REGION=eu-west-1
+      - SONOS_TTS_CACHE_URI=http://192.168.30.20:5601/cache
+
+# Optional MQTT server (I like emqx over mosquitto)
   emqx:
     image: emqx/emqx
     restart: unless-stopped
@@ -93,6 +109,7 @@ Options:
                                                       [boolean] [default: false]
   -h, --help              Show help                                    [boolean]
   --tts-lang              Default TTS language                [default: "en-US"]
+  --tts-endpoint          Default endpoint for text-to-speech
   --device                Start with one known IP instead of device discovery.
   --version               Show version number                          [boolean]
 ```
