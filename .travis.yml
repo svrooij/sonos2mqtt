@@ -1,7 +1,9 @@
 language: node_js
+os: linux
 
 node_js:
   - 10
+  - lts/*
   - 13
 
 branches:
@@ -15,9 +17,8 @@ jobs:
       node_js: lts/*
       if: branch = master
       # Advanced: optionally overwrite your default `script` step to skip the tests
-      # script: skip
+      script: echo "No tests in deploy step"
       deploy:
         provider: script
-        skip_cleanup: true
-        script:
-          - npx semantic-release
+        cleanup: false
+        script: npx semantic-release
