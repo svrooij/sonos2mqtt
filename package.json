@@ -20,8 +20,8 @@
     "semantic-release": "semantic-release"
   },
   "dependencies": {
+    "@svrooij/sonos": "^2.0.0",
     "mqtt": "3.0.0",
-    "@svrooij/sonos": "1.2.2",
     "yalm": "4.1.0",
     "yargs": "15.1.0"
   },
