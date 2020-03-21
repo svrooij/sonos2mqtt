@@ -272,7 +272,7 @@ async function handleGenericCommand (command, payload) {
 
 // Loading the alarms and publishing them to 'sonos/alarms'
 async function listAlarms () {
-  return devices[0].AlarmList().then(alarms => {
+  return devices[0].AlarmClockService.ListAndParseAlarms().then(alarms => {
     log.debug('Got alarms %j', alarms)
     mqttClient.publish(config.name + '/alarms', JSON.stringify(alarms), { retain: false })
     return true
@@ -280,7 +280,7 @@ async function listAlarms () {
 }
 async function setalarm (payload) {
   if (payload.id !== null && payload.enabled !== null) {
-    return devices[0].AlarmPatch({ ID: payload.id, Enabled: payload.enabled === true })
+    return devices[0].AlarmClockService.PatchAlarm({ ID: payload.id, Enabled: payload.enabled === true })
   }
 }
 
@@ -297,7 +297,7 @@ function publishConnectionStatus () {
 function addDevice (device) {
   log.info('Add device %s %s', device.Name, device.host)
   // Start listening for those events!
-  device.Events.on(SonosEvents.CurrentTrack, trackUri => {
+  device.Events.on(SonosEvents.CurrentTrackUri, trackUri => {
     publishTrackUri(device, trackUri)
   })
   device.Events.on(SonosEvents.CurrentTrackMetadata, metadata => {
@@ -325,11 +325,13 @@ function addDevice (device) {
 }
 
 function cancelSubscriptions (device) {
-  device.Events.removeAllListeners(SonosEvents.CurrentTrack)
+  device.Events.removeAllListeners(SonosEvents.CurrentTrackUri)
   device.Events.removeAllListeners(SonosEvents.CurrentTrackMetadata)
   device.Events.removeAllListeners(SonosEvents.CurrentTransportState)
   device.Events.removeAllListeners(SonosEvents.Mute)
   device.Events.removeAllListeners(SonosEvents.Volume)
+  device.Events.removeAllListeners(SonosEvents.GroupName)
+  device.Events.removeAllListeners(SonosEvents.Coordinator)
 }
 
 function cleanName (name) {
