@@ -20,15 +20,15 @@
     "semantic-release": "semantic-release"
   },
   "dependencies": {
-    "@svrooij/sonos": "^2.0.0",
+    "@svrooij/sonos": "^2.0.1",
     "mqtt": "3.0.0",
     "yalm": "4.1.0",
-    "yargs": "15.1.0"
+    "yargs": "15.3.1"
   },
   "devDependencies": {
     "pre-commit": "1.2.2",
-    "semantic-release": "15.4.0",
-    "standard": "14.3.1"
+    "semantic-release": "17.0.4",
+    "standard": "14.3.3"
   },
   "repository": {
     "type": "git",
@@ -39,5 +39,9 @@
   },
   "pre-commit": [
     "test"
-  ]
+  ],
+  "funding": {
+    "type": "Github sponsor",
+    "url": "https://github.com/sponsors/svrooij"
+  }
 }
