@@ -109,6 +109,9 @@ export class SonosCommandMapping {
         return await device.RenderingControlService.SetRelativeVolume({ 
           InstanceID: 0, Channel: 'Master', 
           Adjustment: ((typeof payload === 'number') ? payload : 4)})
+      
+      default:
+        throw new Error(`Command '${command}' not implemented`)
     }
   }
 }

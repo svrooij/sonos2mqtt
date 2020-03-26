@@ -19,11 +19,12 @@
     "build": "tsc",
     "prepack": "npm run build",
     "semantic-release": "semantic-release",
-    "test": "eslint ./src/*.ts ./src/*.js  && exit 0"    
+    "test": "eslint ./src/*.ts ./src/*.js  && exit 0"
   },
   "dependencies": {
     "@svrooij/sonos": "^2.0.1",
     "mqtt": "3.0.0",
+    "serilogger": "^0.3.0",
     "strict-event-emitter-types": "^2.0.0",
     "yalm": "4.1.0",
     "yargs": "15.3.1"

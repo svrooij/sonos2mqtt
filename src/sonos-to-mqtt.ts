@@ -1,5 +1,5 @@
 import { Config } from './config'
-import debug = require('debug')
+import { StaticLogger } from './static-logger'
 import { SonosManager, SonosEvents } from '@svrooij/sonos'
 import { SmarthomeMqtt } from './smarthome-mqtt';
 import { SonosCommandMapping } from './sonos-command-mapping';
@@ -9,7 +9,7 @@ import { SonosCommands } from './sonos-commands';
 export class SonosToMqtt {
   private readonly sonosManager: SonosManager;
   private readonly mqtt: SmarthomeMqtt;
-  private readonly debug = debug('sonos2mqtt:main')
+  private readonly log = StaticLogger.CreateLoggerForSource('Sonos2mqtt.main')
   private readonly states: Array<Partial<SonosState>> = [];
   private readonly stateTimers: {[key: string]: NodeJS.Timeout} = {};
   constructor(private config: Config) {
@@ -18,6 +18,7 @@ export class SonosToMqtt {
   }
 
   async start(): Promise<boolean> {
+    this.log.info('Starting sonos2mqtt')
     let success: boolean
     if(this.config.device !== undefined) {
       success = await this.sonosManager.InitializeFromDevice(this.config.device);
@@ -27,6 +28,7 @@ export class SonosToMqtt {
     success = success && this.sonosManager.Devices.length > 0;
 
     if (success) {
+      this.log.info('Found {numDevices} sonos speakers', this.sonosManager.Devices.length)
       this.setupMqttEvents()
       this.setupSonosEvents()
       this.mqtt.connect()
@@ -50,11 +52,13 @@ export class SonosToMqtt {
    * Will setup all events from mqtt with the correct handler.
    */
   private setupMqttEvents(): void {
+    this.log.debug('Setting up mqtt events')
     this.mqtt.Events.on('connected', (connected) => {
-      this.debug('Mqtt is %s', connected === true ? 'connected' : 'disconnected')
+      this.log.info('Mqtt connection changed to connected: {connected}', connected)
     })
 
     this.mqtt.Events.on('generic', async (command, payload) => {
+      this.log.debug('Got generic command {command} from mqtt', command)
       switch (command) {
         case 'notify':
           return Promise.all(this.sonosManager.Devices.map(d => d.PlayNotification(payload)))
@@ -66,19 +70,22 @@ export class SonosToMqtt {
           break;
         case 'setalarm':
           return this.sonosManager.Devices[0].AlarmClockService.PatchAlarm(payload);
+        case 'setlogging':
+          return StaticLogger.setLevel(payload);
       }
     })
 
     this.mqtt.Events.on('deviceControl', async (uuid, payload)=> {
       const correctDevice = this.sonosManager.Devices.find(d => d.Uuid.toLocaleLowerCase() === uuid || SonosToMqtt.CleanName(d.Name) === uuid);
       if(correctDevice === undefined) {
-        this.debug('Device not found')
+        this.log.warn('Device {uuid} not found', uuid)
         return;
       }
       try {
-        return await SonosCommandMapping.ExecuteControl(correctDevice, payload)
+        await SonosCommandMapping.ExecuteControl(correctDevice, payload)
+        this.log.debug('Executed {command} for {device} ({uuid})', payload.command ?? payload.sonosCommand, correctDevice.Name, correctDevice.Uuid)
       } catch (e) {
-        console.error('Error executing %s for %s', payload.command ?? payload.sonosCommand, uuid, e)
+        this.log.warn(e, 'Error executing {command} for {device} ({uuid})', payload.command ?? payload.sonosCommand, correctDevice.Name, correctDevice.Uuid)
       }
     })
   }
@@ -166,7 +173,8 @@ export class SonosToMqtt {
       currentTrack: data.CurrentTrackMetaData,
       enqueuedMetadata: data.EnqueuedTransportURIMetaData,
       nextTrack: data.NextTrackMetaData,
-      transportState: data.TransportState
+      transportState: data.TransportState,
+      playmode: data.CurrentPlayMode,
     })
   }
 
@@ -207,6 +215,7 @@ export class SonosToMqtt {
 
       // Publish new state on a 400 ms delay. For changes that happen in rapid succession.
       this.stateTimers[uuid] = setTimeout(() => {
+        this.log.verbose('Publishing state for {uuid}', this.states[index].uuid)
         this.mqtt.publish(this.states[index].uuid ?? '', this.states[index], { qos: 0, retain: true });
       }, 400)
     }

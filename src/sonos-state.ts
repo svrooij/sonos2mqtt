@@ -19,4 +19,5 @@ export interface SonosState {
   nextTrack: Track;
   enqueuedMetadata: Track;
   transportState: string;
+  playmode: string;
 }
