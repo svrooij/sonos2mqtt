@@ -19,12 +19,12 @@
     "build": "tsc",
     "prepack": "npm run build",
     "semantic-release": "semantic-release",
-    "test": "eslint ./src/*.ts ./src/*.js  && exit 0"
+    "test": "eslint ./src/*.ts && exit 0"
   },
   "dependencies": {
     "@svrooij/sonos": "^2.0.1",
     "mqtt": "3.0.0",
-    "serilogger": "^0.3.0",
+    "serilogger": "^0.3.1",
     "strict-event-emitter-types": "^2.0.0",
     "yalm": "4.1.0",
     "yargs": "15.3.1"
@@ -47,10 +47,17 @@
     "url": "https://github.com/svrooij/sonos2mqtt/issues"
   },
   "pre-commit": [
+    "build",
     "test"
   ],
   "funding": {
     "type": "Github sponsor",
     "url": "https://github.com/sponsors/svrooij"
-  }
+  },
+  "files": [
+    "README.md",
+    "LICENSE",
+    "lib/**/*.ts",
+    "lib/**/*.js"
+  ]
 }

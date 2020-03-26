@@ -18,3 +18,4 @@ sonosToMqtt
   .catch(err => {
     StaticLogger.Default().fatal(err, 'Error starting sonos2mqtt')
   })
+  

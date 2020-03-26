@@ -1,8 +1,8 @@
-import {LoggerConfiguration, ConsoleSink, DynamicLevelSwitch, LogEventLevel, Logger} from 'serilogger';
+import {LoggerConfiguration, ColoredConsoleSink, DynamicLevelSwitch, LogEventLevel, Logger} from 'serilogger';
 
 export class StaticLogger {
   private static instance: Logger;
-  private static levelSwitch = new DynamicLevelSwitch();
+  private static levelSwitch = new DynamicLevelSwitch(LogEventLevel.information);
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
@@ -11,7 +11,7 @@ export class StaticLogger {
       // Logger.levelSwitch.information();
       StaticLogger.instance = new LoggerConfiguration()
         .minLevel(StaticLogger.levelSwitch)
-        .writeTo(new ConsoleSink({ includeTimestamps: true }))
+        .writeTo(new ColoredConsoleSink({ includeTimestamps: true }))
         .create()
     }
 
@@ -30,24 +30,9 @@ export class StaticLogger {
   public static async setLevel(input: string): Promise<boolean>  {
     if(!Object.keys(LogEventLevel).some(k => k === input)) return false;
     const level = (LogEventLevel as any)[input]
-    switch (level) {
-      case LogEventLevel.verbose:
-        await StaticLogger.levelSwitch.verbose();
-        break;
-      case LogEventLevel.debug:
-        await StaticLogger.levelSwitch.debug();
-        break;
-      case LogEventLevel.information:
-        await StaticLogger.levelSwitch.information();
-        break;
-      case LogEventLevel.warning:
-        await StaticLogger.levelSwitch.warning();
-        break;
-      default:
-        return false;
-    }
+    await StaticLogger.levelSwitch.set(level)
+
     StaticLogger.Default().info('LogLevel changed to {level}', input)
     return true;
   }
-
 }
