@@ -17,7 +17,7 @@
   "preferGlobal": true,
   "scripts": {
     "build": "tsc",
-    "prepack": "npm run build",
+    "prepack": "npm ci && npm run build",
     "semantic-release": "semantic-release",
     "test": "eslint ./src/*.ts && exit 0"
   },
