@@ -88,13 +88,14 @@ export class SmarthomeMqtt{
     const parsedPayload = SmarthomeMqtt.parsePayload(payload.toString())
     const parts = topic.toLocaleLowerCase().split('/')
     
+    // topic: sonos/set/name_of_speaker/command
     if(parts.length === 4 && parts[1] === 'set') {
       this.log.debug('Mqtt parsing {command} for {device}', parts[3], parts[2])
       const control = new DeviceControl(parts[3], undefined, parsedPayload);
       if(control.isValid()) {
         this.Events.emit('deviceControl', parts[2], control)
       }
-    } else if (parts.length === 3
+    } else if (parts.length === 3 // topic: sonos/uuid_of_speaker/control
         && parts[2] === 'control'
         && typeof parsedPayload !== "number" 
         && typeof parsedPayload !== 'string') {
@@ -104,7 +105,7 @@ export class SmarthomeMqtt{
       if(control.isValid()) {
         this.Events.emit('deviceControl', parts[1], control)
       }
-    } else if (parts.length === 3 && parts[1] === 'cmd') {
+    } else if (parts.length === 3 && parts[1] === 'cmd') { // topic: sonos/cmd/global_command
       this.log.debug('Mqtt got generic command {command}', parts[2])
       this.Events.emit('generic', parts[2], parsedPayload)
     }

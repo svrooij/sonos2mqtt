@@ -156,7 +156,9 @@ export class SonosToMqtt {
         json_attributes_topic: `${this.config.prefix}/${d.Uuid}`,
         name: d.Name,
         state_topic: `${this.config.prefix}/${d.Uuid}`,
-        unique_id: `sonos2mqtt_${d.Uuid}`
+        unique_id: `sonos2mqtt_${d.Uuid}_speaker`,
+        availability_topic: `${this.config.prefix}/connected`,
+        payload_available: '2'
       };
       this.mqtt.publishAutodiscovery(this.config.discoveryprefix ?? 'homeassistant', d.Uuid, payload);
     });

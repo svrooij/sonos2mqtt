@@ -117,6 +117,10 @@ Options:
   --version          Show version number                               [boolean]
 ```
 
+### Configuration
+
+The configuration is loaded from any of these sources. Config file from location `/data/config.json` (overridable with ENV `CONFIG_PATH`). Environment variables config name prefixed with `SONOS2MQTT_` or commandline parameters. Choose whatever suits your needs.
+
 ### MQTT Url
 
 Use the MQTT url to connect to your specific mqtt server. Check out [mqtt.connect](https://github.com/mqttjs/MQTT.js#connect) for the full description.
@@ -126,6 +130,122 @@ Use the MQTT url to connect to your specific mqtt server. Check out [mqtt.connec
 |Default|`mqtt://127.0.0.1`|
 |Other host (192.168.0.3) and port (1800)| `mqtt://192.168.0.3:1800`|
 |Username and password|`mqtt://myuser:the_secret_password@192.168.0.3:1800`|
+
+## Controlling Sonos
+
+You can control all your speakers by sending a message to `sonos/uuid_of_speaker/control` with the following payload:
+
+```json
+{
+  "command": "name_of_command",
+  "input": "optional input for this command"
+}
+```
+
+like (to set the volume to 10):
+
+```json
+{
+  "command": "volume",
+  "input": 10
+}
+```
+
+### Supported command
+
+|Command| |Description|Payload|
+|-------|-|-----------|-------|
+|`joingroup`||Join another group by name|name of other device|
+|`leavegroup`||Remove current device from the group it's in| |
+|`mute`|:speaker:|Mute the volume| |
+|`next`|:fast_forward:|Go to next song in queue| |
+|`notify`|:bell:|Play a notification sound and restore playback|see [notifications](#notifications)|
+|`pause`||Pause playback| |
+|`play`|:arrow_forward:|Start playback| |
+|`playmode`|:twisted_rightwards_arrows:|Change the playmode, when using queue|`NORMAL`, `REPEAT_ALL`, `SHUFFLE` or `SHUFFLE_NOREPEAT`.|
+|`previous`|:rewind:|Go to previous song in queue| |
+|`queue`|:heavy_plus_sign:|Add a song to the queue|Track uri|
+|`seek`|:clock330:|Seek in the current track|Time like `0:02:45`|
+|`selecttrack`||Select another track in the current queue|number|
+|`setavtransporturi`|:abcd:|Set the current playback uri, for advanced cases.|playback or track uri (check out the trackUri topic to find the required value)|
+|`sleep`|:zzz:|Set a sleeptimer for x minutes|number|
+|`speak`|:speech_balloon:|Generate text-to-speech file and play as notification :tada:|see [text-to-speech](#text-to-speech)|
+|`stop`|:no_entry_sign:|Stop Playback| |
+|`toggle`||Toggle between pause and play| |
+|`unmute`|:mute:|Unmute the volume| |
+|`volume`|:speaker:|Set the volume to a value|number (between 1 and 100)|
+|`volumedown`|:heavy_minus_sign:|Decrease volume with 5 or number|optional number|
+|`volumeup`|:heavy_plus_sign:|Increase volume with 5 or number|optional number|
+
+#### Advanced commands
+
+The used sonos library has a lot to other [available commands](https://svrooij.github.io/node-sonos-ts/sonos-device) but we cannot implement all of them. Instead we made a way for you to execute all available commands on the sonos device. You'll need to send message to `sonos/uuid_of_speaker/control` with the following payload.
+
+```json
+{
+  "command": "adv-command",
+  "input": {
+    "cmd": "RenderingControlService.SetVolume",
+    "val": {
+      "InstanceID": 0,
+      "Channel": "Master",
+      "DesiredVolume": 20
+    }
+  },
+
+}
+```
+
+## Notifications
+
+To play a short music file as a notification send the following payload to `sonos/uuid_of_speaker/control`. More information about [notifications](https://svrooij.github.io/node-sonos-ts/sonos-device/notifications-and-tts.html)
+
+```JSON
+{
+  "command": "notify",
+  "input": {
+    "trackUri": "https://cdn.smartersoft-group.com/various/pull-bell-short.mp3",
+    "onlyWhenPlaying": false,
+    "timeout": 10,
+    "volume": 8,
+    "delayMs": 700
+  }
+}
+```
+
+You can also have a notification play on all speakers, just send the following message to `sonos/cmd/notify`.
+
+```JSON
+{
+  "trackUri": "https://cdn.smartersoft-group.com/various/pull-bell-short.mp3",
+  "onlyWhenPlaying": false,
+  "timeout": 10,
+  "volume": 8,
+  "delayMs": 700
+}
+```
+
+## Text-to-speech
+
+You can have your sonos speaker prononce some notification text, which is a pretty cool feature. But you'll need some extra work. You'll need a text-to-speech endpoint as described [here](https://svrooij.github.io/node-sonos-ts/sonos-device/notifications-and-tts.html#text-to-speech). You have two options either host your own [server](https://github.com/svrooij/node-sonos-tts-polly) or become a [sponsor][link_sponsor] and get access to my personal hosted TTS server.
+
+Either way you'll have yourself a text-to-speech endpoint. This can be set in the environment as `SONOS_TTS_ENDPOINT` or you'll have to supply it with every request.
+
+Have a speaker speak by sending the following to `sonos/set/device_name/speak`. Endpoint is optional (if set in environment), lang is options if set in config, gender, volume & onlyWhenPlaying are always optional.
+
+```JSON
+{
+  "text": "Someone at the front-door",
+  "endpoint": "https://your.tts.endpoint/api/generate",
+  "lang": "en-US",
+  "gender": "male",
+  "volume": 50,
+  "onlyWhenPlaying": false,
+  "delayMs": 700
+}
+```
+
+This message executes the [SetVolume](https://svrooij.github.io/node-sonos-ts/sonos-device/services/renderingcontrolservice.html#setvolume) command of the speaker.
 
 ## Topics
 
@@ -139,116 +259,147 @@ This bridge uses the `sonos/connected` topic to send retained connection message
 * `1` is connected to mqtt, but not to any sonos device.
 * `2` is connected to mqtt and at least one sonos speaker. (ultimate success!)
 
-### Status messages
+### Status message
 
-The status of each speaker will be published to `sonos/status/speaker_name/subtopic` as a JSON object containing the following fields. This sample uses `sonos` as prefix and the device `Kitchen`. Each event will contain json in the following form.
+We emit a single status message for each sonos speaker, on the `sonos/uuid_of_speaker` topic. This status message is a combination of all the sonos events we are listening for. Just create an issue (or PR) if you think there should be more data send to mqtt.
 
-* `val` The value for this subtopic
-* `name` The name of the speaker
-* `ts` Timestamp of this message
+Topic: `sonos/RINCON_000E5000000001400` this message is **retained**.
 
-The sample value is what is in the `val` property of the json in the body.
-
-|Topic|Description|Retained|Sample value|
-|-----|-----------|--------|------------|
-|`sonos/status/kitchen/coordinator`|When the coordinator (group leader managing the music) of the group changes|Yes|`RINCON_00000000000001400`|
-|`sonos/status/kitchen/group`|Groupname|Yes|`Kitchen` (for a single group) or `Kitchen + 3` (if multiple devices are in the group)|
-|`sonos/status/kitchen/muted`|Is the volume muted|Yes|`false` or `true`|
-|`sonos/status/kitchen/state`|Changes in playback state|Yes|`PLAYING` or `STOPPED`|
-|`sonos/status/kitchen/track`|Current track metadata|No|See below|
-|`sonos/status/kitchen/trackUri`|Current track uri|No|`x-sonos-spotify:spotify%3atrack%3a30cW9fD87IgbYFl8o0lUze?sid=9&amp;flags=8224&amp;sn=7`|
-|`sonos/status/kitchen/volume`|The current volume|Yes|`30` (0 to 100)|
-
-Track topic data sample
-
-```JSON with Comments
+```json
 {
-  "ts" : 1577456567766,
-  "name" : "Keuken",
-  "val" : {
-    "title" : "Home (feat. Bonn)",
-    "artist" : "Martin Garrix",
-    "album" : "Home (feat. Bonn)",
-    "albumArt" : "http://192.168.0.53:1400/getaa?s=1&u=x-sonos-spotify:spotify:track:4aTtHoSBB0CuQGA6vXBNyp%3fsid%3d9%26flags%3d8224%26sn%3d7",
-    "trackUri" : "x-sonos-spotify:spotify:track:4aTtHoSBB0CuQGA6vXBNyp?sid=9&flags=8224&sn=7"
+  "uuid" : "RINCON_000E5000000001400",
+  "name" : "Kantoor",
+  "groupName" : "Kantoor",
+  "coordinatorUuid" : "RINCON_000E5000000001400",
+  "currentTrack" : {
+    "Album" : "Hard Bass 2012 Mixed by The Pitcher, Luna, Frontliner and Chris One",
+    "Artist" : "Pavo",
+    "AlbumArtUri" : "http://192.168.1.105:1400/getaa?s=1&u=x-sonos-spotify:spotify:track:3Je8RHcdTJ8NGG3krmCHUd%3fsid%3d9%26flags%3d8224%26sn%3d7",
+    "Title" : "Let’s Go! - Radio Edit",
+    "UpnpClass" : "object.item.audioItem.musicTrack",
+    "Duration" : "0:04:06",
+    "ItemId" : "-1",
+    "ParentId" : "-1",
+    "TrackUri" : "x-sonos-spotify:spotify:track:3Je8RHcdTJ8NGG3krmCHUd?sid=9&flags=8224&sn=7",
+    "ProtocolInfo" : "sonos.com-spotify:*:audio/x-spotify:*"
+  },
+  "enqueuedMetadata" : {
+    "Artist" : "stephanvanrooij",
+    "AlbumArtUri" : "https://mosaic.scdn.co/640/ab67616d0000b27323f45715a7ccccab470d29b2ab67616d0000b273819f90c805b6a4a816495df9ab67616d0000b273be8e9b832634616dcf14ca97ab67616d0000b273d2cb2c655c141aa8e7fff4f0",
+    "Title" : "Hardstyle",
+    "UpnpClass" : "object.container.playlistContainer",
+    "ItemId" : "10062a6cspotify%3aplaylist%3a5e2KheF9qKRvqCwtFlKEme",
+    "ParentId" : "00080024playlists"
+  },
+  "nextTrack" : {
+    "Album" : "Renegades",
+    "Artist" : "Frequencerz",
+    "AlbumArtUri" : "http://192.168.1.105:1400/getaa?s=1&u=x-sonos-spotify:spotify:track:7iGbCV07PTIWpEBXUoIZG3%3fsid%3d9%26flags%3d8224%26sn%3d7",
+    "Title" : "Renegades",
+    "UpnpClass" : "object.item.audioItem.musicTrack",
+    "Duration" : "0:04:52",
+    "ItemId" : "-1",
+    "ParentId" : "-1",
+    "TrackUri" : "x-sonos-spotify:spotify:track:7iGbCV07PTIWpEBXUoIZG3?sid=9&flags=8224&sn=7",
+    "ProtocolInfo" : "sonos.com-spotify:*:audio/x-spotify:*"
+  },
+  "transportState" : "PLAYING",
+  "playmode" : "SHUFFLE",
+  "ts" : 1586344373119,
+  "volume" : {
+    "Master" : 7,
+    "LF" : 100,
+    "RF" : 100
+  },
+  "mute" : {
+    "Master" : false,
+    "LF" : false,
+    "RF" : false
   }
 }
 ```
 
-By default you can subscribe to the following subtopics `coordinator` (retained), `state` (retained), `volume` (retained), `muted` (retaind) and `track`/`trackUri` (not retained) but if you wish to have separate topics for the track values you can specify the `-d` or `--publish-distinct` parameter and you will get the `artist`, `title`, `album`, `trackUri` and `albumart` topics.
+### AVTransport message
 
-### Controlling sonos
+Topic: `sonos/status/name_of_speaker/avtransport`
 
-You can control sonos by sending an empty message on these topics. The topic format is like `sonos/set/room_name/command` for instance `sonos/set/Office/next`.
-
-|Command| |Description|Payload|
-|-------|-|-----------|-------|
-|`next`|:fast_forward:|Go to next song in queue| |
-|`previous`|:rewind:|Go to previous song in queue| |
-|`pause`||Pause playback| |
-|`play`|:arrow_forward:|Start playback| |
-|`toggle`||Toggle between pause and play| |
-|`stop`|:no_entry_sign:|Stop Playback| |
-|`selecttrack`||Select another track in the current queue|number|
-|`seek`|:clock330:|Seek in the current track|Time like `0:02:45`|
-|`queue`|:heavy_plus_sign:|Add a song to the queue|Track uri|
-|`playmode`|:twisted_rightwards_arrows:|Change the playmode, when using queue|`NORMAL`, `REPEAT_ALL`, `SHUFFLE` or `SHUFFLE_NOREPEAT`.|
-|`setavtransporturi`|:abcd:|Set the current playback uri, for advanced cases.|playback or track uri (check out the trackUri topic to find the required value)|
-|`volume`|:speaker:|Set the volume to a value|number (between 1 and 100)|
-|`volumeup`|:heavy_plus_sign:|Increase volume with 5 or number|optional number|
-|`volumedown`|:heavy_minus_sign:|Decrease volume with 5 or number|optional number|
-|`mute`|:speaker:|Mute the volume| |
-|`unmute`|:mute:|Unmute the volume| |
-|`sleep`|:zzz:|Set a sleeptimer for x minutes|number|
-|`joingroup`||Join another group by name|name of other device|
-|`leavegroup`||Remove current device from the group it's in| |
-|`notify`|:bell:|Play a notification sound and restore playback|see [notifications](#notifications)|
-|`speak`|:speech_balloon:|Generate text-to-speech file and play as notification :tada:|see [text-to-speech](#text-to-speech)|
-|`command`|:cop:|Execute one of the commands above|See [command](#command)|
-|`adv-command`|:guardsman:|Execute a command in [node-sonos-ts](https://github.com/svrooij/node-sonos-ts#commands)|See [all commands](https://github.com/svrooij/node-sonos-ts#commands)|
-
-#### Notifications
-
-To play a short music file as a notification send the following payload to `sonos/set/device_name/notify` or to `sonos/cmd/notify` to play it on all devices.
-
-```JSON
+```json
 {
-  "trackUri": "https://cdn.smartersoft-group.com/various/pull-bell-short.mp3",
-  "onlyWhenPlaying": false,
-  "timeout": 10,
-  "volume": 8
+  "CurrentCrossfadeMode" : false,
+  "CurrentPlayMode" : "NORMAL",
+  "CurrentSection" : 0,
+  "CurrentTrack" : 5,
+  "CurrentTrackDuration" : "0:04:04",
+  "CurrentTrackMetaData" : {
+    "Album" : "Long Way Down (Deluxe)",
+    "Artist" : "Tom Odell",
+    "AlbumArtUri" : "http://192.168.1.105:1400/getaa?s=1&u=x-sonosprog-spotify:spotify:track:3JvKfv6T31zO0ini8iNItO%3fsid%3d9%26flags%3d8224%26sn%3d7",
+    "Title" : "Another Love",
+    "UpnpClass" : "object.item.audioItem.musicTrack",
+    "Duration" : "0:04:04",
+    "ItemId" : "-1",
+    "ParentId" : "-1",
+    "TrackUri" : "x-sonosprog-spotify:spotify:track:3JvKfv6T31zO0ini8iNItO?sid=9&flags=8224&sn=7",
+    "ProtocolInfo" : "sonos.com-spotify:*:audio/x-spotify:*"
+  },
+  "CurrentTrackURI" : "x-sonosprog-spotify:spotify%3atrack%3a3JvKfv6T31zO0ini8iNItO?sid=9&amp;flags=8224&amp;sn=7",
+  "EnqueuedTransportURI" : "x-sonosapi-radio:spotify%3aartistRadio%3a0gadJ2b9A4SKsB1RFkBb66?sid=9&amp;flags=8300&amp;sn=7",
+  "EnqueuedTransportURIMetaData" : {
+    "Artist" : "Passenger",
+    "AlbumArtUri" : "https://i.scdn.co/image/4cc8542ea52b2f0cc4f62d68728a6439068c28b4",
+    "Title" : "Passenger Radio",
+    "UpnpClass" : "object.item.audioItem.audioBroadcast.#artistRadio",
+    "ItemId" : "100c206cspotify%3aartistRadio%3a0gadJ2b9A4SKsB1RFkBb66",
+    "ParentId" : "00050024spotify%3aartist%3a0gadJ2b9A4SKsB1RFkBb66"
+  },
+  "NumberOfTracks" : 37,
+  "TransportState" : "PLAYING"
 }
 ```
 
-#### Text-to-speech
+### Rendering control message
 
-You can have your sonos speaker prononce some notification text, which is a pretty cool feature. But you'll need some extra work. You'll need a text-to-speech endpoint as described [here](https://github.com/svrooij/node-sonos-ts#text-to-speech). You have two options either host your own [server](https://github.com/svrooij/node-sonos-tts-polly) or become a [sponsor][link_sponsor] and get access to my personal hosted TTS server.
+Topic: `sonos/status/name_of_speaker/renderingcontrol`
 
-Either way you'll have yourself a text-to-speech endpoint. This can be set in the environment as `SONOS_TTS_ENDPOINT` or you'll have to supply it with every request.
-
-Have a speaker speak by sending the following to `sonos/set/device_name/speak`. Endpoint is optional (if set in environment), lang is options if set in config, gender, volume & onlyWhenPlaying are always optional.
-
-```JSON
+```json
 {
-  "text": "Someone at the front-door",
-  "endpoint": "https://your.tts.endpoint/api/generate",
-  "lang": "en-US",
-  "gender": "male",
-  "volume": 50,
-  "onlyWhenPlaying": false
+  "Bass" : -2,
+  "HeadphoneConnected" : false,
+  "Loudness" : true,
+  "Mute" : {
+    "Master" : false,
+    "LF" : false,
+    "RF" : false
+  },
+  "OutputFixed" : false,
+  "PresetNameList" : "FactoryDefaults",
+  "SpeakerSize" : 5,
+  "SubCrossover" : "0",
+  "SubEnabled" : true,
+  "SubGain" : "0",
+  "SubPolarity" : "0",
+  "Treble" : 0,
+  "Volume" : {
+    "Master" : 3,
+    "LF" : 100,
+    "RF" : 100
+  }
 }
 ```
 
-#### Command
+### Distinct messages
 
-Someone [suggested](https://github.com/svrooij/sonos2mqtt/issues/21) to create one endpoint to send all commands to. So you can also send one of the commands above to the `sonos/set/kitchen/command` topic with the following json payload. cmd is always required to be one of the commands, val is optional.
+This application also supports sending several splitted messages. You will need to enable them by setting `--distinct`. Once enabled this app will also emit the following messages. These messages all start with `sonos/status/name_of_speaker/` followed by one of these suffixes.
 
-```JSON
-{
-  "cmd":"volume",
-  "val":10
-}
-```
+|suffix|Description|Sample output|
+|-----|-----------|-------------|
+|`group`|Name of the group this player is in|`Kitchen + 2`|
+|`coordinator`|UUID of the group coordinator|`RINCON_000E5000000001400`|
+|`track`|Json with info about current track| *Just check yourself*|
+|`trackuri`|URI of the current song|`x-sonosprog-spotify:spotify%3atrack%3a3JvKfv6T31zO0ini8iNItO?sid=9&amp;flags=8224&amp;sn=7`|
+|`muted`|boolean for muted status|`true` / `false`|
+|`state`|Current playback state|`PLAYING` / `PAUSED` / `STOPPED`|
+|`volume`|Current volume of player|number between 0 and 100|
 
 ### Generic commands
 
@@ -263,20 +414,44 @@ Generic commands:
 |`setalarm`|Enable(/disable) an existing alarm.|JSON `{"id":30,"enabled":true}`|
 |`notify`|Play a notification on all speakers.|JSON see [notifications](#notifications)|
 
-## Run a MQTT server in docker
+## Homeassistant auto-discovery
 
-If your want to test this library it's best to create a mqtt server just for testing. This can easily be done with the following docker command:
-`docker run -it -p 1883:1883 -p 9001:9001 eclipse-mosquitto`
+Currently homeassistant [doesn't support](https://www.home-assistant.io/docs/mqtt/discovery/) auto-discovery for media speakers. This library does however emit auto-discovery messages for each speaker, see it as a new proposed device type supported by auto-discovery over mqtt. Enable the auto-discovery messages by setting `discovery` to true (and change the prefix by setting `discoveryprefix`).
 
-## Use [PM2](http://pm2.keymetrics.io) to run in background
+Topic: `homeassistant/music_player/RINCON_000E5000000001400/sonos/config`
 
-The preferred method of running Sonos2Mqtt is in Docker, but you can always run in on the device itself. PM2 is a nice tool to run and log scripts in the background.And they have a great [guide for this](http://pm2.keymetrics.io/docs/usage/quick-start/).
+```JSON
+{
+  "available_commands" : [ "adv-command", "command", "joingroup", "leavegroup", "mute", "next", "notify", "pause", "play", "playmode", "previous", "queue", "seek", "selecttrack", "setavtransporturi", "sleep", "speak", "stop", "toggle", "unmute", "volume", "volumedown", "volumeup" ],
+  "command_topic" : "sonos/RINCON_000E5000000001400/control",
+  "device" : {
+    "identifiers" : [ "RINCON_000E5000000001400" ],
+    "manufacturer" : "Sonos",
+    "name" : "TV"
+  },
+  "device_class" : "speaker",
+  "icon" : "mdi:speaker",
+  "json_attributes" : true,
+  "json_attributes_topic" : "sonos/RINCON_000E5000000001400",
+  "name" : "TV",
+  "state_topic" : "sonos/RINCON_000E5000000001400",
+  "unique_id" : "sonos2mqtt_RINCON_000E5000000001400_speaker",
+  "availability_topic" : "sonos/connected",
+  "payload_available" : "2"
+}
+```
+
+The command topic accepts all the commands listed in the available_commands property. All the commands should be send like described [here](#controlling-sonos). The json_attribute_topic displays the topic where all the different speakers properties are present. Maybe there should be some standard (contact me, developers from home assistant).
+
+To discover every speaker we emit, just subscribe to `homeassistant/music_player/+/sonos/config` all the discovery messages are retained, so you will also receive the messages if your app starts after sonos2mqtt.
 
 ## Node-sonos-ts
 
 This library depends on [node-sonos-ts](https://github.com/svrooij/node-sonos-ts/) which I also developed. All other libraries using node-sonos-ts should also be able to implemented all the nice features included there. Like **notifications**  or **text-to-speech** which are the coolest new additions for **sonos2mqtt**!
 
 ## Beer or Coffee
+
+I'm a big fan of beer and coffee. To provide something extra to everybody who is sponsoring me, I'll provide a hosted TTS server for all my sponsors.
 
 This bridge and the [sonos package](https://github.com/svrooij/node-sonos-ts) took me a lot of hours to build, so I invite everyone using it to at least have a look at my [Sponsor page](https://github.com/sponsors/svrooij). Even though the sponsoring tiers are montly you can also cancel anytime :wink:
 
