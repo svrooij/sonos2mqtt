@@ -32,8 +32,8 @@
   "devDependencies": {
     "@types/debug": "^4.1.5",
     "@types/yargs": "^15.0.4",
-    "@typescript-eslint/eslint-plugin": "^2.25.0",
-    "@typescript-eslint/parser": "^2.25.0",
+    "@typescript-eslint/eslint-plugin": "^2.27.0",
+    "@typescript-eslint/parser": "^2.27.0",
     "eslint": "^6.8.0",
     "pre-commit": "1.2.2",
     "semantic-release": "17.0.4",
