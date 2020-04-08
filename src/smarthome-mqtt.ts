@@ -24,7 +24,7 @@ export class SmarthomeMqtt{
     this.mqttClient = mqtt.connect(this.uri.toString(), {
       will: {
         topic: `${this.prefix}/connected`,
-        payload: '',
+        payload: '0',
         qos: 0,
         retain: true
       },
@@ -36,7 +36,6 @@ export class SmarthomeMqtt{
       this.mqttClient?.subscribe(`${this.prefix}/set/+/+`)
       this.mqttClient?.subscribe(`${this.prefix}/cmd/+`)
       this.mqttClient?.subscribe(`${this.prefix}/+/control`)
-
     })
     this.mqttClient.on('message', (topic, payload, packet) => {this.handleIncomingMessage(topic,payload,packet)})
     this.mqttClient.on('close', () => {
@@ -61,6 +60,7 @@ export class SmarthomeMqtt{
   }
 
   close(): void {
+    this.publishStatus('0');
     this.mqttClient?.end()
   }
 
@@ -77,6 +77,10 @@ export class SmarthomeMqtt{
     if(typeof payload !== 'string') payload = JSON.stringify(payload);
     const topic = `${prefix}/music_player/${uuid}/sonos/config`;
     this.mqttClient?.publish(topic, payload, { qos:0, retain: true });
+  }
+
+  publishStatus(status: '0' | '1' | '2'): void {
+    this.publish('connected', status, { retain: true, qos: 0 })
   }
   
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

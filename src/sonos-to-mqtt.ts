@@ -32,6 +32,7 @@ export class SonosToMqtt {
       this.setupMqttEvents()
       this.setupSonosEvents()
       this.mqtt.connect()
+      this.mqtt.publishStatus('2');
 
       if(this.config.discovery === true) {
         this.publishDiscoveryMessages();
@@ -42,6 +43,7 @@ export class SonosToMqtt {
   }
 
   stop(): void {
+    this.mqtt.publishStatus('1');
     this.mqtt.close();
     this.sonosManager.Devices.forEach(d => {
       d.CancelEvents()
