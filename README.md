@@ -95,23 +95,26 @@ Using sonos2mqtt is really easy, but it requires at least [Node.js](https://node
 sonos2mqtt 0.0.0-development
 A smarthome bridge between your sonos system and a mqtt server.
 
-Usage: sonos2mqtt [options]
+Usage: index.js [options]
 
 Options:
-  -v, --verbosity         Verbosity level
-                   [choices: "error", "warn", "info", "debug"] [default: "info"]
-  -i, --name              instance name. used as mqtt client id and as prefix
-                          for connected topic                 [default: "sonos"]
-  --mqtt                  mqtt broker url. See
-                          https://github.com/mqttjs/MQTT.js#connect-using-a-url
+  --prefix           instance name. used as mqtt client id and as prefix for
+                     connected topic                          [default: "sonos"]
+  --mqtt             mqtt broker url. See
+                     https://github.com/svrooij/sonos2mqtt#mqtt-url
                                                    [default: "mqtt://127.0.0.1"]
-  -d, --publish-distinct  Publish distinct track states
-                                                      [boolean] [default: false]
-  -h, --help              Show help                                    [boolean]
-  --tts-lang              Default TTS language                [default: "en-US"]
-  --tts-endpoint          Default endpoint for text-to-speech
-  --device                Start with one known IP instead of device discovery.
-  --version               Show version number                          [boolean]
+  --log              Set the loglevel
+           [choices: "warning", "information", "debug"] [default: "information"]
+  -d, --distinct     Publish distinct track states    [boolean] [default: false]
+  -h, --help         Show help                                         [boolean]
+  --ttslang          Default TTS language                     [default: "en-US"]
+  --ttsendpoint      Default endpoint for text-to-speech
+  --device           Start with one known IP instead of device discovery.
+  --discovery        Emit retained auto-discovery messages for each player.
+                                                                       [boolean]
+  --discoveryprefix  The prefix for the discovery messages
+                                                      [default: "homeassistant"]
+  --version          Show version number                               [boolean]
 ```
 
 ### MQTT Url

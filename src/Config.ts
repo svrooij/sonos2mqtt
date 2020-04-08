@@ -56,7 +56,7 @@ export class ConfigLoader {
     return yargs
       .usage(pkg.name + ' ' + pkg.version + '\n' + pkg.description + '\n\nUsage: $0 [options]')
       .describe('prefix', 'instance name. used as mqtt client id and as prefix for connected topic')
-      .describe('mqtt', 'mqtt broker url. See https://github.com/mqttjs/MQTT.js#connect-using-a-url')
+      .describe('mqtt', 'mqtt broker url. See https://github.com/svrooij/sonos2mqtt#mqtt-url')
       .describe('log', 'Set the loglevel')
       .describe('d', 'Publish distinct track states')
       .describe('h', 'show help')
