@@ -22,7 +22,7 @@
     "test": "eslint ./src/*.ts && exit 0"
   },
   "dependencies": {
-    "@svrooij/sonos": "^2.0.4",
+    "@svrooij/sonos": "^2.0.5",
     "mqtt": "3.0.0",
     "serilogger": "^0.3.1",
     "strict-event-emitter-types": "^2.0.0",
