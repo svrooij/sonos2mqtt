@@ -88,6 +88,15 @@ export class SonosCommandMapping {
 
       case SonosCommands.Stop:
         return await device.Stop();
+      
+      case SonosCommands.SwitchToLine:
+        return await device.SwitchToLineIn();
+
+      case SonosCommands.SwitchToQueue:
+        return await device.SwitchToQueue();
+      
+      case SonosCommands.SwitchToQueue:
+        return await device.SwitchToTV();
 
       case SonosCommands.Toggle:
         return await device.TogglePlayback();

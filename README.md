@@ -29,6 +29,8 @@ Every setting of this library can be set with environment variables prefixed wit
 SONOS2MQTT_DEVICE=192.168.x.x
 # Set the mqtt connection string
 SONOS2MQTT_MQTT=mqtt://ip_or_host_of_mqtt
+# Publish distinct if your want
+# SONOS2MQTT_DISTINCT=true
 # Set the IP of the docker host (so node-sonos-ts knows where the events should be send to)
 SONOS_LISTENER_HOST=192.168.x.x
 # Set text-to-speech endpoint (optional)
@@ -56,6 +58,7 @@ services:
     environment:
       - SONOS2MQTT_DEVICE=192.168.50.4 # Service discovery doesn't work very well inside docker, so start with one device.
       - SONOS2MQTT_MQTT=mqtt://emqx:1883 # EMQX is a nice mqtt broker
+      # - SONOS2MQTT_DISTINCT=true # if your want distinct topics
       - SONOS_LISTENER_HOST=192.168.50.44 # Docker host IP
       - SONOS_TTS_ENDPOINT=http://sonos-tts:5601/api/generate # If you deployed the TTS with the same docker-compose
     depends_on:
@@ -105,7 +108,7 @@ Options:
                                                    [default: "mqtt://127.0.0.1"]
   --log              Set the loglevel
            [choices: "warning", "information", "debug"] [default: "information"]
-  -d, --distinct     Publish distinct track states    [boolean] [default: false]
+  --distinct         Publish distinct track states    [boolean] [default: false]
   -h, --help         Show help                                         [boolean]
   --ttslang          Default TTS language                     [default: "en-US"]
   --ttsendpoint      Default endpoint for text-to-speech
@@ -171,6 +174,9 @@ like (to set the volume to 10):
 |`sleep`|:zzz:|Set a sleeptimer for x minutes|number|
 |`speak`|:speech_balloon:|Generate text-to-speech file and play as notification :tada:|see [text-to-speech](#text-to-speech)|
 |`stop`|:no_entry_sign:|Stop Playback| |
+|`switchtoline`||Switch to line-in (on supported devices)| |
+|`switchtoqueue`||Switch to queue| |
+|`switchtotv`||Switch to TV input (on supported devices, eg. playbar)| |
 |`toggle`||Toggle between pause and play| |
 |`unmute`|:mute:|Unmute the volume| |
 |`volume`|:speaker:|Set the volume to a value|number (between 1 and 100)|
