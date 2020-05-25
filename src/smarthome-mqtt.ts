@@ -86,28 +86,35 @@ export class SmarthomeMqtt{
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private handleIncomingMessage(topic: string, payload: Buffer, packet: mqtt.Packet): void {
     const parsedPayload = SmarthomeMqtt.parsePayload(payload.toString())
-    const parts = topic.toLocaleLowerCase().split('/')
+    const parts = topic.replace(`${this.prefix}/`, '').toLocaleLowerCase().split('/')
     
-    // topic: sonos/set/name_of_speaker/command
-    if(parts.length === 4 && parts[1] === 'set') {
-      this.log.debug('Mqtt parsing {command} for {device}', parts[3], parts[2])
-      const control = new DeviceControl(parts[3], undefined, parsedPayload);
-      if(control.isValid()) {
-        this.Events.emit('deviceControl', parts[2], control)
-      }
-    } else if (parts.length === 3 // topic: sonos/uuid_of_speaker/control
-        && parts[2] === 'control'
-        && typeof parsedPayload !== "number" 
-        && typeof parsedPayload !== 'string') {
-      this.log.debug('Mqtt parsing {command} for {device}', parsedPayload.cmd ?? parsedPayload.command, parts[1])
-      const control = new DeviceControl(parsedPayload.cmd ?? parsedPayload.command, parsedPayload.sonosCommand, parsedPayload.input)
-
+    // topic: {prefix}/set/name_of_speaker/command
+    // parts: ['set', 'name_of_speaker', 'command']
+    if(parts.length === 3 && parts[0] === 'set') {
+      this.log.debug('Mqtt parsing {command} for {device}', parts[2], parts[1])
+      const control = new DeviceControl(parts[2], undefined, parsedPayload);
       if(control.isValid()) {
         this.Events.emit('deviceControl', parts[1], control)
       }
-    } else if (parts.length === 3 && parts[1] === 'cmd') { // topic: sonos/cmd/global_command
-      this.log.debug('Mqtt got generic command {command}', parts[2])
-      this.Events.emit('generic', parts[2], parsedPayload)
+    } 
+     // topic: {prefix}/uuid_of_speaker/control
+     // parts: ['uuid_of_speaker', 'control']
+    else if (parts.length === 2
+        && parts[1] === 'control'
+        && typeof parsedPayload !== "number" 
+        && typeof parsedPayload !== 'string') {
+      this.log.debug('Mqtt parsing {command} for {device}', parsedPayload.cmd ?? parsedPayload.command, parts[0])
+      const control = new DeviceControl(parsedPayload.cmd ?? parsedPayload.command, parsedPayload.sonosCommand, parsedPayload.input)
+
+      if(control.isValid()) {
+        this.Events.emit('deviceControl', parts[0], control)
+      }
+    }
+    // topic: {prefix}/cmd/global_command
+    // parts: ['cmd', 'global_command']
+    else if (parts.length === 2 && parts[0] === 'cmd') { 
+      this.log.debug('Mqtt got generic command {command}', parts[1])
+      this.Events.emit('generic', parts[1], parsedPayload)
     }
   }
 
