@@ -222,7 +222,7 @@ To play a short music file as a notification send the following payload to `sono
 }
 ```
 
-You can also have a notification play on all speakers, just send the following message to `sonos/cmd/notify`.
+You can also have a notification play on all groups (all devices that coordinate themself), just send the following message to `sonos/cmd/notify`.
 
 ```JSON
 {
