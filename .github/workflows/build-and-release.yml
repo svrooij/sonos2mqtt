@@ -20,6 +20,8 @@ jobs:
         run: npm ci
       - name: Run tests
         run: npm test
+      - name: Build library
+        run: npm run build
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v2
         id: semantic
