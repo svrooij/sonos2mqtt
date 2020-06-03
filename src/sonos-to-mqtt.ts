@@ -100,39 +100,39 @@ export class SonosToMqtt {
       this.states.push({uuid: d.Uuid, name: d.Name, groupName: d.GroupName, coordinatorUuid: d.Coordinator.Uuid})
       d.Events.on(SonosEvents.AVTransport, (data) => {
         this.updateStateWithAv(d.Uuid, data);
-        this.mqtt.publish(`status/${SonosToMqtt.CleanName(d.Name)}/avtransport`,data)
+        this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/avtransport`,data)
       })
       d.Events.on(SonosEvents.RenderingControl, (data) => {
         this.updateStateWithRenderingControl(d.Uuid, data);
-        this.mqtt.publish(`status/${SonosToMqtt.CleanName(d.Name)}/renderingcontrol`,data)
+        this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/renderingcontrol`,data)
       })
       d.Events.on(SonosEvents.GroupName, (groupName) => {
         this.updateState(d.Uuid, { groupName });
         if(this.config.distinct === true) {
-          this.mqtt.publish(`status/${SonosToMqtt.CleanName(d.Name)}/group`, groupName)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/group`, groupName)
         }
       })
       d.Events.on(SonosEvents.Coordinator, (coordinatorUuid) => {
         this.updateState(d.Uuid, { coordinatorUuid });
         if(this.config.distinct === true) {
-          this.mqtt.publish(`status/${SonosToMqtt.CleanName(d.Name)}/coordinator`, coordinatorUuid)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/coordinator`, coordinatorUuid)
         }
       })
       if(this.config.distinct === true) {
         d.Events.on(SonosEvents.CurrentTrackMetadata, (track) => {
-          this.mqtt.publish(`status/${SonosToMqtt.CleanName(d.Name)}/track`, track)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/track`, track)
         })
         d.Events.on(SonosEvents.CurrentTrackUri, (trackUri) => {
-          this.mqtt.publish(`status/${SonosToMqtt.CleanName(d.Name)}/trackUri`, trackUri)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/trackUri`, trackUri)
         })
         d.Events.on(SonosEvents.Mute, (mute) => {
-          this.mqtt.publish(`status/${SonosToMqtt.CleanName(d.Name)}/muted`, mute)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/muted`, mute)
         })
         d.Events.on(SonosEvents.CurrentTransportStateSimple, (state) => {
-          this.mqtt.publish(`status/${SonosToMqtt.CleanName(d.Name)}/state`, state)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/state`, state)
         })
         d.Events.on(SonosEvents.Volume, (volume) => {
-          this.mqtt.publish(`status/${SonosToMqtt.CleanName(d.Name)}/volume`, volume)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/volume`, volume)
         })
 
       }
@@ -223,6 +223,10 @@ export class SonosToMqtt {
         this.mqtt.publish(this.states[index].uuid ?? '', this.states[index], { qos: 0, retain: true });
       }, 400)
     }
+  }
+
+  private topicId(name: string, uuid: string): string {
+    return this.config.friendlynames === 'name' ? SonosToMqtt.CleanName(name) : uuid;
   }
 
   private static CleanName (name: string): string {

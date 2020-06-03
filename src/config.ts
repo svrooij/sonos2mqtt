@@ -15,6 +15,7 @@ export interface Config {
   discoveryprefix: string;
   log: string;
   clientid?: string;
+  friendlynames: 'name' | 'uuid';
 }
 
 const defaultConfig: Config = {
@@ -23,7 +24,8 @@ const defaultConfig: Config = {
   distinct: false,
   discovery: true,
   discoveryprefix: 'homeassistant',
-  log: 'information'
+  log: 'information',
+  friendlynames: 'name'
 }
 
 export class ConfigLoader {
@@ -68,6 +70,8 @@ export class ConfigLoader {
       .describe('device', 'Start with one known IP instead of device discovery.')
       .describe('discovery', 'Emit retained auto-discovery messages for each player.')
       .describe('discoveryprefix', 'The prefix for the discovery messages')
+      .describe('friendlynames', 'Use device name or uuid in topics (except the united topic, always uuid)')
+      .choices('friendlynames', ['name', 'uuid'])
       .alias({
         h: 'help',
         d: 'distinct'
