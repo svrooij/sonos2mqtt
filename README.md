@@ -101,11 +101,12 @@ A smarthome bridge between your sonos system and a mqtt server.
 Usage: index.js [options]
 
 Options:
-  --prefix           instance name. used as mqtt client id and as prefix for
-                     connected topic                          [default: "sonos"]
+  --prefix           instance name. used as prefix for all topics
+                                                              [default: "sonos"]
   --mqtt             mqtt broker url. See
                      https://github.com/svrooij/sonos2mqtt#mqtt-url
                                                    [default: "mqtt://127.0.0.1"]
+  --clientid         Specify the client id to be used
   --log              Set the loglevel
            [choices: "warning", "information", "debug"] [default: "information"]
   --distinct         Publish distinct track states    [boolean] [default: false]

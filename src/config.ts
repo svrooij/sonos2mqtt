@@ -14,6 +14,7 @@ export interface Config {
   discovery: boolean;
   discoveryprefix: string;
   log: string;
+  clientid?: string;
 }
 
 const defaultConfig: Config = {
@@ -56,8 +57,9 @@ export class ConfigLoader {
     const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json')).toString())
     return yargs
       .usage(pkg.name + ' ' + pkg.version + '\n' + pkg.description + '\n\nUsage: $0 [options]')
-      .describe('prefix', 'instance name. used as mqtt client id and as prefix for connected topic')
+      .describe('prefix', 'instance name. used as prefix for all topics')
       .describe('mqtt', 'mqtt broker url. See https://github.com/svrooij/sonos2mqtt#mqtt-url')
+      .describe('clientid', 'Specify the client id to be used')
       .describe('log', 'Set the loglevel')
       .describe('d', 'Publish distinct track states')
       .describe('h', 'show help')
