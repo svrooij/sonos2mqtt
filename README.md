@@ -4,7 +4,7 @@
 [![docker pulls][badge_docker]][link_docker]
 [![Support me on Github][badge_sponsor]][link_sponsor]
 [![github issues][badge_issues]][link_issues]
-[![travis](https://img.shields.io/travis/svrooij/sonos2mqtt.svg?style=flat-square)](https://travis-ci.org/svrooij/sonos2mqtt)
+[![Run build and publish][badge_build]][link_build]
 [![mqtt-smarthome](https://img.shields.io/badge/mqtt-smarthome-blue.svg?style=flat-square)](https://github.com/mqtt-smarthome/mqtt-smarthome)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
 
@@ -118,6 +118,8 @@ Options:
                                                                        [boolean]
   --discoveryprefix  The prefix for the discovery messages
                                                       [default: "homeassistant"]
+  --friendlynames    Use device name or uuid in topics (except the united topic,
+                     always uuid)                      [choices: "name", "uuid"]
   --version          Show version number                               [boolean]
 ```
 
@@ -469,6 +471,9 @@ The latest version of this bridge is inspired on [hue2mqtt.js](https://github.co
 [badge_sponsor]: https://img.shields.io/badge/Sponsor-on%20Github-red
 [badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt
 [badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt
+[badge_build]: https://github.com/svrooij/sonos2mqtt/workflows/Run%20tests%20and%20publish/badge.svg
+
 [link_sponsor]: https://github.com/sponsors/svrooij
 [link_issues]: https://github.com/svrooij/sonos2mqtt/issues
+[link_build]: https://github.com/svrooij/sonos2mqtt/actions
 [link_docker]: https://hub.docker.com/r/svrooij/sonos2mqtt
