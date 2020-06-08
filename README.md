@@ -200,8 +200,7 @@ The used sonos library has a lot to other [available commands](https://svrooij.g
       "Channel": "Master",
       "DesiredVolume": 20
     }
-  },
-
+  }
 }
 ```
 
