@@ -16,7 +16,7 @@ export class SmarthomeMqtt{
   private readonly uri: URL
   private mqttClient?: MqttClient;
   public readonly Events: StrictEventEmitter<EventEmitter, MqttEvents> = new EventEmitter();
-  constructor(mqttUrl: string, private readonly prefix: string = 'sonos') {
+  constructor(mqttUrl: string, private readonly prefix: string = 'sonos', private readonly clientId?: string) {
     this.uri = new URL(mqttUrl)
   }
 
@@ -28,7 +28,8 @@ export class SmarthomeMqtt{
         qos: 0,
         retain: true
       },
-      keepalive: 60000
+      keepalive: 60000,
+      clientId: this.clientId
     });
     this.mqttClient.on('connect',() => {
       this.log.debug('Connected to server {server}', this.uri.host)

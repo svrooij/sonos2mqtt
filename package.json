@@ -17,12 +17,11 @@
   "preferGlobal": true,
   "scripts": {
     "build": "tsc",
-    "prepack": "npm ci && npm run build",
     "semantic-release": "semantic-release",
-    "test": "eslint ./src/*.ts && exit 0"
+    "test": "eslint ./src/*.ts"
   },
   "dependencies": {
-    "@svrooij/sonos": "^2.0.6",
+    "@svrooij/sonos": "^2.0.8",
     "mqtt": "3.0.0",
     "serilogger": "^0.3.1",
     "strict-event-emitter-types": "^2.0.0",

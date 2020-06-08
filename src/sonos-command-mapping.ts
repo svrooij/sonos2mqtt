@@ -95,7 +95,7 @@ export class SonosCommandMapping {
       case SonosCommands.SwitchToQueue:
         return await device.SwitchToQueue();
       
-      case SonosCommands.SwitchToQueue:
+      case SonosCommands.SwitchToTv:
         return await device.SwitchToTV();
 
       case SonosCommands.Toggle:

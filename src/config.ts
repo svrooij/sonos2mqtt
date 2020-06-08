@@ -14,6 +14,8 @@ export interface Config {
   discovery: boolean;
   discoveryprefix: string;
   log: string;
+  clientid?: string;
+  friendlynames: 'name' | 'uuid';
 }
 
 const defaultConfig: Config = {
@@ -22,7 +24,8 @@ const defaultConfig: Config = {
   distinct: false,
   discovery: true,
   discoveryprefix: 'homeassistant',
-  log: 'information'
+  log: 'information',
+  friendlynames: 'name'
 }
 
 export class ConfigLoader {
@@ -56,8 +59,9 @@ export class ConfigLoader {
     const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json')).toString())
     return yargs
       .usage(pkg.name + ' ' + pkg.version + '\n' + pkg.description + '\n\nUsage: $0 [options]')
-      .describe('prefix', 'instance name. used as mqtt client id and as prefix for connected topic')
+      .describe('prefix', 'instance name. used as prefix for all topics')
       .describe('mqtt', 'mqtt broker url. See https://github.com/svrooij/sonos2mqtt#mqtt-url')
+      .describe('clientid', 'Specify the client id to be used')
       .describe('log', 'Set the loglevel')
       .describe('d', 'Publish distinct track states')
       .describe('h', 'show help')
@@ -66,6 +70,8 @@ export class ConfigLoader {
       .describe('device', 'Start with one known IP instead of device discovery.')
       .describe('discovery', 'Emit retained auto-discovery messages for each player.')
       .describe('discoveryprefix', 'The prefix for the discovery messages')
+      .describe('friendlynames', 'Use device name or uuid in topics (except the united topic, always uuid)')
+      .choices('friendlynames', ['name', 'uuid'])
       .alias({
         h: 'help',
         d: 'distinct'
