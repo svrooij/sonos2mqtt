@@ -87,7 +87,10 @@ export class SonosToMqtt {
         return;
       }
       try {
-        await SonosCommandMapping.ExecuteControl(correctDevice, payload)
+        const response = await SonosCommandMapping.ExecuteControl(correctDevice, payload);
+        if(payload.replyTopic) {
+          this.mqtt.publish(`${correctDevice.Uuid}/${payload.replyTopic}`, JSON.stringify(response));
+        }
         this.log.debug('Executed {command} for {device} ({uuid})', payload.command ?? payload.sonosCommand, correctDevice.Name, correctDevice.Uuid)
       } catch (e) {
         this.log.warn(e, 'Error executing {command} for {device} ({uuid})', payload.command ?? payload.sonosCommand, correctDevice.Name, correctDevice.Uuid)
