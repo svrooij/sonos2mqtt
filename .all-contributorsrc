@@ -1,0 +1,55 @@
+{
+  "projectName": "sonos2mqtt",
+  "projectOwner": "svrooij",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md",
+    "docs/index.md",
+    "docs/development.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "none",
+  "contributors": [
+    {
+      "login": "svrooij",
+      "name": "Stephan van Rooij",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1292510?v=4",
+      "profile": "https://svrooij.nl",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "cheanrod",
+      "name": "Sven Werner",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/35066927?v=4",
+      "profile": "https://github.com/cheanrod",
+      "contributions": [
+        "platform",
+        "code"
+      ]
+    },
+    {
+      "login": "matthias-burgfried",
+      "name": "Matthias Burgfried",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/7872104?v=4",
+      "profile": "https://mi.o-o.im",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "mqtt-fan",
+      "name": "mqtt-fan",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/32242849?v=4",
+      "profile": "https://github.com/mqtt-fan",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7
+}

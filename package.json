@@ -17,6 +17,7 @@
   "preferGlobal": true,
   "scripts": {
     "build": "tsc",
+    "serve-docs": "docker run --rm --volume=\"$PWD/docs/vendor/bundle:/usr/local/bundle\" --volume=\"$PWD/docs:/srv/jekyll\" -p 4000:4000 -p 35729:35729 -it jekyll/jekyll jekyll serve --livereload",
     "semantic-release": "semantic-release",
     "test": "eslint ./src/*.ts"
   },
