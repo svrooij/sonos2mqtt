@@ -23,19 +23,20 @@
       ]
     },
     {
-      "login": "matthias-burgfried",
-      "name": "Matthias Burgfried",
-      "avatar_url": "https://avatars0.githubusercontent.com/u/7872104?v=4",
-      "profile": "https://mi.o-o.im",
-      "contributions": [
-        "code"
-      ]
-    },
-    {
       "login": "cheanrod",
       "name": "Sven Werner",
       "avatar_url": "https://avatars3.githubusercontent.com/u/35066927?v=4",
       "profile": "https://github.com/cheanrod",
+      "contributions": [
+        "platform",
+        "code"
+      ]
+    },
+    {
+      "login": "matthias-burgfried",
+      "name": "Matthias Burgfried",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/7872104?v=4",
+      "profile": "https://mi.o-o.im",
       "contributions": [
         "code"
       ]
