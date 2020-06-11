@@ -1,5 +1,6 @@
 export enum SonosCommands {
   AdvancedCommand = 'adv-command',
+  ClearQueue = 'clearqueue',
   Command = 'command',
   JoinGroup = 'joingroup',
   LeaveGroup = 'leavegroup',

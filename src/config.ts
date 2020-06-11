@@ -48,7 +48,7 @@ export class ConfigLoader {
   private static LoadConfigFromFile(): Partial<Config> | undefined {
     // https://developers.home-assistant.io/docs/hassio_addon_config
     if (process.env.CONFIG_PATH === undefined) process.env.CONFIG_PATH = '/data/options.json'
-    if(process.env.CONFIG_PATH !== undefined && fs.existsSync(process.env.CONFIG_PATH)) {
+    if(fs.existsSync(process.env.CONFIG_PATH)) {
       const fileContent = fs.readFileSync(process.env.CONFIG_PATH).toString()
       return JSON.parse(fileContent) as Partial<Config>
     }

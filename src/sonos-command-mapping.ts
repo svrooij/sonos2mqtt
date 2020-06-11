@@ -18,6 +18,9 @@ export class SonosCommandMapping {
           return await device.ExecuteCommand(payload.cmd, payload.val)
         break;
 
+      case SonosCommands.ClearQueue:
+        return await device.AVTransportService.RemoveAllTracksFromQueue();
+
       case SonosCommands.Command:
         if (payload.cmd && Object.values(SonosCommands).some(v => v === payload.cmd))
           return SonosCommandMapping.ExecuteCommand(device, payload.cmd as SonosCommands, payload.val)
