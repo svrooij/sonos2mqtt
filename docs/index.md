@@ -1,29 +1,53 @@
+---
+# Feel free to add content and custom Front Matter to this file.
+# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
+
+layout: default
+title: Home
+nav_order: 1
+permalink: /
+---
+
 # Sonos2mqtt
 
+[![Run build and publish][badge_build]][link_build]
+[![github issues][badge_issues]][link_issues]
+[![Support me on Github][badge_sponsor]][link_sponsor]
 [![npm](https://img.shields.io/npm/v/sonos2mqtt.svg?style=flat-square)](https://www.npmjs.com/package/sonos2mqtt)
 [![docker pulls][badge_docker]][link_docker]
-[![Support me on Github][badge_sponsor]][link_sponsor]
-[![github issues][badge_issues]][link_issues]
-[![Run build and publish][badge_build]][link_build]
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![mqtt-smarthome](https://img.shields.io/badge/mqtt-smarthome-blue.svg?style=flat-square)](https://github.com/mqtt-smarthome/mqtt-smarthome)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
 
-This node application is a bridge between the Sonos and a mqtt server. The status of all your sonos devices will be published to mqtt and you can control the sonos speakers over mqtt.
-
-It's intended as a building block in heterogenous smart home environments where an MQTT message broker is used as the centralized message bus. See [MQTT Smarthome on Github](https://github.com/mqtt-smarthome/mqtt-smarthome) for a rationale and architectural overview.
-
-Check out the other bridges in the [software list](https://github.com/mqtt-smarthome/mqtt-smarthome/blob/master/Software.md)
+This library is in no way connected to [Sonos](//en.wikipedia.org/wiki/Sonos). It's just a library to control their speakers from your mqtt server.
 
 ## Documentation
 
-See: [https://svrooij.github.io/sonos2mqtt](https://svrooij.github.io/sonos2mqtt)
+- [Getting started](getting-started.html)
+- [Topic](topics.html)
+- [Controlling speakers](control)
+- [Development](development.html)
 
-## Node-sonos-ts
+---
 
-This library depends on [node-sonos-ts](https://github.com/svrooij/node-sonos-ts/) which I also developed. All other libraries using node-sonos-ts should also be able to implemented all the nice features included there. Like **notifications**  or **text-to-speech** which are the coolest new additions for **sonos2mqtt**!
+## Key features
+
+- Using local push for immediate state changes.
+- Talking straight to the sonos device (no cloud involved).
+- Supporting **all** sonos actions
+
+## Sonos library (typescript/node)
+
+This app uses [node-sonos-ts](https://github.com/svrooij/node-sonos-ts) to talk to the sonos speakers. And can easily be integrated in all kind of other apps.
+
+## Sonos CLI
+
+Not really an mqtt guy/girl? I also created a small [sonos cli](https://github.com/svrooij/sonos-cli) to control your speakers from the command line.
+
+```shell
+npm i -g @svrooij/sonos-cli
+sonos zones --save
+sonos control office next
+```
 
 ## Beer or Coffee
 
@@ -66,4 +90,3 @@ Contributions of any kind welcome!
 [link_issues]: https://github.com/svrooij/sonos2mqtt/issues
 [link_build]: https://github.com/svrooij/sonos2mqtt/actions
 [link_docker]: https://hub.docker.com/r/svrooij/sonos2mqtt
-
