@@ -91,6 +91,10 @@ export class SonosToMqtt {
         this.log.debug('Executed {command} for {device} ({uuid})', payload.command ?? payload.sonosCommand, correctDevice.Name, correctDevice.Uuid)
       } catch (e) {
         this.log.warn(e, 'Error executing {command} for {device} ({uuid})', payload.command ?? payload.sonosCommand, correctDevice.Name, correctDevice.Uuid)
+        this.mqtt.publish(`${correctDevice.Uuid}/error`, {
+          command: payload.command ?? payload.sonosCommand,
+          error: e
+        });
       }
     })
   }
