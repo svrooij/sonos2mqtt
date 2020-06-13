@@ -156,6 +156,64 @@ In case you want to remove all tracks from the queue you can call this command.
 }
 ```
 
+### List queue content (expert)
+
+`sonos/uuid/control`
+
+```json
+{
+  "command": "adv-command",
+  "input": {
+    "cmd": "GetQueue",
+    "reply": "MyQueueReply"
+  }
+}
+```
+
+Response will be send to `sonos/uuid/MyQueueResult` (last part is the value of the reply in request).
+
+```json
+{
+  "Result": [{
+    "Album": "Carry On",
+    "Artist": "Martin Jensen",
+    "AlbumArtUri": "http://192.168.x.x:1400/getaa?s=1&u=x-sonos-spotify:spotify:track:3YnOIhATp9QC9OxJb3pDfg%3fsid%3d9%26flags%3d8224%26sn%3d7",
+    "Title": "Carry On",
+    "UpnpClass": "object.item.audioItem.musicTrack",
+    "Duration": "0:02:32",
+    "ItemId": "Q:0/1",
+    "ParentId": "Q:0",
+    "TrackUri": "x-sonos-spotify:spotify:track:3YnOIhATp9QC9OxJb3pDfg?sid=9&flags=8224&sn=7",
+    "ProtocolInfo": "sonos.com-spotify:*:audio/x-spotify:*"
+  }, {
+    "Album": "By My Side (feat. Anthony Valadez)",
+    "Artist": "Ferreck Dawn",
+    "AlbumArtUri": "http://192.168.x.x:1400/getaa?s=1&u=x-sonos-spotify:spotify:track:6eSWdCAvzD4danVK3OlqYU%3fsid%3d9%26flags%3d8224%26sn%3d7",
+    "Title": "By My Side (feat. Anthony Valadez)",
+    "UpnpClass": "object.item.audioItem.musicTrack",
+    "Duration": "0:02:37",
+    "ItemId": "Q:0/2",
+    "ParentId": "Q:0",
+    "TrackUri": "x-sonos-spotify:spotify:track:6eSWdCAvzD4danVK3OlqYU?sid=9&flags=8224&sn=7",
+    "ProtocolInfo": "sonos.com-spotify:*:audio/x-spotify:*"
+  }, {
+    "Album": "Get in Trouble (So What)",
+    "Artist": "Dimitri Vegas &amp; Like Mike",
+    "AlbumArtUri": "http://192.168.x.x:1400/getaa?s=1&u=x-sonos-spotify:spotify:track:5KC7ginqShi7mhDQLttQh0%3fsid%3d9%26flags%3d8224%26sn%3d7",
+    "Title": "Get in Trouble (So What)",
+    "UpnpClass": "object.item.audioItem.musicTrack",
+    "Duration": "0:02:41",
+    "ItemId": "Q:0/61",
+    "ParentId": "Q:0",
+    "TrackUri": "x-sonos-spotify:spotify:track:5KC7ginqShi7mhDQLttQh0?sid=9&flags=8224&sn=7",
+    "ProtocolInfo": "sonos.com-spotify:*:audio/x-spotify:*"
+  }],
+  "NumberReturned": 61,
+  "TotalMatches": 61,
+  "UpdateID": 4
+}
+```
+
 ## Special streams
 
 Your player also has some special streams, where you can connect to. These will start a special stream and will thus disconnect from the queue.
