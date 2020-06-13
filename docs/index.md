@@ -43,7 +43,7 @@ This library is in no way connected to [Sonos](//en.wikipedia.org/wiki/Sonos). I
 
 ## Sonos library (typescript/node)
 
-This app uses [node-sonos-ts](https://github.com/svrooij/node-sonos-ts) to talk to the sonos speakers. And can easily be integrated in all kind of other apps.
+This app uses [node-sonos-ts](https://svrooij.github.io/node-sonos-ts) to talk to the sonos speakers. And can easily be integrated in all kind of other apps.
 
 ## Sonos CLI
 

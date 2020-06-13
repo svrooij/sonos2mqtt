@@ -33,7 +33,7 @@ Send a message to the control endpoint `sonos/uuid_of_speaker/control` with the 
 
 ## Fetch data
 
-Where are also trying to implemened a way to fetch data from the speakers, this is currently discussed [here](https://github.com/svrooij/sonos2mqtt/issues/101) (feedback wanted!). The current (not released) proposal looks like:
+Where are also trying to implemened a way to fetch data from the speakers, this is currently discussed [here](https://github.com/svrooij/sonos2mqtt/issues/101) (feedback wanted!). The current (beta) solution looks like:
 
 Send a command that you expect to return data and specify the `reply` option.
 
