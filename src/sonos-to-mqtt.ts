@@ -14,7 +14,7 @@ export class SonosToMqtt {
   private readonly stateTimers: {[key: string]: NodeJS.Timeout} = {};
   constructor(private config: Config) {
     this.sonosManager = new SonosManager();
-    this.mqtt = new SmarthomeMqtt(config.mqtt, config.prefix, config.clientid);
+    this.mqtt = new SmarthomeMqtt(config);
   }
 
   async start(): Promise<boolean> {
@@ -201,7 +201,7 @@ export class SonosToMqtt {
    * @memberof SonosToMqtt
    */
   private updateStateWithRenderingControl(uuid: string, data: RenderingControlServiceEvent): void {
-    this.updateState(uuid, { 
+    this.updateState(uuid, {
       volume: data.Volume,
       mute: data.Mute
     })

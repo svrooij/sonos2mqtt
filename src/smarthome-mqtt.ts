@@ -4,6 +4,7 @@ import {StrictEventEmitter} from 'strict-event-emitter-types'
 import {EventEmitter} from 'events'
 import { DeviceControl } from './device-control'
 import {StaticLogger} from './static-logger'
+import {MqttConfig} from './config'
 
 interface MqttEvents {
   connected: (connected: boolean) => void;
@@ -13,49 +14,52 @@ interface MqttEvents {
 
 export class SmarthomeMqtt{
   private readonly log = StaticLogger.CreateLoggerForSource('sonos2mqtt.SmarthomeMqtt')
-  private readonly uri: URL
+  private readonly config: MqttConfig
   private mqttClient?: MqttClient;
   public readonly Events: StrictEventEmitter<EventEmitter, MqttEvents> = new EventEmitter();
-  constructor(mqttUrl: string, private readonly prefix: string = 'sonos', private readonly clientId?: string) {
-    this.uri = new URL(mqttUrl)
+
+  constructor(private readonly mqttConfig: MqttConfig) {
+    this.config = mqttConfig;
   }
 
   connect(): void {
-    this.mqttClient = mqtt.connect(this.uri.toString(), {
+    this.mqttClient = mqtt.connect(this.mqttConfig.mqtt, {
       will: {
-        topic: `${this.prefix}/connected`,
+        topic: `${this.config.prefix}/connected`,
         payload: '0',
         qos: 0,
         retain: true
       },
       keepalive: 60000,
-      clientId: this.clientId
+      clientId: this.config.clientid,
+      username: this.config.mqttuser,
+      password: this.config.mqttpw
     });
     this.mqttClient.on('connect',() => {
-      this.log.debug('Connected to server {server}', this.uri.host)
+      this.log.debug('Connected to server {server}', this.config.mqtt)
       this.Events.emit('connected', true)
-      this.mqttClient?.subscribe(`${this.prefix}/set/+/+`)
-      this.mqttClient?.subscribe(`${this.prefix}/cmd/+`)
-      this.mqttClient?.subscribe(`${this.prefix}/+/control`)
+      this.mqttClient?.subscribe(`${this.config.prefix}/set/+/+`)
+      this.mqttClient?.subscribe(`${this.config.prefix}/cmd/+`)
+      this.mqttClient?.subscribe(`${this.config.prefix}/+/control`)
     })
     this.mqttClient.on('message', (topic, payload, packet) => {this.handleIncomingMessage(topic,payload,packet)})
     this.mqttClient.on('close', () => {
       this.Events.emit('connected', false)
-      this.log.debug('Mqtt connection closed with {server}', this.uri.host)
+      this.log.debug('Mqtt connection closed with {server}', this.config.mqtt)
 
     })
-  
+
     this.mqttClient.on('error', (err) => {
       this.log.warn(err, 'Mqtt error')
     })
-  
+
     this.mqttClient.on('offline', () => {
-      this.log.warn('Mqtt offline {server}', this.uri.host)
+      this.log.warn('Mqtt offline {server}', this.config.mqtt)
 
     })
-  
+
     this.mqttClient.on('reconnect', () => {
-      this.log.info('Mqtt reconnecting {server}', this.uri.host)
+      this.log.info('Mqtt reconnecting {server}', this.config.mqtt)
 
     })
   }
@@ -66,7 +70,7 @@ export class SmarthomeMqtt{
   }
 
   publish(topic: string, payload: string | any, options: IClientPublishOptions = {} as IClientPublishOptions): void {
-    topic = `${this.prefix}/${topic}`
+    topic = `${this.config.prefix}/${topic}`
     if(typeof payload === 'number') payload = payload.toString();
     if(typeof payload === 'boolean') payload = payload === true ? 'true': 'false'
     this.log.verbose('Mqtt publish to {topic} {payload}', topic, payload)
@@ -83,12 +87,12 @@ export class SmarthomeMqtt{
   publishStatus(status: '0' | '1' | '2'): void {
     this.publish('connected', status, { retain: true, qos: 0 })
   }
-  
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private handleIncomingMessage(topic: string, payload: Buffer, packet: mqtt.Packet): void {
     const parsedPayload = SmarthomeMqtt.parsePayload(payload.toString())
-    const parts = topic.replace(`${this.prefix}/`, '').toLocaleLowerCase().split('/')
-    
+    const parts = topic.replace(`${this.config.prefix}/`, '').toLocaleLowerCase().split('/')
+
     // topic: {prefix}/set/name_of_speaker/command
     // parts: ['set', 'name_of_speaker', 'command']
     if(parts.length === 3 && parts[0] === 'set') {
@@ -97,12 +101,12 @@ export class SmarthomeMqtt{
       if(control.isValid()) {
         this.Events.emit('deviceControl', parts[1], control)
       }
-    } 
+    }
      // topic: {prefix}/uuid_of_speaker/control
      // parts: ['uuid_of_speaker', 'control']
     else if (parts.length === 2
         && parts[1] === 'control'
-        && typeof parsedPayload !== "number" 
+        && typeof parsedPayload !== "number"
         && typeof parsedPayload !== 'string') {
       this.log.debug('Mqtt parsing {command} for {device}', parsedPayload.cmd ?? parsedPayload.command, parts[0])
       const control = new DeviceControl(parsedPayload.cmd ?? parsedPayload.command, parsedPayload.sonosCommand, parsedPayload.input)
@@ -113,7 +117,7 @@ export class SmarthomeMqtt{
     }
     // topic: {prefix}/cmd/global_command
     // parts: ['cmd', 'global_command']
-    else if (parts.length === 2 && parts[0] === 'cmd') { 
+    else if (parts.length === 2 && parts[0] === 'cmd') {
       this.log.debug('Mqtt got generic command {command}', parts[1])
       this.Events.emit('generic', parts[1], parsedPayload)
     }

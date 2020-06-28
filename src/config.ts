@@ -4,8 +4,18 @@ import fs from 'fs'
 import path from 'path'
 import { StaticLogger } from './static-logger';
 
+export interface MqttConfig {
+  mqtt: string;
+  mqttuser?: string;
+  mqttpw?: string;
+  prefix: string;
+  clientid?: string;
+}
+
 export interface Config {
   mqtt: string;
+  mqttuser?: string;
+  mqttpw?: string;
   prefix: string;
   distinct: boolean;
   device?: string;
@@ -60,7 +70,9 @@ export class ConfigLoader {
     return yargs
       .usage(pkg.name + ' ' + pkg.version + '\n' + pkg.description + '\n\nUsage: $0 [options]')
       .describe('prefix', 'instance name. used as prefix for all topics')
-      .describe('mqtt', 'mqtt broker url. See https://github.com/svrooij/sonos2mqtt#mqtt-url')
+      .describe('mqtt', 'mqtt broker url.')
+      .describe('mqttuser', 'mqtt user name')
+      .describe('mqttpw', 'mqtt password')
       .describe('clientid', 'Specify the client id to be used')
       .describe('log', 'Set the loglevel')
       .describe('d', 'Publish distinct track states')
