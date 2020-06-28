@@ -45,6 +45,12 @@ This library is in no way connected to [Sonos](//en.wikipedia.org/wiki/Sonos). I
 
 This app uses [node-sonos-ts](https://svrooij.github.io/node-sonos-ts) to talk to the sonos speakers. And can easily be integrated in all kind of other apps.
 
+## Text-to-speech server
+
+[sonos-tts-polly](https://github.com/svrooij/node-sonos-tts-polly) is a perfect companion for this library. It will act as a [text-to-speech](https://static.svrooij.nl/node-sonos-ts/sonos-device/notifications-and-tts.html#text-to-speech) server. Generating mp3s for some text and playing it on all your speakers.
+
+All [sponsors][link_sponsor] get a hosted TTS endpoint, for instant text to speech support.
+
 ## Sonos CLI
 
 Not really an mqtt guy/girl? I also created a small [sonos cli](https://github.com/svrooij/sonos-cli) to control your speakers from the command line.
