@@ -116,13 +116,13 @@ Usage: index.js [options]
 Options:
   --prefix           instance name. used as prefix for all topics
                                                               [default: "sonos"]
-  --mqtt             mqtt broker url. See
-                     https://github.com/svrooij/sonos2mqtt#mqtt-url
+  --mqtt             mqtt broker url. See https://static.svrooij.nl/sonos2mqtt/g
+                     etting-started.html#configuration
                                                    [default: "mqtt://127.0.0.1"]
   --clientid         Specify the client id to be used
   --log              Set the loglevel
            [choices: "warning", "information", "debug"] [default: "information"]
-  --distinct         Publish distinct track states    [boolean] [default: false]
+  -d, --distinct     Publish distinct track states    [boolean] [default: false]
   -h, --help         Show help                                         [boolean]
   --ttslang          Default TTS language                     [default: "en-US"]
   --ttsendpoint      Default endpoint for text-to-speech
@@ -135,6 +135,10 @@ Options:
                      always uuid)                      [choices: "name", "uuid"]
   --version          Show version number                               [boolean]
 ```
+
+You can configure the **mqtt** url by setting a supported [URL](https://nodejs.org/api/url.html#url_constructor_new_url_input_base).
+
+Most used format is `mqtt://[user]:[password]@[host]:[port]` like `mqtt://user:password@mqtt:1883`.
 
 ### Configuration by json file
 
