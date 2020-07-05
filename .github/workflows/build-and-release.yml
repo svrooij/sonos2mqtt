@@ -6,7 +6,15 @@ on:
       - master
       - development
       - beta
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - '.all-contributorsrc'
   pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - 'README.md'
+      - '.all-contributorsrc'
 
 jobs:
   run-build-on-node12:

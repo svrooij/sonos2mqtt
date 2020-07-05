@@ -49,6 +49,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "roth",
+      "name": "Martin Roth",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/716931?v=4",
+      "profile": "https://github.com/roth",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
