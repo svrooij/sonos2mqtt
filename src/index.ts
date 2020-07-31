@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import {SonosToMqtt} from './sonos-to-mqtt'
 import {ConfigLoader} from './config'
 import { StaticLogger } from './static-logger'
