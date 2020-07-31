@@ -237,4 +237,3 @@ Topic: `sonos/uuid_of_player/control`
   "command": "switchtotv"
 }
 ```
-

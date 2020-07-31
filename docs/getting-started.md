@@ -138,7 +138,7 @@ Options:
 
 You can configure the **mqtt** url by setting a supported [URL](https://nodejs.org/api/url.html#url_constructor_new_url_input_base).
 
-Most used format is `mqtt://[user]:[password]@[host]:[port]` like `mqtt://user:password@mqtt:1883`.
+Most used format is `mqtt(s)://[user]:[password]@[host]:[port]` like `mqtt://user:password@hostname:1883`, or `mqtts://user:password@hostname:8883` for a mqtt server supporting TLS.
 
 ### Configuration by json file
 

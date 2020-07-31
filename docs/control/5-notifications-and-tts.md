@@ -33,6 +33,8 @@ Payload:
 }
 ```
 
+### Play notification on all speakers
+
 You can also have a notification play on all groups (all devices that coordinate themself), just send the following message to `sonos/cmd/notify`.
 
 ```json
@@ -59,7 +61,7 @@ More information about [notifications](https://svrooij.github.io/node-sonos-ts/s
 
 ## Text to speech
 
-[![Support me on Github][badge_sponsor]][link_sponsor]
+<iframe src="https://github.com/sponsors/svrooij/button" title="Sponsor svrooij" height="35" width="107" style="border: 0;"></iframe>
 
 You can have your sonos speaker prononce some notification text, which is a pretty cool feature. But you'll need some extra work. You'll need a text-to-speech endpoint as described [here](https://svrooij.github.io/node-sonos-ts/sonos-device/notifications-and-tts.html#text-to-speech). You have two options either host your own [server][link_polly_tts] or become a [sponsor][link_sponsor] and get access to my personal hosted TTS server.
 
@@ -70,7 +72,7 @@ Either way you will have a TTS endpoint at hand. You can set it in the configura
 |Default language|`en-US`|`SONOS_TTS_LANG`|`--ttslang`|
 |Default endpoint|`http://some-server.domain.com/api/generate`|`SONOS_TTS_ENDPOINT`|`--ttsendpoint`|
 
-Have a speaker speak by sending the following to `sonos/uuid_of_speaker/control`. Endpoint is optional (if set in environment), lang is options if set in config, gender, volume & onlyWhenPlaying are always optional.
+Have a speaker speak by sending the following to `sonos/uuid_of_speaker/control`. Endpoint is optional (if set in environment), lang is options if set in config, `gender`, `name`, `volume` & `onlyWhenPlaying` are always optional.
 
 ```json
 {
@@ -80,10 +82,28 @@ Have a speaker speak by sending the following to `sonos/uuid_of_speaker/control`
     "endpoint": "https://your.tts.endpoint/api/generate",
     "lang": "en-US",
     "gender": "male",
+    "name": "Salli",
     "volume": 50,
     "onlyWhenPlaying": false,
     "delayMs": 700
   }
+}
+```
+
+### Text to speech on all speakers
+
+Send this payload to `sonos/cmd/speak` to play it on all groups. Same parameters as above.
+
+```json
+{
+  "text": "Someone at the front-door",
+  "endpoint": "https://your.tts.endpoint/api/generate",
+  "lang": "en-US",
+  "gender": "male",
+  "name": "Salli",
+  "volume": 50,
+  "onlyWhenPlaying": false,
+  "delayMs": 700
 }
 ```
 

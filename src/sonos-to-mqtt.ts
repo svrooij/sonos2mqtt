@@ -63,10 +63,9 @@ export class SonosToMqtt {
       this.log.debug('Got generic command {command} from mqtt', command)
       switch (command) {
         case 'notify':
-          return Promise.all(this.sonosManager.Devices
-            .filter(d => d.Coordinator.Uuid === d.Uuid)
-            .map(d => d.PlayNotification(payload))
-          )
+          return this.sonosManager.PlayNotification(payload);
+        case 'speak':
+          return this.sonosManager.PlayTTS(payload);
         case 'pauseall':
           return Promise.all(this.sonosManager.Devices.map(d => d.Pause()));
         case 'listalarm':
