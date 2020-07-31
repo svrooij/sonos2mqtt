@@ -20,4 +20,6 @@ export interface SonosState {
   enqueuedMetadata: Track;
   transportState: string;
   playmode: string;
+  bass: number;
+  treble: number;
 }

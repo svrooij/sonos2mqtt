@@ -202,7 +202,9 @@ export class SonosToMqtt {
   private updateStateWithRenderingControl(uuid: string, data: RenderingControlServiceEvent): void {
     this.updateState(uuid, { 
       volume: data.Volume,
-      mute: data.Mute
+      mute: data.Mute,
+      bass: data.Bass,
+      treble: data.Treble
     })
   }
 
