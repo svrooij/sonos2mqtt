@@ -18,7 +18,6 @@ export class SonosToMqtt {
   }
 
   async start(): Promise<boolean> {
-    this.log.info('Starting sonos2mqtt')
     let success: boolean
     if(this.config.device !== undefined) {
       success = await this.sonosManager.InitializeFromDevice(this.config.device);
@@ -38,7 +37,6 @@ export class SonosToMqtt {
         this.publishDiscoveryMessages();
       }
     }
-
     return success;
   }
 
