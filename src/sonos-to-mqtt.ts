@@ -220,7 +220,14 @@ export class SonosToMqtt {
     const index = this.states.findIndex(s => s.uuid === uuid)
     if(index !== -1) {
       // Merge update over the current state (only fields with value are updated)
-      this.states[index] = {...this.states[index], ...update};
+      // The following would also remove values if undefined in update. Anyone has a better solution, please?
+      //this.states[index] = {...this.states[index], ...update};
+      // Enumarate update object entries and only copy values where it has a value
+      for(const [key, value] of Object.entries(update)) {
+        if(value !== undefined) {
+          this.states[index][key] = value;
+        }
+      }
 
       // Change timestamp to now
       this.states[index].ts = Date.now();

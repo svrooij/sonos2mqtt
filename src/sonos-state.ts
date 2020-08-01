@@ -1,4 +1,4 @@
-import { Track } from '@svrooij/sonos/lib/models'
+import { Track, ChannelValue } from '@svrooij/sonos/lib/models'
 /**
  * Object that keeps the state of each device,
  * this is what is changed by the events and published to mqtt as a full object.
@@ -7,14 +7,14 @@ import { Track } from '@svrooij/sonos/lib/models'
  * @export
  * @interface SonosState
  */
-export interface SonosState {
+export interface SonosState extends SonosStateBase {
   readonly uuid: string;
   ts: number;
   name: string;
   groupName: string;
   coordinatorUuid: string;
-  volume: any;
-  mute: any;
+  volume: ChannelValue<number>;
+  mute: ChannelValue<boolean>;
   currentTrack: Track;
   nextTrack: Track;
   enqueuedMetadata: Track;
@@ -22,4 +22,9 @@ export interface SonosState {
   playmode: string;
   bass: number;
   treble: number;
+  
+}
+
+interface SonosStateBase {
+  [key: string]: string | number | Track | ChannelValue<number> | ChannelValue<boolean>;
 }
