@@ -74,6 +74,8 @@ export class SonosToMqtt {
           return this.sonosManager.Devices[0].AlarmClockService.PatchAlarm(payload);
         case 'setlogging':
           return StaticLogger.setLevel(payload);
+        case 'check-subscriptions':
+          return this.sonosManager.CheckAllEventSubscriptions();
       }
     })
 

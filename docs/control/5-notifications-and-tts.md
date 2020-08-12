@@ -118,25 +118,27 @@ The text-to-speech method executes the following:
 
 This way you don't have to worry about encoding the text so sonos understands it. Sonos will just get a regular url to the mp3 file with the spoken text.
 
-The [server][link_polly_tts] I've build is based on Amazon Polly, but I invite eveybody to build their own if you want to support an other tts service.
+The [server][link_polly_tts] I've build is based on Amazon Polly, but I invite eveybody to build their own if you want to support an other tts service. You can replace it with any other TTS service as long as it expects a post request with the data below and responds with a json message with either `uri` or `cdnUri`. The sonos speaker needs the `.mp3` at the end to be able to play the file smoothly.
 
-```js
-const SonosDevice = require('@svrooij/sonos').SonosDevice
-const sonos = new SonosDevice(process.env.SONOS_HOST || '192.168.96.56')
-sonos.PlayTTS({
-    text: 'Someone at the front-door',
-    lang: 'en-US',
-    gender: 'male',
-    volume: 50,
-    endpoint: 'https://your.tts.endpoint/api/generate'
-  })
-  .then(played => {
-    console.log('Played notification %o', played)
-    // Timeout to allow event subscriptions to cancel.
-    setTimeout(() => {
-      process.exit(0)
-    }, 500)
-  })
+### TTS API
+
+Request `POST` to `https://your-tts-api.com/api/generate`
+
+```json
+{
+  "text": "Hello from polly",
+  "lang": "en-US",
+  "gender": "male"
+}
+```
+
+Response
+
+```json
+{
+  "cdnUri": "https://cacheUri/en-US/4b6eddb411d4cec3933528bfca05341828ca7593.mp3",
+  "uri": "http://your_ip:5601/cache/en-US/4b6eddb411d4cec3933528bfca05341828ca7593.mp3"
+}
 ```
 
 [badge_sponsor]: https://img.shields.io/badge/Sponsor-on%20Github-red
