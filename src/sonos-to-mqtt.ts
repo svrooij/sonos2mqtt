@@ -18,7 +18,6 @@ export class SonosToMqtt {
   }
 
   async start(): Promise<boolean> {
-    this.log.info('Starting sonos2mqtt')
     let success: boolean
     if(this.config.device !== undefined) {
       success = await this.sonosManager.InitializeFromDevice(this.config.device);
@@ -38,7 +37,6 @@ export class SonosToMqtt {
         this.publishDiscoveryMessages();
       }
     }
-
     return success;
   }
 
@@ -76,6 +74,8 @@ export class SonosToMqtt {
           return this.sonosManager.Devices[0].AlarmClockService.PatchAlarm(payload);
         case 'setlogging':
           return StaticLogger.setLevel(payload);
+        case 'check-subscriptions':
+          return this.sonosManager.CheckAllEventSubscriptions();
       }
     })
 
@@ -202,7 +202,9 @@ export class SonosToMqtt {
   private updateStateWithRenderingControl(uuid: string, data: RenderingControlServiceEvent): void {
     this.updateState(uuid, { 
       volume: data.Volume,
-      mute: data.Mute
+      mute: data.Mute,
+      bass: data.Bass,
+      treble: data.Treble
     })
   }
 
@@ -218,7 +220,14 @@ export class SonosToMqtt {
     const index = this.states.findIndex(s => s.uuid === uuid)
     if(index !== -1) {
       // Merge update over the current state (only fields with value are updated)
-      this.states[index] = {...this.states[index], ...update};
+      // The following would also remove values if undefined in update. Anyone has a better solution, please?
+      //this.states[index] = {...this.states[index], ...update};
+      // Enumarate update object entries and only copy values where it has a value
+      for(const [key, value] of Object.entries(update)) {
+        if(value !== undefined) {
+          this.states[index][key] = value;
+        }
+      }
 
       // Change timestamp to now
       this.states[index].ts = Date.now();
