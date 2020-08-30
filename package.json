@@ -21,7 +21,7 @@
     "test": "eslint ./src/*.ts"
   },
   "dependencies": {
-    "@svrooij/sonos": "2.1.0-beta.1",
+    "@svrooij/sonos": "2.1.0",
     "mqtt": "3.0.0",
     "serilogger": "^0.3.1",
     "strict-event-emitter-types": "^2.0.0",
