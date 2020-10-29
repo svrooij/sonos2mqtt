@@ -69,4 +69,3 @@ Contributions of any kind welcome!
 [link_issues]: https://github.com/svrooij/sonos2mqtt/issues
 [link_build]: https://github.com/svrooij/sonos2mqtt/actions
 [link_docker]: https://hub.docker.com/r/svrooij/sonos2mqtt
-
