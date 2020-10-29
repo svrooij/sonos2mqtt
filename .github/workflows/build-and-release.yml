@@ -38,7 +38,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       -
-        name: Set up QEMU
+        name: Set up QEMU (multi platform)
         uses: docker/setup-qemu-action@v1
         if: steps.semantic.outputs.new_release_published == 'true'
         with:
