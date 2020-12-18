@@ -15,9 +15,9 @@ export interface SonosState extends SonosStateBase {
   coordinatorUuid: string;
   volume: ChannelValue<number>;
   mute: ChannelValue<boolean>;
-  currentTrack: Track;
-  nextTrack: Track;
-  enqueuedMetadata: Track;
+  currentTrack: Track | string;
+  nextTrack: Track | string;
+  enqueuedMetadata: Track | string;
   transportState: string;
   playmode: string;
   bass: number;
