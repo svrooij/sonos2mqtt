@@ -105,8 +105,9 @@ export class SonosToMqtt {
    * Will setup event handlers from sonos devices, and what to publish
    */
   private setupSonosEvents(): void {
-    this.sonosManager.Devices.forEach(d => {
-      this.states.push({uuid: d.Uuid, name: d.Name, groupName: d.GroupName, coordinatorUuid: d.Coordinator.Uuid})
+    this.sonosManager.Devices.forEach(async (d) => {
+      const deviceDescription = await d.GetDeviceDescription();
+      this.states.push({uuid: d.Uuid, model: deviceDescription.modelName, name: d.Name, groupName: d.GroupName, coordinatorUuid: d.Coordinator.Uuid})
       d.Events.on(SonosEvents.AVTransport, (data) => {
         this.updateStateWithAv(d.Uuid, data);
         this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/avtransport`,data)

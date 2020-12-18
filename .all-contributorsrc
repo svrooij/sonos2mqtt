@@ -58,7 +58,17 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "dgmltn",
+      "name": "Doug Melton",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/698270?v=4",
+      "profile": "http://dgmltn.com",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "skipCi": true
 }

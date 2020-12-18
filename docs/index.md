@@ -10,16 +10,23 @@ permalink: /
 
 # Sonos2mqtt
 
-[![Run build and publish][badge_build]][link_build]
+[![Sonos2mqtt][badge_sonos-mqtt]][link_sonos-mqtt]
+[![npm][badge_npm]][link_npm]
+[![Sonos api documentation][badge_sonos-docs]][link_sonos-docs]
+[![Sonos typescript this library][badge_sonos-typescript]][link_sonos-typescript]
+[![Sonos cli][badge_sonos-cli]][link_sonos-cli]
+[![Join us on Discord][badge_discord]][link_discord]
+
 [![github issues][badge_issues]][link_issues]
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-[![npm](https://img.shields.io/npm/v/sonos2mqtt.svg?style=flat-square)](https://www.npmjs.com/package/sonos2mqtt)
 [![docker pulls][badge_docker]][link_docker]
-[![mqtt-smarthome](https://img.shields.io/badge/mqtt-smarthome-blue.svg?style=flat-square)](https://github.com/mqtt-smarthome/mqtt-smarthome)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
+[![Downloads/week](https://img.shields.io/npm/dw/sonos2mqtt.svg?style=flat-square)](https://npmjs.org/package/sonos2mqtt)
+[![License](https://img.shields.io/npm/l/sonos2mqtt.svg?style=flat-square)](https://github.com/svrooij/sonos2mqtt/blob/master/package.json)
 [![Support me on Github][badge_sponsor]][link_sponsor]
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+This node application is a bridge between the Sonos and a mqtt server. The status of all your sonos devices will be published to mqtt and you can control the sonos speakers over mqtt.
 
 This library is in no way connected to [Sonos](//en.wikipedia.org/wiki/Sonos). It's just a library to control their speakers from your mqtt server.
 
@@ -43,21 +50,20 @@ This library is in no way connected to [Sonos](//en.wikipedia.org/wiki/Sonos). I
 
 ## Sonos library (typescript/node)
 
-This app uses [node-sonos-ts](https://svrooij.github.io/node-sonos-ts) to talk to the sonos speakers. And can easily be integrated in all kind of other apps.
+This app uses [node-sonos-ts][link_sonos-typescript] to talk to the sonos speakers. And can easily be integrated in all kind of other apps.
 
 ## Text-to-speech server
 
-[sonos-tts-polly](https://github.com/svrooij/node-sonos-tts-polly) is a perfect companion for this library. It will act as a [text-to-speech](https://static.svrooij.nl/node-sonos-ts/sonos-device/notifications-and-tts.html#text-to-speech) server. Generating mp3s for some text and playing it on all your speakers.
+[sonos-tts-polly](https://github.com/svrooij/node-sonos-tts-polly) is a perfect companion for this library. It will act as a [text-to-speech](https://svrooij.io/node-sonos-ts/sonos-device/notifications-and-tts.html#text-to-speech) server. Generating mp3s for some text and playing it on all your speakers.
 
 All [sponsors][link_sponsor] get a hosted TTS endpoint, for instant text to speech support.
 
 ## Sonos CLI
 
-Not really an mqtt guy/girl? I also created a small [sonos cli](https://github.com/svrooij/sonos-cli) to control your speakers from the command line.
+Not really an mqtt guy/girl? I also created a small [sonos cli][link_sonos-cli] to control your speakers from the command line.
 
 ```shell
 npm i -g @svrooij/sonos-cli
-sonos zones --save
 sonos control office next
 ```
 
@@ -65,7 +71,7 @@ sonos control office next
 
 I'm a big fan of beer and coffee. To provide something extra to everybody who is sponsoring me, I'll provide a hosted TTS server for all my sponsors.
 
-This bridge and the [sonos package](https://github.com/svrooij/node-sonos-ts) took me a lot of hours to build, so I invite everyone using it to at least have a look at my [Sponsor page](https://github.com/sponsors/svrooij). Even though the sponsoring tiers are monthly you can also cancel anytime :wink:
+This bridge and the [sonos package][link_sonos-typescript] took me a lot of hours to build, so I invite everyone using it to at least have a look at my [Sponsor page][link_sponsor]. Even though the sponsoring tiers are monthly you can also cancel anytime :wink:
 
 ## Special thanks
 
@@ -85,6 +91,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://mi.o-o.im"><img src="https://avatars0.githubusercontent.com/u/7872104?v=4" width="100px;" alt=""/><br /><sub><b>Matthias Burgfried</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=matthias-burgfried" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/mqtt-fan"><img src="https://avatars1.githubusercontent.com/u/32242849?v=4" width="100px;" alt=""/><br /><sub><b>mqtt-fan</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=mqtt-fan" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/roth"><img src="https://avatars3.githubusercontent.com/u/716931?v=4" width="100px;" alt=""/><br /><sub><b>Martin Roth</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=roth" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://dgmltn.com"><img src="https://avatars3.githubusercontent.com/u/698270?v=4" width="100px;" alt=""/><br /><sub><b>Doug Melton</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/issues?q=author%3Adgmltn" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
@@ -95,12 +102,24 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
 Contributions of any kind welcome!
 
-[badge_sponsor]: https://img.shields.io/badge/Sponsor-on%20Github-red
-[badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt
-[badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt
 [badge_build]: https://github.com/svrooij/sonos2mqtt/workflows/Run%20tests%20and%20publish/badge.svg
+[badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt
+[badge_discord]: https://img.shields.io/discord/782374564054564875?style=flat-square
+[badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt?style=flat-square
+[badge_npm]: https://img.shields.io/npm/v/sonos2mqtt?style=flat-square
+[badge_sonos-cli]: https://img.shields.io/badge/sonos-cli-blue?style=flat-square
+[badge_sonos-docs]: https://img.shields.io/badge/sonos-api-blue?style=flat-square
+[badge_sonos-mqtt]: https://img.shields.io/badge/sonos-mqtt-blue?style=flat-square
+[badge_sonos-typescript]: https://img.shields.io/badge/sonos-typescript-blue?style=flat-square
+[badge_sponsor]: https://img.shields.io/badge/Sponsor-on%20Github-red?style=flat-square
 
-[link_sponsor]: https://github.com/sponsors/svrooij
-[link_issues]: https://github.com/svrooij/sonos2mqtt/issues
 [link_build]: https://github.com/svrooij/sonos2mqtt/actions
+[link_discord]: https://discord.gg/VMtG6Ft36J
 [link_docker]: https://hub.docker.com/r/svrooij/sonos2mqtt
+[link_issues]: https://github.com/svrooij/sonos2mqtt/issues
+[link_npm]: https://www.npmjs.com/package/sonos2mqtt
+[link_sonos-cli]: https://github.com/svrooij/sonos-cli
+[link_sonos-docs]: https://svrooij.io/sonos-api-docs
+[link_sonos-mqtt]: https://svrooij.io/sonos2mqtt
+[link_sonos-typescript]: https://svrooij.io/node-sonos-ts
+[link_sponsor]: https://github.com/sponsors/svrooij

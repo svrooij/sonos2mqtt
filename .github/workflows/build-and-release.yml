@@ -1,6 +1,7 @@
 name: Run tests and publish
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
@@ -36,23 +37,32 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Set up Docker Buildx
+      -
+        name: Set up QEMU (multi platform)
+        uses: docker/setup-qemu-action@v1
+        if: steps.semantic.outputs.new_release_published == 'true'
+        with:
+          platforms: all
+      -
+        name: Set up Docker Buildx
         id: buildx
         if: steps.semantic.outputs.new_release_published == 'true'
-        uses: crazy-max/ghaction-docker-buildx@v2
+        uses: docker/setup-buildx-action@v1
         with:
-          buildx-version: latest
-          skip-cache: false
-          qemu-version: latest
-      - name: Docker login
+          version: latest
+      -
+        name: Login to DockerHub
+        uses: docker/login-action@v1
         if: steps.semantic.outputs.new_release_published == 'true'
-        run:
-          docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Publish to docker with buildx as latest
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/master'
         run: |
           docker buildx build \
-            --platform linux/386,linux/amd64,linux/arm/v7,linux/arm64 \
+            --platform linux/amd64,linux/arm/v7,linux/arm64 \
             --push \
             -t $GITHUB_REPOSITORY:latest \
             -t $GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }} \
@@ -64,7 +74,7 @@ jobs:
         if: steps.semantic.outputs.new_release_published == 'true' && github.ref != 'refs/heads/master'
         run: |
           docker buildx build \
-            --platform linux/386,linux/amd64,linux/arm/v7,linux/arm64 \
+            --platform linux/amd64,linux/arm/v7,linux/arm64 \
             --push \
             -t $GITHUB_REPOSITORY:beta \
             -t $GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }} \

@@ -21,20 +21,20 @@
     "test": "eslint ./src/*.ts"
   },
   "dependencies": {
-    "@svrooij/sonos": "2.1.0",
-    "mqtt": "3.0.0",
+    "@svrooij/sonos": "2.2.0",
+    "mqtt": "4.2.6",
     "serilogger": "^0.3.1",
     "strict-event-emitter-types": "^2.0.0",
     "yalm": "4.1.0",
-    "yargs": "15.4.1"
+    "yargs": "16.2.0"
   },
   "devDependencies": {
     "@types/debug": "4.1.5",
-    "@types/node": "^14.0.27",
-    "@types/yargs": "15.0.5",
-    "@typescript-eslint/eslint-plugin": "3.9.0",
-    "@typescript-eslint/parser": "3.9.0",
-    "eslint": "7.6.0",
+    "@types/node": "^14.14.14",
+    "@types/yargs": "15.0.9",
+    "@typescript-eslint/eslint-plugin": "4.10.0",
+    "@typescript-eslint/parser": "4.10.0",
+    "eslint": "7.15.0",
     "pre-commit": "1.2.2",
     "typescript": "3.8.3"
   },

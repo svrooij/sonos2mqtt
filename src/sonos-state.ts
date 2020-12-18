@@ -9,15 +9,16 @@ import { Track, ChannelValue } from '@svrooij/sonos/lib/models'
  */
 export interface SonosState extends SonosStateBase {
   readonly uuid: string;
+  readonly model: string;
   ts: number;
   name: string;
   groupName: string;
   coordinatorUuid: string;
   volume: ChannelValue<number>;
   mute: ChannelValue<boolean>;
-  currentTrack: Track;
-  nextTrack: Track;
-  enqueuedMetadata: Track;
+  currentTrack: Track | string;
+  nextTrack: Track | string;
+  enqueuedMetadata: Track | string;
   transportState: string;
   playmode: string;
   bass: number;
