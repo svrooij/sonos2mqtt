@@ -1,10 +1,23 @@
 # Sonos2mqtt
 
-[![npm](https://img.shields.io/npm/v/sonos2mqtt.svg?style=flat-square)](https://www.npmjs.com/package/sonos2mqtt)
+[![Sonos2mqtt][badge_sonos-mqtt]][link_sonos-mqtt]
+[![npm][badge_npm]][link_npm]
+[![Sonos api documentation][badge_sonos-docs]][link_sonos-docs]
+[![Sonos typescript this library][badge_sonos-typescript]][link_sonos-typescript]
+[![Sonos cli][badge_sonos-cli]][link_sonos-cli]
+[![Join us on Discord][badge_discord]][link_discord]
+
+[![github issues][badge_issues]][link_issues]
+[![docker pulls][badge_docker]][link_docker]
+[![Downloads/week](https://img.shields.io/npm/dw/sonos2mqtt.svg?style=flat-square)](https://npmjs.org/package/sonos2mqtt)
+[![License](https://img.shields.io/npm/l/sonos2mqtt.svg?style=flat-square)](https://github.com/svrooij/sonos2mqtt/blob/master/package.json)
+[![Support me on Github][badge_sponsor]][link_sponsor]
+
+<!-- [![npm](https://img.shields.io/npm/v/sonos2mqtt.svg?style=flat-square)](https://www.npmjs.com/package/sonos2mqtt)
 [![docker pulls][badge_docker]][link_docker]
 [![Support me on Github][badge_sponsor]][link_sponsor]
 [![github issues][badge_issues]][link_issues]
-[![Run build and publish][badge_build]][link_build]
+[![Run build and publish][badge_build]][link_build] -->
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
@@ -60,12 +73,24 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
 Contributions of any kind welcome!
 
-[badge_sponsor]: https://img.shields.io/badge/Sponsor-on%20Github-red
-[badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt
-[badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt
 [badge_build]: https://github.com/svrooij/sonos2mqtt/workflows/Run%20tests%20and%20publish/badge.svg
+[badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt
+[badge_discord]: https://img.shields.io/discord/782374564054564875?style=flat-square
+[badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt?style=flat-square
+[badge_npm]: https://img.shields.io/npm/v/sonos2mqtt?style=flat-square
+[badge_sonos-cli]: https://img.shields.io/badge/sonos-cli-blue?style=flat-square
+[badge_sonos-docs]: https://img.shields.io/badge/sonos-api-blue?style=flat-square
+[badge_sonos-mqtt]: https://img.shields.io/badge/sonos-mqtt-blue?style=flat-square
+[badge_sonos-typescript]: https://img.shields.io/badge/sonos-typescript-blue?style=flat-square
+[badge_sponsor]: https://img.shields.io/badge/Sponsor-on%20Github-red?style=flat-square
 
-[link_sponsor]: https://github.com/sponsors/svrooij
-[link_issues]: https://github.com/svrooij/sonos2mqtt/issues
 [link_build]: https://github.com/svrooij/sonos2mqtt/actions
+[link_discord]: https://discord.gg/VMtG6Ft36J
 [link_docker]: https://hub.docker.com/r/svrooij/sonos2mqtt
+[link_issues]: https://github.com/svrooij/sonos2mqtt/issues
+[link_npm]: https://www.npmjs.com/package/sonos2mqtt
+[link_sonos-cli]: https://github.com/svrooij/sonos-cli
+[link_sonos-docs]: https://svrooij.io/sonos-api-docs
+[link_sonos-mqtt]: https://svrooij.io/sonos2mqtt
+[link_sonos-typescript]: https://svrooij.io/node-sonos-ts
+[link_sponsor]: https://github.com/sponsors/svrooij
