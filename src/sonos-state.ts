@@ -9,6 +9,7 @@ import { Track, ChannelValue } from '@svrooij/sonos/lib/models'
  */
 export interface SonosState extends SonosStateBase {
   readonly uuid: string;
+  readonly model: string;
   ts: number;
   name: string;
   groupName: string;
