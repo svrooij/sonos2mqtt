@@ -34,6 +34,7 @@ Topic: `sonos/uuid_of_player/control`
 |Provider|Name|Format|Sample|
 |--------|----|------|------|
 ||MP3|`http://somesite.com/song.mp3`||
+|Deezer|Track|`deezer:track:{id}`||
 |Spotify|Track|`spotify:track:{id}`|`spotify:track:0GiWi4EkPduFWHQyhiKpRB`|
 |Spotify|Artist radio|`spotify:artistRadio:{artistId}`|`spotify:artistRadio:72qVrKXRp9GeFQOesj0Pmv`|
 |TuneIn|Radio station|`radio:s{id}`||
@@ -93,7 +94,11 @@ Topic: `sonos/uuid_of_player/control`
 |--------|----|------|------|
 ||MP3|`http://somesite.com/song.mp3`||
 |Sonos|Local file|||
-|Sonos|Playlist|||
+|Sonos|Playlist|`sonos:playlist:{id}`|`sonos:playlist:7`|
+|Deezer|Album|`deezer:album:{id}`||
+|Deezer|Artist Top Tracks|`deezer:artistTopTracks:{id}`||
+|Deezer|Playlist|`deezer:playlist:{id}`||
+|Deezer|Track|`deezer:track:{id}`||
 |Spotify|Album|`spotify:album:{id}`|`spotify:album:4q2mtBkyPrFynvTRbi5HOv`|
 |Spotify|Artist top tracks|`spotify:artistTopTracks:{artistId}`|`spotify:artistTopTracks:72qVrKXRp9GeFQOesj0Pmv`|
 |Spotify|Playlist|`spotify:playlist:{id}`|`spotify:playlist:??`|
