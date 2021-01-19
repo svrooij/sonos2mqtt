@@ -41,8 +41,10 @@ This library is in no way connected to [Sonos](//en.wikipedia.org/wiki/Sonos). I
 ## Documentation
 
 - [Getting started](getting-started.html)
+- [Splitted system (S1 and S2 speakers)](splitted-system.html)
 - [Topic](topics.html)
 - [Controlling speakers](control)
+- [Global commands](global-commands.html)
 - [Development](development.html)
 - [Contributors](#contributors-)
 
