@@ -42,6 +42,9 @@ export class SonosCommandMapping {
 
       case SonosCommands.Notify:
         return await device.PlayNotification(payload);
+      
+      case SonosCommands.NotifyTwo:
+        return await device.PlayNotificationTwo(payload);
 
       case SonosCommands.Pause:
         return await device.Pause();
@@ -86,6 +89,12 @@ export class SonosCommandMapping {
       case SonosCommands.Speak:
         if(typeof payload === "object") {
           return await device.PlayTTS(payload)
+        }
+        break;
+      
+      case SonosCommands.SpeakTwo:
+        if(typeof payload === "object") {
+          return await device.PlayTTSTwo(payload)
         }
         break;
 
