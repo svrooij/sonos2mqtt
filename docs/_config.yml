@@ -19,14 +19,15 @@ description: >- # this means to ignore newlines until "baseurl:"
   Control your sonos speakers right from your mqtt server.
   This app helps in creating an awesome home automation system.
 baseurl: "/sonos2mqtt" # the subpath of your site, e.g. /blog
-url: "https://svrooij.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://svrooij.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: svrooij
 github_username:  svrooij
 repository: https://github.com/svrooij/sonos2mqtt
 
 # Build settings
 markdown: kramdown
-remote_theme: pmarsceill/just-the-docs
+# remote_theme: pmarsceill/just-the-docs
+remote_theme: svrooij/just-the-docs@relative-everything
 plugins:
   - jekyll-feed
   - jemoji
