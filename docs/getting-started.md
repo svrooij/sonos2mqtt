@@ -144,7 +144,7 @@ Most used format is `mqtt(s)://[user]:[password]@[host]:[port]` like `mqtt://use
 
 Some systems don't like the preferred docker way of configuration (which is environment settings), so it will also check for a json file when starting up.
 
-- Default path: `/data/config.json`
+- Default path: `/data/options.json`
 - Override by setting: `CONFIG_PATH`
 
 Sample file:
