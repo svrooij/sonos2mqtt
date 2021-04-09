@@ -73,8 +73,41 @@ export class SonosCommandMapping {
           return await device.SeekTrack(payload)
         break;
 
+      case SonosCommands.SetBass:
+        if(typeof payload === 'number')
+          return await device.RenderingControlService.SetBass({
+            InstanceID: 0,
+            DesiredBass: payload
+          });
+        break;
+
+      case SonosCommands.SetButtonLockState:
+        if(typeof payload === 'string')
+          return await device.DevicePropertiesService.SetButtonLockState({
+            DesiredButtonLockState: payload
+          });
+        break;
+
+      case SonosCommands.SetLEDState:
+        if(typeof payload === 'string')
+          return await device.DevicePropertiesService.SetLEDState({
+            DesiredLEDState: payload
+          });
+        break;
+
+      case SonosCommands.SetNightmode:
+        return await device.SetNightMode(String(payload) === 'On');
+
       case SonosCommands.SetTransportUri:
         return await device.SetAVTransportURI(payload)
+
+      case SonosCommands.SetTreble:
+        if(typeof payload === 'number')
+          return await device.RenderingControlService.SetTreble({
+            InstanceID: 0,
+            DesiredTreble: payload
+          });
+        break;
 
       case SonosCommands.Sleep:
         if(typeof payload === 'number') {

@@ -18,7 +18,12 @@ export enum SonosCommands {
   Queue = 'queue',
   Seek = 'seek',
   SelectTrack = 'selecttrack',
+  SetBass = 'setbass',
+  SetButtonLockState = 'setbuttonlockstate',
+  SetLEDState = 'setledstate',
+  SetNightmode = 'setnightmode',
   SetTransportUri = 'setavtransporturi',
+  SetTreble = 'settreble',
   Sleep = 'sleep',
   Speak = 'speak',
   /**
