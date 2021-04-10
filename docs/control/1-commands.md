@@ -44,7 +44,12 @@ All these commands are crafted specially to be used in sonos2mqtt.
 |`queue`|:heavy_plus_sign:|Add a song to the queue|Track uri|
 |`seek`|:clock330:|Seek in the current track|Time like `0:02:45`|
 |`selecttrack`||Select another track in the current queue|number|
+|`setbass`||Set bass level|number between -10 and 10|
+|`setbuttonlockstate`|:no_good:|Enable or disable buttons on device|`On`, `Off`|
+|`setledstate`|:low_brightness:|Enable or disable device LED|`On`, `Off`|
+|`setnightmode`|:moon:|Enable or disable nightmode|`On`, `Off`|
 |`setavtransporturi`|:abcd:|Set the current playback uri, for advanced cases.|playback or track uri (check out the trackUri topic to find the required value)|
+|`settreble`||Set treble level|number between -10 and 10|
 |`sleep`|:zzz:|Set a sleeptimer for x minutes|number|
 |`speak`|:speech_balloon:|Generate text-to-speech file and play as notification :tada:|see [text-to-speech](notifications.html#text-to-speech)|
 |`stop`|:no_entry_sign:|Stop Playback| |
