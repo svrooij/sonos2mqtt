@@ -66,7 +66,9 @@ export class SonosToMqtt {
           return this.sonosManager.PlayTTS(payload);
         case 'pauseall':
           return Promise.all(this.sonosManager.Devices.map(d => d.Pause()));
-        case 'listalarm':
+        
+        case 'listalarm': // This typ-o is still there for backward compatibility 
+        case 'listalarms':
           const alarms = await this.sonosManager.Devices[0].AlarmClockService.ListAndParseAlarms()
           this.mqtt.publish('alarms', alarms);
           break;
