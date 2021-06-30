@@ -21,8 +21,8 @@
     "test": "eslint ./src/*.ts"
   },
   "dependencies": {
-    "@svrooij/sonos": "2.4.0-beta.2",
-    "mqtt": "4.2.6",
+    "@svrooij/sonos": "2.4.0",
+    "mqtt": "4.2.8",
     "serilogger": "^0.3.1",
     "strict-event-emitter-types": "^2.0.0",
     "yalm": "4.1.0",
@@ -32,9 +32,10 @@
     "@types/debug": "4.1.5",
     "@types/node": "^14.14.21",
     "@types/yargs": "15.0.12",
+    "@types/ws": "^7.4.5",
     "@typescript-eslint/eslint-plugin": "4.14.0",
     "@typescript-eslint/parser": "4.14.0",
-    "eslint": "7.18.0",
+    "eslint": "7.29.0",
     "pre-commit": "1.2.2",
     "typescript": "3.9.4"
   },
