@@ -62,18 +62,25 @@ export class SonosToMqtt {
       switch (command) {
         case 'notify':
           return this.sonosManager.PlayNotification(payload);
+
         case 'speak':
           return this.sonosManager.PlayTTS(payload);
+
         case 'pauseall':
           return Promise.all(this.sonosManager.Devices.map(d => d.Pause()));
-        case 'listalarm':
+        
+        case 'listalarm': // This typ-o is still there for backward compatibility 
+        case 'listalarms':
           const alarms = await this.sonosManager.Devices[0].AlarmClockService.ListAndParseAlarms()
           this.mqtt.publish('alarms', alarms);
           break;
+
         case 'setalarm':
           return this.sonosManager.Devices[0].AlarmClockService.PatchAlarm(payload);
+
         case 'setlogging':
           return StaticLogger.setLevel(payload);
+
         case 'check-subscriptions':
           return this.sonosManager.CheckAllEventSubscriptions();
       }
