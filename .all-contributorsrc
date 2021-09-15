@@ -67,6 +67,24 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "sebbo2002",
+      "name": "Sebastian",
+      "avatar_url": "https://avatars.githubusercontent.com/u/812398?v=4",
+      "profile": "https://sebbo.net/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "evenisse",
+      "name": "Emmanuel Venisse",
+      "avatar_url": "https://avatars.githubusercontent.com/u/682743?v=4",
+      "profile": "https://github.com/evenisse",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,

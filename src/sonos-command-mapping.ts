@@ -11,7 +11,8 @@ export class SonosCommandMapping {
       return await device.ExecuteCommand(control.sonosCommand, control.input)
     }
   }
-  static async ExecuteCommand(device: SonosDevice, command: SonosCommands, payload: any): Promise<any> {
+  static async ExecuteCommand(device: SonosDevice, command: SonosCommands, input: unknown): Promise<any> {
+    const payload = input as any;
     switch(command) {
       case SonosCommands.AdvancedCommand:
         if (payload.cmd)
@@ -42,6 +43,9 @@ export class SonosCommandMapping {
 
       case SonosCommands.Notify:
         return await device.PlayNotification(payload);
+      
+      case SonosCommands.NotifyTwo:
+        return await device.PlayNotificationTwo(payload);
 
       case SonosCommands.Pause:
         return await device.Pause();
@@ -70,8 +74,41 @@ export class SonosCommandMapping {
           return await device.SeekTrack(payload)
         break;
 
+      case SonosCommands.SetBass:
+        if(typeof payload === 'number')
+          return await device.RenderingControlService.SetBass({
+            InstanceID: 0,
+            DesiredBass: payload
+          });
+        break;
+
+      case SonosCommands.SetButtonLockState:
+        if(typeof payload === 'string')
+          return await device.DevicePropertiesService.SetButtonLockState({
+            DesiredButtonLockState: payload
+          });
+        break;
+
+      case SonosCommands.SetLEDState:
+        if(typeof payload === 'string')
+          return await device.DevicePropertiesService.SetLEDState({
+            DesiredLEDState: payload
+          });
+        break;
+
+      case SonosCommands.SetNightmode:
+        return await device.SetNightMode(String(payload) === 'On');
+
       case SonosCommands.SetTransportUri:
         return await device.SetAVTransportURI(payload)
+
+      case SonosCommands.SetTreble:
+        if(typeof payload === 'number')
+          return await device.RenderingControlService.SetTreble({
+            InstanceID: 0,
+            DesiredTreble: payload
+          });
+        break;
 
       case SonosCommands.Sleep:
         if(typeof payload === 'number') {
@@ -86,6 +123,12 @@ export class SonosCommandMapping {
       case SonosCommands.Speak:
         if(typeof payload === "object") {
           return await device.PlayTTS(payload)
+        }
+        break;
+      
+      case SonosCommands.SpeakTwo:
+        if(typeof payload === "object") {
+          return await device.PlayTTSTwo(payload)
         }
         break;
 

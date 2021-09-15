@@ -17,26 +17,26 @@
   "preferGlobal": true,
   "scripts": {
     "build": "tsc",
-    "serve-docs": "docker run --rm --volume=\"$PWD/docs/vendor/bundle:/usr/local/bundle\" --volume=\"$PWD/docs:/srv/jekyll\" -p 4000:4000 -p 35729:35729 -it jekyll/jekyll jekyll serve --livereload",
+    "serve-docs": "docker-compose -f ./docs/docker-compose.yml up jekyll",
     "test": "eslint ./src/*.ts"
   },
   "dependencies": {
-    "@svrooij/sonos": "2.2.0",
-    "mqtt": "4.2.6",
+    "@svrooij/sonos": "^2.4.1",
+    "mqtt": "4.2.8",
     "serilogger": "^0.3.1",
-    "strict-event-emitter-types": "^2.0.0",
     "yalm": "4.1.0",
-    "yargs": "16.2.0"
+    "yargs": "17.1.1"
   },
   "devDependencies": {
-    "@types/debug": "4.1.5",
-    "@types/node": "^14.14.14",
-    "@types/yargs": "15.0.9",
-    "@typescript-eslint/eslint-plugin": "4.10.0",
-    "@typescript-eslint/parser": "4.10.0",
-    "eslint": "7.15.0",
+    "@types/debug": "4.1.7",
+    "@types/node": "^14.14.21",
+    "@types/yargs": "17.0.2",
+    "@types/ws": "^7.4.7",
+    "@typescript-eslint/eslint-plugin": "4.31.0",
+    "@typescript-eslint/parser": "4.31.1",
+    "eslint": "7.32.0",
     "pre-commit": "1.2.2",
-    "typescript": "3.8.3"
+    "typescript": "3.9.5"
   },
   "repository": {
     "type": "git",

@@ -9,7 +9,7 @@ permalink: /control/playback.html
 # Playback
 {: .no_toc }
 
-You have a lot of ways to play stuff on your sonos speaker. Sonos devides this into two groups items and containers (eg. playlists). You might need some kind of metadata to play your track.
+You have a lot of ways to play stuff on your sonos speaker. Sonos divides this into two groups **items** and **containers** (eg. playlists). You might need some kind of metadata to play your track.
 
 1. TOC
 {:toc}
@@ -34,9 +34,12 @@ Topic: `sonos/uuid_of_player/control`
 |Provider|Name|Format|Sample|
 |--------|----|------|------|
 ||MP3|`http://somesite.com/song.mp3`||
+|Deezer|Track|`deezer:track:{id}`||
 |Spotify|Track|`spotify:track:{id}`|`spotify:track:0GiWi4EkPduFWHQyhiKpRB`|
 |Spotify|Artist radio|`spotify:artistRadio:{artistId}`|`spotify:artistRadio:72qVrKXRp9GeFQOesj0Pmv`|
 |TuneIn|Radio station|`radio:s{id}`||
+
+This list might not be complete, check out [sonos-ts](https://svrooij.io/node-sonos-ts/sonos-device/methods.html#metadata) for a complete list.
 
 ### Play a single item for experts
 
@@ -47,7 +50,7 @@ To above sample tries to guess the required metadata based on the track uri. Thi
 
 You probably need set the following metadata properties `UpnpClass` and `CdUdn`, sometimes the `ItemId` is also required. You can start by skipping them if you don't know the required values. This sample command is in fact the same as the above (where the metadata is [guessed automatically](https://github.com/svrooij/node-sonos-ts/blob/46b95b18dd6c96cb93ed8442d4f067afbdb687f4/src/helpers/metadata-helper.ts#L175-L186)).
 
-You can find the metadata by listening for events and changing the track with the regular sonos app. Or (how this was done originally) start WireShark on your laptop to monitor `port 1400` and capture the instruction from the regular sonos app.
+You can find the metadata by listening for events and changing the track with the regular sonos app. Or (how this was done originally) start WireShark on your laptop to monitor `port 1400` and capture the instructions from the regular sonos app.
 
 Topic: `sonos/uuid_of_player/control`
 
@@ -93,12 +96,18 @@ Topic: `sonos/uuid_of_player/control`
 |--------|----|------|------|
 ||MP3|`http://somesite.com/song.mp3`||
 |Sonos|Local file|||
-|Sonos|Playlist|||
+|Sonos|Playlist|`sonos:playlist:{id}`|`sonos:playlist:7`|
+|Deezer|Album|`deezer:album:{id}`||
+|Deezer|Artist Top Tracks|`deezer:artistTopTracks:{id}`||
+|Deezer|Playlist|`deezer:playlist:{id}`||
+|Deezer|Track|`deezer:track:{id}`||
 |Spotify|Album|`spotify:album:{id}`|`spotify:album:4q2mtBkyPrFynvTRbi5HOv`|
 |Spotify|Artist top tracks|`spotify:artistTopTracks:{artistId}`|`spotify:artistTopTracks:72qVrKXRp9GeFQOesj0Pmv`|
-|Spotify|Playlist|`spotify:playlist:{id}`|`spotify:playlist:??`|
+|Spotify|Playlist|`spotify:playlist:{id}`|`spotify:playlist:37i9dQZF1DX4dyzvuaRJ0n`|
 |Spotify|Track|`spotify:track:{id}`|`spotify:track:0GiWi4EkPduFWHQyhiKpRB`|
 |Spotify|User Playlist|`spotify:user:{id}`|`spotify:user:??`|
+
+This list might not be complete, check out [sonos-ts](https://svrooij.io/node-sonos-ts/sonos-device/methods.html#metadata) for a complete list.
 
 ### Add item to queue for experts
 

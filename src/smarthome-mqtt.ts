@@ -1,6 +1,6 @@
 import mqtt, { IClientPublishOptions } from 'mqtt'
 import { MqttClient } from 'mqtt'
-import {StrictEventEmitter} from 'strict-event-emitter-types'
+import TypedEmitter from 'typed-emitter';
 import {EventEmitter} from 'events'
 import { DeviceControl } from './device-control'
 import {StaticLogger} from './static-logger'
@@ -15,7 +15,7 @@ export class SmarthomeMqtt{
   private readonly log = StaticLogger.CreateLoggerForSource('sonos2mqtt.SmarthomeMqtt')
   private readonly uri: URL
   private mqttClient?: MqttClient;
-  public readonly Events: StrictEventEmitter<EventEmitter, MqttEvents> = new EventEmitter();
+  public readonly Events: TypedEmitter<MqttEvents> = new EventEmitter();
   constructor(mqttUrl: string, private readonly prefix: string = 'sonos', private readonly clientId?: string) {
     this.uri = new URL(mqttUrl)
   }
@@ -74,8 +74,9 @@ export class SmarthomeMqtt{
     this.mqttClient?.publish(topic, payload, options)
   }
 
-  publishAutodiscovery(prefix: string, uuid: string, payload: any): void {
-    if(typeof payload !== 'string') payload = JSON.stringify(payload);
+  publishAutodiscovery(prefix: string, uuid: string, input: unknown): void {
+    const payload = typeof input !== 'string' ? JSON.stringify(input) : input;
+
     const topic = `${prefix}/music_player/${uuid}/sonos/config`;
     this.mqttClient?.publish(topic, payload, { qos:0, retain: true });
   }

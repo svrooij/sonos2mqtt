@@ -7,6 +7,10 @@ export enum SonosCommands {
   Mute = 'mute',
   Next = 'next',
   Notify = 'notify',
+  /**
+   * @deprecated Experimental see https://github.com/svrooij/node-sonos-ts/issues/119
+   */
+  NotifyTwo = 'notifytwo',
   Pause = 'pause',
   Play = 'play',
   PlayMode = 'playmode',
@@ -14,9 +18,18 @@ export enum SonosCommands {
   Queue = 'queue',
   Seek = 'seek',
   SelectTrack = 'selecttrack',
+  SetBass = 'setbass',
+  SetButtonLockState = 'setbuttonlockstate',
+  SetLEDState = 'setledstate',
+  SetNightmode = 'setnightmode',
   SetTransportUri = 'setavtransporturi',
+  SetTreble = 'settreble',
   Sleep = 'sleep',
   Speak = 'speak',
+  /**
+   * @deprecated Experimental see https://github.com/svrooij/node-sonos-ts/issues/119
+   */
+  SpeakTwo = 'speaktwo',
   Stop = 'stop',
   SwitchToLine = "switchtoline",
   SwitchToQueue = "switchtoqueue",

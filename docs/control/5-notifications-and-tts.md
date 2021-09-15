@@ -15,6 +15,7 @@ Notification are automatically managed by the application. It will return playba
 ## Play a mp3
 
 To play a short music file as a notification send the following payload to command topic.
+You can send multiple notifications after each other, and they will be played after each other.
 
 Topic: `sonos/uuid_of_speaker/control`
 
@@ -23,6 +24,28 @@ Payload:
 ```json
 {
   "command": "notify",
+  "input": {
+    "trackUri": "https://cdn.smartersoft-group.com/various/pull-bell-short.mp3",
+    "onlyWhenPlaying": false,
+    "timeout": 10,
+    "volume": 8,
+    "delayMs": 700
+  }
+}
+```
+
+### Experimental notification queue
+
+There is a second implementation of the notification queue, that you can use with the following command.
+You should not mix them, but you we are curious to what you [think](https://github.com/svrooij/node-sonos-ts/issues/119)
+
+Topic: `sonos/uuid_of_speaker/control`
+
+Payload:
+
+```json
+{
+  "command": "notifytwo",
   "input": {
     "trackUri": "https://cdn.smartersoft-group.com/various/pull-bell-short.mp3",
     "onlyWhenPlaying": false,
@@ -89,6 +112,11 @@ Have a speaker speak by sending the following to `sonos/uuid_of_speaker/control`
   }
 }
 ```
+
+### Experimental tts queue
+
+There is a second implementation of the notification queue (used by TTS), just change `speak` to `speaktwo` in the above command.
+You should not mix them, but you we are curious to what you [think](https://github.com/svrooij/node-sonos-ts/issues/119)
 
 ### Text to speech on all speakers
 
