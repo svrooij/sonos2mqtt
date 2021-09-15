@@ -76,6 +76,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "evenisse",
+      "name": "Emmanuel Venisse",
+      "avatar_url": "https://avatars.githubusercontent.com/u/682743?v=4",
+      "profile": "https://github.com/evenisse",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
