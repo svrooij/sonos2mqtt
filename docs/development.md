@@ -55,13 +55,27 @@ It's also important to start the app and test it in your local environment. If y
 
 ## Debugging
 
-This library has a VSCode task defined, be sure to change your sonos host in the `.vscode/launch.json` file. You should be able to debug the library in VSCode with breakpoints and everything.
+This library has a VSCode launch file (`.vscode/launch.json`). You should be able to debug the library in VSCode with breakpoints and everything. The launch file is configured to load a `.env` file from the root of the library.
+
+Create a `.env` file in the root with the following config:
+
+```bash
+# Setting the Sonos device to start with
+SONOS2MQTT_DEVICE=192.168.x.x
+
+# Change default mqtt server
+# SONOS2MQTT_MQTT=mqtt://some.host:port
+
+# Text-to-speech stuff https://svrooij.io/node-sonos-ts/sonos-device/notifications-and-tts.html#text-to-speech
+# SONOS_TTS_ENDPOINT=https://sonos-tts:5601/api/generate
+# SONOS_TTS_LANG=en-US
+```
 
 ## Run documentation generator locally
 
 The documentation can be found in [/docs](https://github.com/svrooij/sonos2mqtt/tree/master/docs) and uses Jekyll to convert the markdown to html. To check the generated documenation locally you can use the following script. It uses docker, so it won't install anything on your machine. It also has live reload to you can edit and save and should see the changes instantly.
 
-`npm run serve-docs`
+`npm run serve-docs` or change dir to `docs` and run `docker-compose up`
 
 ## Contributors ✨
 

@@ -74,8 +74,9 @@ export class SmarthomeMqtt{
     this.mqttClient?.publish(topic, payload, options)
   }
 
-  publishAutodiscovery(prefix: string, uuid: string, payload: any): void {
-    if(typeof payload !== 'string') payload = JSON.stringify(payload);
+  publishAutodiscovery(prefix: string, uuid: string, input: unknown): void {
+    const payload = typeof input !== 'string' ? JSON.stringify(input) : input;
+
     const topic = `${prefix}/music_player/${uuid}/sonos/config`;
     this.mqttClient?.publish(topic, payload, { qos:0, retain: true });
   }

@@ -11,7 +11,8 @@ export class SonosCommandMapping {
       return await device.ExecuteCommand(control.sonosCommand, control.input)
     }
   }
-  static async ExecuteCommand(device: SonosDevice, command: SonosCommands, payload: any): Promise<any> {
+  static async ExecuteCommand(device: SonosDevice, command: SonosCommands, input: unknown): Promise<any> {
+    const payload = input as any;
     switch(command) {
       case SonosCommands.AdvancedCommand:
         if (payload.cmd)
