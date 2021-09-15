@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "preLaunchTask": "typescript compile",
+      "request": "launch",
+      "name": "Start Sonos2mqtt",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "program": "${workspaceFolder}\\lib\\index.js",
+      "envFile": "${workspaceFolder}/.env"
+    }
+  ]
+}
