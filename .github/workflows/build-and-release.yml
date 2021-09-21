@@ -25,13 +25,14 @@ on:
 
 jobs:
   build:
+    name: 'Build and test on Node v${{ matrix.node }}'
     runs-on: ubuntu-latest
     strategy:
       matrix:
         node: [12, 14, 16]
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
       - name: Install depencencies
@@ -43,12 +44,15 @@ jobs:
   
   release:
     runs-on: ubuntu-latest
+    name: Semantic release
     needs: [build]
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
           node-version: 16
+      - name: Install depencencies
+        run: npm ci
       - name: Build library
         run: npm run build
       - name: Semantic Release
