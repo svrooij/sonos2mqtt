@@ -1,34 +1,54 @@
-name: Run tests and publish
+name: Run tests and release npm package
 
 on:
   workflow_dispatch:
   push:
     branches:
       - master
+      - main
       - development
       - beta
+      - auto-build
     paths-ignore:
       - 'docs/**'
       - 'README.md'
       - '.all-contributorsrc'
   pull_request:
+    branches:
+      - master
+      - main
+      - beta
     paths-ignore:
       - 'docs/**'
       - 'README.md'
       - '.all-contributorsrc'
 
 jobs:
-  run-build-on-node12:
+  build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [12, 14, 16]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: ${{ matrix.node }}
       - name: Install depencencies
         run: npm ci
       - name: Run tests
         run: npm test
+      - name: Build library
+        run: npm run build
+  
+  release:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
       - name: Build library
         run: npm run build
       - name: Semantic Release
@@ -37,48 +57,82 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      -
-        name: Set up QEMU (multi platform)
-        uses: docker/setup-qemu-action@v1
+      - name: Setup node for Github Registry
         if: steps.semantic.outputs.new_release_published == 'true'
+        uses: actions/setup-node@v2
         with:
-          platforms: all
-      -
-        name: Set up Docker Buildx
-        id: buildx
+          node-version: 16
+          registry-url: 'https://npm.pkg.github.com'
+          scope: 'svrooij'
+      - name: Publish To GitHub Package Registry
         if: steps.semantic.outputs.new_release_published == 'true'
-        uses: docker/setup-buildx-action@v1
-        with:
-          version: latest
-      -
-        name: Login to DockerHub
-        uses: docker/login-action@v1
-        if: steps.semantic.outputs.new_release_published == 'true'
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+        
 
-      - name: Publish to docker with buildx as latest
-        if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/master'
-        run: |
-          docker buildx build \
-            --platform linux/amd64,linux/arm/v7,linux/arm64 \
-            --push \
-            -t $GITHUB_REPOSITORY:latest \
-            -t $GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }} \
-            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg BUILD_VERSION=${{ steps.semantic.outputs.new_release_version }} \
-            --build-arg VSC_REF=$(echo ${GITHUB_SHA} | cut -c1-8) \
-            .
-      - name: Publish to docker with buildx as beta
-        if: steps.semantic.outputs.new_release_published == 'true' && github.ref != 'refs/heads/master'
-        run: |
-          docker buildx build \
-            --platform linux/amd64,linux/arm/v7,linux/arm64 \
-            --push \
-            -t $GITHUB_REPOSITORY:beta \
-            -t $GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }} \
-            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg BUILD_VERSION=${{ steps.semantic.outputs.new_release_version }} \
-            --build-arg VSC_REF=$(echo ${GITHUB_SHA} | cut -c1-8) \
-            .
+
+  # run-build-on-node12:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v1
+  #       with:
+  #         node-version: 12
+  #     - name: Install depencencies
+  #       run: npm ci
+  #     - name: Run tests
+  #       run: npm test
+  #     - name: Build library
+  #       run: npm run build
+  #     - name: Semantic Release
+  #       uses: cycjimmy/semantic-release-action@v2
+  #       id: semantic
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  #     -
+  #       name: Set up QEMU (multi platform)
+  #       uses: docker/setup-qemu-action@v1
+  #       if: steps.semantic.outputs.new_release_published == 'true'
+  #       with:
+  #         platforms: all
+  #     -
+  #       name: Set up Docker Buildx
+  #       id: buildx
+  #       if: steps.semantic.outputs.new_release_published == 'true'
+  #       uses: docker/setup-buildx-action@v1
+  #       with:
+  #         version: latest
+  #     -
+  #       name: Login to DockerHub
+  #       uses: docker/login-action@v1
+  #       if: steps.semantic.outputs.new_release_published == 'true'
+  #       with:
+  #         username: ${{ secrets.DOCKER_USERNAME }}
+  #         password: ${{ secrets.DOCKER_PASSWORD }}
+
+  #     - name: Publish to docker with buildx as latest
+  #       if: steps.semantic.outputs.new_release_published == 'true' && github.ref == 'refs/heads/master'
+  #       run: |
+  #         docker buildx build \
+  #           --platform linux/amd64,linux/arm/v7,linux/arm64 \
+  #           --push \
+  #           -t $GITHUB_REPOSITORY:latest \
+  #           -t $GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }} \
+  #           --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+  #           --build-arg BUILD_VERSION=${{ steps.semantic.outputs.new_release_version }} \
+  #           --build-arg VSC_REF=$(echo ${GITHUB_SHA} | cut -c1-8) \
+  #           .
+  #     - name: Publish to docker with buildx as beta
+  #       if: steps.semantic.outputs.new_release_published == 'true' && github.ref != 'refs/heads/master'
+  #       run: |
+  #         docker buildx build \
+  #           --platform linux/amd64,linux/arm/v7,linux/arm64 \
+  #           --push \
+  #           -t $GITHUB_REPOSITORY:beta \
+  #           -t $GITHUB_REPOSITORY:${{ steps.semantic.outputs.new_release_version }} \
+  #           --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
+  #           --build-arg BUILD_VERSION=${{ steps.semantic.outputs.new_release_version }} \
+  #           --build-arg VSC_REF=$(echo ${GITHUB_SHA} | cut -c1-8) \
+  #           .
