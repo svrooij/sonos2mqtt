@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Container release
     needs: [npm-release]
-    if: needs.npm-release.released == 'true'
+    if: needs.npm-release.outputs.released == 'true'
     steps:
       - uses: actions/checkout@v2
 
@@ -127,11 +127,11 @@ jobs:
             --push \
             -f ./Dockerfile.npm \
             -t $GITHUB_REPOSITORY:latest \
-            -t $GITHUB_REPOSITORY:${{ needs.npm-release.version }} \
+            -t $GITHUB_REPOSITORY:${{ needs.npm-release.outputs.version }} \
             -t ghcr.io/svrooij/sonos2mqtt:latest \
-            -t ghcr.io/svrooij/sonos2mqtt:${{ needs.npm-release.version }} \
+            -t ghcr.io/svrooij/sonos2mqtt:${{ needs.npm-release.outputs.version }} \
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg BUILD_VERSION=${{ needs.npm-release.version }} \
+            --build-arg BUILD_VERSION=${{ needs.npm-release.outputs.version }} \
             --build-arg VSC_REF=$(echo ${GITHUB_SHA} | cut -c1-8) \
             .
 
@@ -143,10 +143,10 @@ jobs:
             --push \
             -f ./Dockerfile.npm \
             -t $GITHUB_REPOSITORY:beta \
-            -t $GITHUB_REPOSITORY:${{ needs.npm-release.version }} \
+            -t $GITHUB_REPOSITORY:${{ needs.npm-release.outputs.version }} \
             -t ghcr.io/svrooij/sonos2mqtt:beta \
-            -t ghcr.io/svrooij/sonos2mqtt:${{ needs.npm-release.version }} \
+            -t ghcr.io/svrooij/sonos2mqtt:${{ needs.npm-release.outputs.version }} \
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg BUILD_VERSION=${{ needs.npm-release.version }} \
+            --build-arg BUILD_VERSION=${{ needs.npm-release.outputs.version }} \
             --build-arg VSC_REF=$(echo ${GITHUB_SHA} | cut -c1-8) \
             .
