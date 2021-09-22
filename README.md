@@ -36,6 +36,8 @@ See: [https://svrooij.github.io/sonos2mqtt](https://svrooij.github.io/sonos2mqtt
 
 ## Node-sonos-ts
 
+[![Sonos typescript this library][badge_sonos-typescript]][link_sonos-typescript]
+
 This library depends on [node-sonos-ts](https://github.com/svrooij/node-sonos-ts/) which I also developed. All other libraries using node-sonos-ts should also be able to implemented all the nice features included there. Like **notifications**  or **text-to-speech** which are the coolest new additions for **sonos2mqtt**!
 
 ## Beer or Coffee
@@ -78,7 +80,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
 Contributions of any kind welcome!
 
-[badge_build]: https://github.com/svrooij/sonos2mqtt/workflows/Run%20tests%20and%20publish/badge.svg
+[badge_build]: https://github.com/svrooij/sonos2mqtt/workflows/Run%20tests%20and%20release%20npm%20package/badge.svg
 [badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt
 [badge_discord]: https://img.shields.io/discord/782374564054564875?style=flat-square
 [badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt?style=flat-square

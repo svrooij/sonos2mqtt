@@ -24,7 +24,8 @@ on:
       - '.all-contributorsrc'
 
 jobs:
-  build:
+  # Install dependencies, run tests and try to build
+  test:
     name: 'Build and test on Node v${{ matrix.node }}'
     runs-on: ubuntu-latest
     strategy:
@@ -41,11 +42,13 @@ jobs:
         run: npm test
       - name: Build library
         run: npm run build
-  
+
+  # Release to NPM if its not a pull request
   npm-release:
     runs-on: ubuntu-latest
-    name: Semantic release
-    needs: [build]
+    name: NPM Release
+    if: github.event_name != 'pull_request'
+    needs: [test]
     outputs:
       released: ${{ steps.semantic.outputs.new_release_published }}
       version: ${{ steps.semantic.outputs.new_release_version }}
@@ -78,10 +81,11 @@ jobs:
           npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-        
-  docker-release:
+
+  # Release container if it released to npm.
+  container-release:
     runs-on: ubuntu-latest
-    name: Docker release
+    name: Container release
     needs: [npm-release]
     if: needs.npm-release.released == 'true'
     steps:
