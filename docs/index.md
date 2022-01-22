@@ -23,7 +23,7 @@ permalink: /
 [![License](https://img.shields.io/npm/l/sonos2mqtt.svg?style=flat-square)](https://github.com/svrooij/sonos2mqtt/blob/master/package.json)
 [![Support me on Github][badge_sponsor]][link_sponsor]
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 This node application is a bridge between the Sonos and a mqtt server. The status of all your sonos devices will be published to mqtt and you can control the sonos speakers over mqtt.
@@ -98,6 +98,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/evenisse"><img src="https://avatars.githubusercontent.com/u/682743?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Emmanuel Venisse</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=evenisse" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://jonasmhansen.com"><img src="https://avatars.githubusercontent.com/u/1939229?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jonas Hansen</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=JonasMH" title="Documentation">📖</a></td>
   </tr>
 </table>
 

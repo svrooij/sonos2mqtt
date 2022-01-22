@@ -96,6 +96,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://github.com/evenisse"><img src="https://avatars.githubusercontent.com/u/682743?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Emmanuel Venisse</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=evenisse" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://jonasmhansen.com"><img src="https://avatars.githubusercontent.com/u/1939229?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jonas Hansen</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=JonasMH" title="Documentation">📖</a></td>
   </tr>
 </table>
 
