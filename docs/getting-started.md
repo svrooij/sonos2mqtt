@@ -27,7 +27,7 @@ Using this library in docker is the preferred way.
 
 1. Create an `.env` file with the following settings.
 2. Set the required values.
-3. Run `docker run --env-file .env -p 6329:6329 svrooij/sonos2mqtt`
+3. Run `docker run --env-file .env -p 6329:6329 ghcr.io/svrooij/sonos2mqtt`
 
 ```shell
 # Set the IP of one known sonos speaker (device discovery doesnt always work inside docker.)
@@ -84,7 +84,8 @@ We automatically build a multi-architecture image for `amd64`, `arm64`, `armv7` 
 version: "3.7"
 services:
   sonos:
-    image: svrooij/sonos2mqtt
+    image: ghcr.io/svrooij/sonos2mqtt
+    # or the dockerhub svrooij/sonos2mqtt
     restart: unless-stopped
     ports:
       - "6329:6329"
