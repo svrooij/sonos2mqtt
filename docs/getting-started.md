@@ -44,17 +44,41 @@ SONOS_LISTENER_HOST=192.168.x.x
 
 See [configuration](#configuration) for additional settings.
 
-This app makes heavy use of events, so you'll have to make sure they still work. That is why you need to expose the listening port (`6329`), changing the port will cause problems. The library will automaticcally subscribe to events from the sonos device, but because you're running in docker it cannot figure out the IP by itself. You set the IP of the docker host in the `SONOS_LISTENER_HOST` environment variable. This is how the events flow.
+### Events
+
+sonos2mqtt requires events to be configured correctly before being able to send status updates to MQTT, so you'll have to make sure they work. Sonos events works by sonos2mqtt registers a callback url in the speaker(s), when the speaker state then changes, the speaker will make a new http request to the provided callback url:
 
 ```
-================              ===============              ==============
-| Sonos Device |  == HTTP =>  | Docker host |  == HTTP =>  | sonos2mqtt |
-================              ===============              ==============
++-------------+                            +-------------+                            +-------+
+| sonos2mqtt  |                            | dockerhost  |                            | sonos |
++-------------+                            +-------------+                            +-------+
+       |                                          |                                       |
+       | SetupEvents(callbackUrl)                 |                                       |
+       |----------------------------------------->|                                       |
+       |                                          |                                       |
+       |                                          | SetupEvents(callbackUrl)              |
+       |                                          |-------------------------------------->|
+       |                                          |                                       |
+       |                                          |     http://callbackUrl: State changed |
+       |                                          |<--------------------------------------|
+       |                                          |                                       |
+       |        http://callbackUrl: State changed |                                       |
+       |<-----------------------------------------|                                       |
+       |                                          |                                       |
 ```
 
-We automatically build a multi-architecture image for `amd64`, `arm64`, `armv7` and `i386`. This means you can run sonos2mqtt in docker on almost any device.
+This means that the speaker should be able to connect to sonos2mqtt on `SONOS_LISTENER_HOST:6329`. This can be verified by starting up sonos2mqtt, and then on another machine try to access `http://SONOS_LISTENER_HOST:6329/status` where you should see a json document. If this doesn't work, try through the following steps one by one until it works:
+
+1. Verify `SONOS_LISTENER_HOST` is set to the host machine ip
+2. Verify port `6329` has been bound in docker (See the `docker-compose.yml` below)
+3. Create an exception for `6329` in the firewall
+4. Make sure port `6329` is not in use by another service
+
+That is why you need to expose the listening port (`6329`), changing the port will cause problems. The library will automaticcally subscribe to events from the sonos device, but because you're running in docker it cannot figure out the IP by itself. You set the IP of the docker host in the `SONOS_LISTENER_HOST` environment variable. This is how the events flow:
 
 ### Docker-compose
+
+We automatically build a multi-architecture image for `amd64`, `arm64`, `armv7` and `i386`. This means you can run sonos2mqtt in docker on almost any device.
 
 ```yaml
 version: "3.7"
