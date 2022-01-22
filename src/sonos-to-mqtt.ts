@@ -99,7 +99,11 @@ export class SonosToMqtt {
         }
         this.log.debug('Executed {command} for {device} ({uuid})', payload.command ?? payload.sonosCommand, correctDevice.Name, correctDevice.Uuid)
       } catch (e) {
-        this.log.warn(e, 'Error executing {command} for {device} ({uuid})', payload.command ?? payload.sonosCommand, correctDevice.Name, correctDevice.Uuid)
+        if (e instanceof Error) {
+          this.log.warn(e, 'Error executing {command} for {device} ({uuid})', payload.command ?? payload.sonosCommand, correctDevice.Name, correctDevice.Uuid)
+        } else {
+          this.log.warn('Error executing {command} for {device} ({uuid})', payload.command ?? payload.sonosCommand, correctDevice.Name, correctDevice.Uuid)
+        }
         this.mqtt.publish(`${correctDevice.Uuid}/error`, {
           command: payload.command ?? payload.sonosCommand,
           error: e
@@ -135,6 +139,12 @@ export class SonosToMqtt {
           this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/coordinator`, coordinatorUuid)
         }
       })
+      d.Events.on('transportState', (transportState) => {
+        this.updateState(d.Uuid, { transportState } );
+        if (this.config.distinct === true) {
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/state`, transportState)
+        }
+      })
       if(this.config.distinct === true) {
         d.Events.on(SonosEvents.CurrentTrackMetadata, (track) => {
           this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/track`, track)
@@ -144,9 +154,6 @@ export class SonosToMqtt {
         })
         d.Events.on(SonosEvents.Mute, (mute) => {
           this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/muted`, mute)
-        })
-        d.Events.on(SonosEvents.CurrentTransportStateSimple, (state) => {
-          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/state`, state)
         })
         d.Events.on(SonosEvents.Volume, (volume) => {
           this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/volume`, volume)
@@ -194,7 +201,7 @@ export class SonosToMqtt {
       currentTrack: data.CurrentTrackMetaData,
       enqueuedMetadata: data.EnqueuedTransportURIMetaData,
       nextTrack: data.NextTrackMetaData,
-      transportState: data.TransportState,
+      // transportState: data.TransportState,
       playmode: data.CurrentPlayMode,
     })
   }

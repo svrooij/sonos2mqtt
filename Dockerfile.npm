@@ -1,19 +1,20 @@
-FROM node:current-alpine3.12 as build
-WORKDIR /usr/src/app
-COPY package*.json tsconfig.json ./
-RUN npm ci
-COPY ./src ./src
-RUN npm run build
+# FROM node:current-alpine as build
+# WORKDIR /usr/src/app
+# COPY package*.json tsconfig.json ./
+# RUN npm ci
+# COPY ./src ./src
+# RUN npm run build
 
 FROM node:current-alpine3.12 as prod
-ARG BUILD_DATE=unknown
-ARG BUILD_VERSION=0.0.0-development
-ARG VCS_REF=not-set
 ENV SONOS2MQTT_RUNNING_IN_CONTAINER=true
 WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY --from=build /usr/src/app/lib/*.js /usr/src/app/lib/
+
+ARG BUILD_VERSION=latest
+
+RUN npm install -g sonos2mqtt@${BUILD_VERSION}
+
+ARG BUILD_DATE=unknown
+ARG VCS_REF=unknown
 LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.description="Connecting your sonos speakers to mqtt" \
       org.label-schema.name=sonos2mqtt \
@@ -22,4 +23,4 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
       org.label-schema.version=$BUILD_VERSION \
       org.label-schema.vcs-ref=$VCS_REF
 EXPOSE 6329
-CMD ["node", "./lib/index.js"]
+CMD ["sonos2mqtt"]

@@ -19,7 +19,7 @@
 [![github issues][badge_issues]][link_issues]
 [![Run build and publish][badge_build]][link_build] -->
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 [![mqtt-smarthome](https://img.shields.io/badge/mqtt-smarthome-blue.svg?style=flat-square)](https://github.com/mqtt-smarthome/mqtt-smarthome)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
@@ -35,6 +35,8 @@ Check out the other bridges in the [software list](https://github.com/mqtt-smart
 See: [https://svrooij.github.io/sonos2mqtt](https://svrooij.github.io/sonos2mqtt)
 
 ## Node-sonos-ts
+
+[![Sonos typescript this library][badge_sonos-typescript]][link_sonos-typescript]
 
 This library depends on [node-sonos-ts](https://github.com/svrooij/node-sonos-ts/) which I also developed. All other libraries using node-sonos-ts should also be able to implemented all the nice features included there. Like **notifications**  or **text-to-speech** which are the coolest new additions for **sonos2mqtt**!
 
@@ -62,11 +64,12 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://mi.o-o.im"><img src="https://avatars0.githubusercontent.com/u/7872104?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matthias Burgfried</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=matthias-burgfried" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/mqtt-fan"><img src="https://avatars1.githubusercontent.com/u/32242849?v=4?s=100" width="100px;" alt=""/><br /><sub><b>mqtt-fan</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=mqtt-fan" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/roth"><img src="https://avatars3.githubusercontent.com/u/716931?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Martin Roth</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=roth" title="Documentation">📖</a></td>
-    <td align="center"><a href="http://dgmltn.com"><img src="https://avatars3.githubusercontent.com/u/698270?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Doug Melton</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/issues?q=author%3Adgmltn" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://sebbo.net/"><img src="https://avatars.githubusercontent.com/u/812398?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sebastian</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=sebbo2002" title="Code">💻</a></td>
   </tr>
   <tr>
+    <td align="center"><a href="http://dgmltn.com"><img src="https://avatars3.githubusercontent.com/u/698270?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Doug Melton</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/issues?q=author%3Adgmltn" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://sebbo.net/"><img src="https://avatars.githubusercontent.com/u/812398?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Sebastian</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=sebbo2002" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/evenisse"><img src="https://avatars.githubusercontent.com/u/682743?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Emmanuel Venisse</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=evenisse" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://jonasmhansen.com"><img src="https://avatars.githubusercontent.com/u/1939229?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jonas Hansen</b></sub></a><br /><a href="https://github.com/svrooij/sonos2mqtt/commits?author=JonasMH" title="Documentation">📖</a></td>
   </tr>
 </table>
 
@@ -78,7 +81,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
 Contributions of any kind welcome!
 
-[badge_build]: https://github.com/svrooij/sonos2mqtt/workflows/Run%20tests%20and%20publish/badge.svg
+[badge_build]: https://github.com/svrooij/sonos2mqtt/workflows/Run%20tests%20and%20release%20npm%20package/badge.svg
 [badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt
 [badge_discord]: https://img.shields.io/discord/782374564054564875?style=flat-square
 [badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt?style=flat-square
