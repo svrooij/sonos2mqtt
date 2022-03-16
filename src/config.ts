@@ -60,7 +60,7 @@ export class ConfigLoader {
     return yargs
       .usage(pkg.name + ' ' + pkg.version + '\n' + pkg.description + '\n\nUsage: $0 [options]')
       .describe('prefix', 'instance name. used as prefix for all topics')
-      .describe('mqtt', 'mqtt broker url. See https://static.svrooij.nl/sonos2mqtt/getting-started.html#configuration')
+      .describe('mqtt', 'mqtt broker url. See https://svrooij.io/sonos2mqtt/getting-started.html#configuration')
       .describe('clientid', 'Specify the client id to be used')
       .describe('log', 'Set the loglevel')
       .describe('d', 'Publish distinct track states')
@@ -84,11 +84,12 @@ export class ConfigLoader {
         d: false,
         'ttslang': 'en-US',
         'ttsendpoint': undefined,
+        discovery: false,
         discoveryprefix: 'homeassistant',
         log: 'information'
       })
       .choices('log', ['warning', 'information', 'debug'])
-      .wrap(80)
+      .wrap(90)
       .version()
       .help('help')
       .env('SONOS2MQTT')
