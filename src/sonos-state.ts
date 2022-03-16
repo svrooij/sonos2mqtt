@@ -17,8 +17,9 @@ export interface SonosState extends SonosStateBase {
   volume: ChannelValue<number>;
   mute: ChannelValue<boolean>;
   currentTrack: Track | string;
+  position: PositionInfo;
   nextTrack: Track | string;
-  enqueuedMetadata: Track | string;
+  enqueuedMetadata: TrackWithQueueInfo | string;
   transportState: ExtendedTransportState;
   playmode: string;
   bass: number;
@@ -27,5 +28,15 @@ export interface SonosState extends SonosStateBase {
 }
 
 interface SonosStateBase {
-  [key: string]: string | number | Track | ChannelValue<number> | ChannelValue<boolean> | ExtendedTransportState;
+  [key: string]: string | number | Track | ChannelValue<number> | ChannelValue<boolean> | ExtendedTransportState | PositionInfo | TrackWithQueueInfo;
+}
+
+interface PositionInfo {
+  Position: string;
+  LastUpdate: number;
+}
+
+interface TrackWithQueueInfo extends Track {
+  QueueLength?: number;
+  QueuePosition?: number;
 }

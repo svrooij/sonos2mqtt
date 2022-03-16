@@ -82,6 +82,28 @@ Internally the notifications work as following.
 
 More information about [notifications](https://svrooij.github.io/node-sonos-ts/sonos-device/notifications-and-tts.html)
 
+{% raw %}
+<pre class="mermaid">
+sequenceDiagram;
+    participant user as User
+    participant s2m as Sonos2MQTT
+    participant s as Sonos Speaker
+    user-->>s2m: Play notification url
+    s2m->>s: What is the current position?
+    s->>s2m: Here you go
+    s2m-->>s2m: Save playback snapshot
+    Note right of s2m: Current Track, Volume, Position, Mute & Metadata
+    s2m->>s: Set track uri, volume etc.
+    s->>s: Play notification track
+    s2m-->>s2m: Wait for event or timeout
+    s->>s2m: Playback stopped (event)
+    s2m-->>s: Play next notification
+    s-->>s2m: Playback stopped (event)
+    s2m->>s: Restore full state
+
+</pre>
+{% endraw %}
+
 ## Text to speech
 
 <iframe src="https://github.com/sponsors/svrooij/button" title="Sponsor svrooij" height="35" width="107" style="border: 0;"></iframe>
@@ -144,6 +166,25 @@ The text-to-speech method executes the following:
 3. The TTS endpoint returns the url of the mp3.
 4. We call the `.PlayNotification({})` command above, with the tts url.
 
+{% raw %}
+<pre class="mermaid">
+sequenceDiagram;
+    participant user as User
+    participant s2m as Sonos2MQTT
+    participant tts as Text-to-speech server
+    participant api as Remote service
+    user->>s2m: Play text-to-speech
+    s2m->>+tts: HTTP post /api/generate
+    tts-->>tts: Have mp3 for text?
+    tts->>+api: Generate mp3 for text
+    api->>-tts: Here you go
+    tts->>tts: Save file locally
+    tts->>-s2m: Url for mp3 file
+    s2m->>s2m: Play notification url (see above)
+
+</pre>
+{% endraw %}
+
 This way you don't have to worry about encoding the text so sonos understands it. Sonos will just get a regular url to the mp3 file with the spoken text.
 
 The [server][link_polly_tts] I've build is based on Amazon Polly, but I invite eveybody to build their own if you want to support an other tts service. You can replace it with any other TTS service as long as it expects a post request with the data below and responds with a json message with either `uri` or `cdnUri`. The sonos speaker needs the `.mp3` at the end to be able to play the file smoothly.
@@ -168,6 +209,11 @@ Response
   "uri": "http://your_ip:5601/cache/en-US/4b6eddb411d4cec3933528bfca05341828ca7593.mp3"
 }
 ```
+
+<script src="{{ "/assets/mermaid-8.14.0/mermaid.min.js" | relative_url }}"></script>
+ <script>
+ mermaid.initialize({startOnLoad:true});
+</script>
 
 [badge_sponsor]: https://img.shields.io/badge/Sponsor-on%20Github-red
 [link_sponsor]: https://github.com/sponsors/svrooij

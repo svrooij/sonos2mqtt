@@ -1,16 +1,19 @@
+import { SonosManager, SonosEvents, SonosDevice, } from '@svrooij/sonos'
+import { AVTransportServiceEvent, RenderingControlServiceEvent } from '@svrooij/sonos/lib/services';
+import { TransportState } from '@svrooij/sonos/lib/models';
 import { Config } from './config'
 import { StaticLogger } from './static-logger'
-import { SonosManager, SonosEvents } from '@svrooij/sonos'
 import { SmarthomeMqtt } from './smarthome-mqtt';
 import { SonosCommandMapping } from './sonos-command-mapping';
 import { SonosState } from './sonos-state';
-import { AVTransportServiceEvent, RenderingControlServiceEvent } from '@svrooij/sonos/lib/services';
 import { SonosCommands } from './sonos-commands';
+
 export class SonosToMqtt {
   private readonly sonosManager: SonosManager;
   private readonly mqtt: SmarthomeMqtt;
   private readonly log = StaticLogger.CreateLoggerForSource('Sonos2mqtt.main')
   private readonly states: Array<Partial<SonosState>> = [];
+  private readonly positionTimers: {[key: string]: NodeJS.Timeout} = {};
   private readonly stateTimers: {[key: string]: NodeJS.Timeout} = {};
   constructor(private config: Config) {
     this.sonosManager = new SonosManager();
@@ -139,18 +142,30 @@ export class SonosToMqtt {
           this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/coordinator`, coordinatorUuid)
         }
       })
-      d.Events.on('transportState', (transportState) => {
+      d.Events.on('transportState', async (transportState) => {
         this.updateState(d.Uuid, { transportState } );
         if (this.config.distinct === true) {
           this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/state`, transportState)
+        }
+
+        if (transportState === TransportState.Playing || transportState === TransportState.Transitioning) {
+          await this.periodicallyUpdatePosition(d);
+        } else {
+          this.deletePosition(d.Uuid);
+          if(this.positionTimers[d.Uuid]) clearTimeout(this.positionTimers[d.Uuid]);
+        }
+      })
+      d.Events.on(SonosEvents.CurrentTrackUri, async (trackUri) => {
+        if (this.config.distinct === true) {
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/trackUri`, trackUri)
+        }
+        if (d.CurrentTransportStateSimple == TransportState.Playing) {
+          await this.periodicallyUpdatePosition(d);
         }
       })
       if(this.config.distinct === true) {
         d.Events.on(SonosEvents.CurrentTrackMetadata, (track) => {
           this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/track`, track)
-        })
-        d.Events.on(SonosEvents.CurrentTrackUri, (trackUri) => {
-          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/trackUri`, trackUri)
         })
         d.Events.on(SonosEvents.Mute, (mute) => {
           this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/muted`, mute)
@@ -160,19 +175,36 @@ export class SonosToMqtt {
         })
 
       }
+
+      d.DevicePropertiesService.Events.on('serviceEvent', (data) => {
+        this.log.debug('device_properties %o', data);
+      })
     })
   }
 
-  private publishDiscoveryMessages(): void {
-    this.sonosManager.Devices.forEach(d => {
+  private async periodicallyUpdatePosition(device: SonosDevice): Promise<void> {
+    if(this.positionTimers[device.Uuid]) clearTimeout(this.positionTimers[device.Uuid]);
+
+    const position = await device.AVTransportService.GetPositionInfo();
+    this.updateState(device.Uuid, { position: {Position: position.RelTime, LastUpdate: Date.now() }});
+    this.positionTimers[device.Uuid] = setTimeout(() => {
+      return this.periodicallyUpdatePosition(device);
+    }, 30000)
+  }
+
+  private async publishDiscoveryMessages(): Promise<void> {
+    for (const d of this.sonosManager.Devices) {
+      const description = await d.GetDeviceDescription();
       const payload = {
         available_commands: Object.values(SonosCommands),
         command_topic: `${this.config.prefix}/${d.Uuid}/control`,
         device: {
           identifiers: [d.Uuid],
-          manufacturer: 'Sonos',
-          // model: '', Model not available at the moment (but would be nice if added in the sonos lib)
-          name: d.Name
+          manufacturer: description.manufacturer,
+          model: description.modelName,
+          name: d.Name,
+          sw_version: description.softwareVersion,
+          connections: [["host", `${d.Host}:${d.Port}`]]
         },
         device_class: 'speaker',
         icon: 'mdi:speaker',
@@ -185,7 +217,7 @@ export class SonosToMqtt {
         payload_available: '2'
       };
       this.mqtt.publishAutodiscovery(this.config.discoveryprefix ?? 'homeassistant', d.Uuid, payload);
-    });
+    }
   }
 
   /**
@@ -197,13 +229,14 @@ export class SonosToMqtt {
    * @memberof SonosToMqtt
    */
   private updateStateWithAv(uuid: string, data: AVTransportServiceEvent): void {
-    this.updateState(uuid, {
-      currentTrack: data.CurrentTrackMetaData,
-      enqueuedMetadata: data.EnqueuedTransportURIMetaData,
-      nextTrack: data.NextTrackMetaData,
-      // transportState: data.TransportState,
-      playmode: data.CurrentPlayMode,
-    })
+    if (typeof data.EnqueuedTransportURIMetaData === 'object' && typeof data.CurrentTrackMetaData === 'object') {
+      this.updateState(uuid, {
+        currentTrack: data.CurrentTrackMetaData,
+        enqueuedMetadata: { ...data.EnqueuedTransportURIMetaData, QueueLength: data.NumberOfTracks, QueuePosition: data.CurrentTrack },
+        nextTrack: data.NextTrackMetaData,
+        playmode: data.CurrentPlayMode,
+      })
+    }
   }
 
   /**
@@ -240,6 +273,12 @@ export class SonosToMqtt {
       // Enumarate update object entries and only copy values where it has a value
       for(const [key, value] of Object.entries(update)) {
         if(value !== undefined) {
+          const currentValue = this.states[index][key];
+          if (typeof value === 'object' && typeof currentValue === 'object') {
+            this.states[index][key] = { ...currentValue, ...value }
+            continue;
+          }
+          
           this.states[index][key] = value;
         }
       }
@@ -255,6 +294,13 @@ export class SonosToMqtt {
         this.log.verbose('Publishing state for {uuid}', this.states[index].uuid)
         this.mqtt.publish(this.states[index].uuid ?? '', this.states[index], { qos: 0, retain: true });
       }, 400)
+    }
+  }
+
+  private deletePosition(uuid: string): void {
+    const index = this.states.findIndex(s => s.uuid === uuid)
+    if(index !== -1) {
+      delete this.states[index]['position'];
     }
   }
 

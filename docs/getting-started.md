@@ -19,64 +19,75 @@ Using sonos2mqtt is really easy.
 - (local) mqtt server
 - always on (single board) computer
 
-## Run sonos2mqtt in docker
+## Sonos2mqtt details
 
-- [Sonos2mqtt on docker hub](https://hub.docker.com/r/svrooij/sonos2mqtt)
+| What | Value |
+|------|-------|
+| Docker image | `ghcr.io/svrooij/sonos2mqtt:latest` or `svrooij/sonos2mqtt:latest`|
+| Docker image (beta) | `ghcr.io/svrooij/sonos2mqtt:beta` or `svrooij/sonos2mqtt:beta`|
+| NPM | `https://www.npmjs.com/package/sonos2mqtt` |
 
-Using this library in docker is the preferred way.
+## Configuration
 
-1. Create an `.env` file with the following settings.
-2. Set the required values.
-3. Run `docker run --env-file .env -p 6329:6329 ghcr.io/svrooij/sonos2mqtt`
+Every setting of this library can be set with environment variables prefixed with `SONOS2MQTT_`. Like `SONOS2MQTT_PREFIX=music` to change the topic prefix to `music`.
 
-```shell
-# Set the IP of one known sonos speaker (device discovery doesnt always work inside docker.)
-SONOS2MQTT_DEVICE=192.168.x.x
-# Set the mqtt connection string
-SONOS2MQTT_MQTT=mqtt://ip_or_host_of_mqtt
-# Publish distinct if your want
-# SONOS2MQTT_DISTINCT=true
-# Set the IP of the docker host (so node-sonos-ts knows where the events should be send to)
-SONOS_LISTENER_HOST=192.168.x.x
-# Set text-to-speech endpoint (optional)
-# SONOS_TTS_ENDPOINT=https://tts.server.com/api/generate
+```bash
+sonos2mqtt 0.0.0-development
+A smarthome bridge between your sonos system and a mqtt server.
+
+Usage: index.js [options]
+
+Options:
+      --prefix           instance name. used as prefix for all topics   [default: "sonos"]
+      --mqtt             mqtt broker url. See
+                         https://svrooij.io/sonos2mqtt/getting-started.html#configuration
+                                                             [default: "mqtt://127.0.0.1"]
+      --clientid         Specify the client id to be used
+      --log              Set the loglevel
+                     [choices: "warning", "information", "debug"] [default: "information"]
+  -d, --distinct         Publish distinct track states          [boolean] [default: false]
+  -h, --help             Show help                                               [boolean]
+      --ttslang          Default TTS language                           [default: "en-US"]
+      --ttsendpoint      Default endpoint for text-to-speech
+      --device           Start with one known IP instead of device discovery.
+      --discovery        Emit retained auto-discovery messages for each player.
+                                                                [boolean] [default: false]
+      --discoveryprefix  The prefix for the discovery messages  [default: "homeassistant"]
+      --friendlynames    Use device name or uuid in topics (except the united topic,
+                         always uuid)                            [choices: "name", "uuid"]
+      --version          Show version number                                     [boolean]
 ```
 
-See [configuration](#configuration) for additional settings.
+You can configure the **mqtt** url by setting a supported [URL](https://nodejs.org/api/url.html#url_constructor_new_url_input_base).
 
-### Events
+Most used format is `mqtt(s)://[user]:[password]@[host]:[port]` like `mqtt://user:password@hostname:1883`, or `mqtts://user:password@hostname:8883` for a mqtt server supporting TLS.
 
-sonos2mqtt requires events to be configured correctly before being able to send status updates to MQTT, so you'll have to make sure they work. Sonos events works by sonos2mqtt registers a callback url in the speaker(s), when the speaker state then changes, the speaker will make a new http request to the provided callback url:
+### Configuration by json file
 
+Some systems don't like the preferred docker way of configuration (which is environment settings), so it will also check for a json file when starting up.
+
+- Default path: `/data/options.json`
+- Override by setting: `CONFIG_PATH`
+
+Sample file:
+
+```json
+{
+  "mqtt": "",
+  "prefix": "sonos",
+  "distinct": false,
+  "device": "192.168.x.x",
+  "ttslang": "en-US",
+  "ttsendpoint": "",
+  "discovery": false,
+  "discoveryprefix": "homeassistant",
+  "log": "information",
+  "clientid": "",
+  "friendlynames": "name"
+}
 ```
-+-------------+                            +-------------+                            +-------+
-| sonos2mqtt  |                            | dockerhost  |                            | sonos |
-+-------------+                            +-------------+                            +-------+
-       |                                          |                                       |
-       | SetupEvents(callbackUrl)                 |                                       |
-       |----------------------------------------->|                                       |
-       |                                          |                                       |
-       |                                          | SetupEvents(callbackUrl)              |
-       |                                          |-------------------------------------->|
-       |                                          |                                       |
-       |                                          |     http://callbackUrl: State changed |
-       |                                          |<--------------------------------------|
-       |                                          |                                       |
-       |        http://callbackUrl: State changed |                                       |
-       |<-----------------------------------------|                                       |
-       |                                          |                                       |
-```
 
-This means that the speaker should be able to connect to sonos2mqtt on `SONOS_LISTENER_HOST:6329`. This can be verified by starting up sonos2mqtt, and then on another machine try to access `http://SONOS_LISTENER_HOST:6329/status` where you should see a json document. If this doesn't work, try through the following steps one by one until it works:
-
-1. Verify `SONOS_LISTENER_HOST` is set to the host machine ip
-2. Verify port `6329` has been bound in docker (See the `docker-compose.yml` below)
-3. Create an exception for `6329` in the firewall
-4. Make sure port `6329` is not in use by another service
-
-That is why you need to expose the listening port (`6329`), changing the port will cause problems. The library will automaticcally subscribe to events from the sonos device, but because you're running in docker it cannot figure out the IP by itself. You set the IP of the docker host in the `SONOS_LISTENER_HOST` environment variable. This is how the events flow:
-
-### Docker-compose
+## Run Sonos2mqtt with docker-compose
 
 We automatically build a multi-architecture image for `amd64`, `arm64`, `armv7` and `i386`. This means you can run sonos2mqtt in docker on almost any device.
 
@@ -109,7 +120,7 @@ services:
       - SONOS_TTS_AMAZON_KEY=your_key_id_here
       - SONOS_TTS_AMAZON_SECRET=your_secret_access_token_here
       - SONOS_TTS_AMAZON_REGION=eu-west-1
-      - SONOS_TTS_CACHE_URI=http://192.168.30.20:5601/cache
+      - SONOS_TTS_CACHE_URI=http://192.168.50.44:5601/cache
 
 # Optional MQTT server (I like emqx over mosquitto)
   emqx:
@@ -120,72 +131,76 @@ services:
       - "18083:18083"
 ```
 
-## Local installation
+## Run sonos2mqtt with docker
 
-You can also use sonos2mqtt on every device that has node installed. The latest LTS (long-time-support) version is always recommended, but it should run on v10 or higher. When creating an issue please verify that you're on the latest LTS (v12 for now) or higher.
+1. Create an `.env` file with the following settings.
+2. Set the required values.
+3. Run `docker run --env-file .env -p 6329:6329 ghcr.io/svrooij/sonos2mqtt`
 
-`sudo npm install -g sonos2mqtt`
-
-You have to make sure it runs in the background yourself. You could check out [PM2](https://pm2.keymetrics.io/docs/usage/process-management/) for a node process manager (for auto restarts in case of crash).
-
-## Configuration
-
-Every setting of this library can be set with environment variables prefixed with `SONOS2MQTT_`. Like `SONOS2MQTT_PREFIX=music` to change the topic prefix to `music`.
-
-```bash
-sonos2mqtt 0.0.0-development
-A smarthome bridge between your sonos system and a mqtt server.
-
-Usage: index.js [options]
-
-Options:
-  --prefix           instance name. used as prefix for all topics
-                                                              [default: "sonos"]
-  --mqtt             mqtt broker url. See https://static.svrooij.nl/sonos2mqtt/g
-                     etting-started.html#configuration
-                                                   [default: "mqtt://127.0.0.1"]
-  --clientid         Specify the client id to be used
-  --log              Set the loglevel
-           [choices: "warning", "information", "debug"] [default: "information"]
-  -d, --distinct     Publish distinct track states    [boolean] [default: false]
-  -h, --help         Show help                                         [boolean]
-  --ttslang          Default TTS language                     [default: "en-US"]
-  --ttsendpoint      Default endpoint for text-to-speech
-  --device           Start with one known IP instead of device discovery.
-  --discovery        Emit retained auto-discovery messages for each player.
-                                                                       [boolean]
-  --discoveryprefix  The prefix for the discovery messages
-                                                      [default: "homeassistant"]
-  --friendlynames    Use device name or uuid in topics (except the united topic,
-                     always uuid)                      [choices: "name", "uuid"]
-  --version          Show version number                               [boolean]
+```shell
+# Set the IP of one known sonos speaker (device discovery doesnt always work inside docker.)
+SONOS2MQTT_DEVICE=192.168.x.x
+# Set the mqtt connection string
+SONOS2MQTT_MQTT=mqtt://ip_or_host_of_mqtt
+# Publish distinct if your want
+# SONOS2MQTT_DISTINCT=true
+# Set the IP of the docker host (so node-sonos-ts knows where the events should be send to)
+SONOS_LISTENER_HOST=192.168.x.x
+# Set text-to-speech endpoint (optional)
+# SONOS_TTS_ENDPOINT=https://tts.server.com/api/generate
 ```
 
-You can configure the **mqtt** url by setting a supported [URL](https://nodejs.org/api/url.html#url_constructor_new_url_input_base).
+See [configuration](#configuration) for additional settings.
 
-Most used format is `mqtt(s)://[user]:[password]@[host]:[port]` like `mqtt://user:password@hostname:1883`, or `mqtts://user:password@hostname:8883` for a mqtt server supporting TLS.
+## Run sonos2mqtt with node
 
-### Configuration by json file
+While you can run sonos2mqtt on bare metal (or a VM), it's best avoided. It means you're also responsible for making sure it's restarted if there is an error. You can use a process manager for that task like, [PM2](https://pm2.keymetrics.io/docs/usage/process-management/) but setting it up is not supported by us.
 
-Some systems don't like the preferred docker way of configuration (which is environment settings), so it will also check for a json file when starting up.
+Install the app globally `sudo npm install -g sonos2mqtt`
 
-- Default path: `/data/options.json`
-- Override by setting: `CONFIG_PATH`
+And start the app `sonos2mqtt --mqtt mqtt://mqtt-host:1883 --device {sonos_ip_or_hostname}`
 
-Sample file:
+## Events explained
 
-```json
-{
-  "mqtt": "",
-  "prefix": "sonos",
-  "distinct": false,
-  "device": "192.168.x.x",
-  "ttslang": "en-US",
-  "ttsendpoint": "",
-  "discovery": false,
-  "discoveryprefix": "homeassistant",
-  "log": "information",
-  "clientid": "",
-  "friendlynames": "name"
-}
-```
+**Sonos2mqtt** doesn't use any pull mechanism, it uses event subscriptions to get notified as soon as something on the speakers changes. Once this app is started, it tries to get an ip that should be used in the callback url. If you run this application inside docker, the application has no idea what the  local ip of the machine running this application is.
+
+That is why you have to tell the application the local ip of the docker host with the `SONOS_LISTENER_HOST` environment variable.
+
+{% raw %}
+<pre class="mermaid">
+sequenceDiagram;
+    participant s2m as Sonos2MQTT
+    participant d as docker
+    participant s as Sonos Speaker
+    Note right of s2m: Create new subscription
+    s2m-->>d: What ip is reachable for sonos speaker?
+    d-->>s2m: Use this IP
+    s2m->>s: Send service updates to http://ip:port please?
+    s->>s2m: Here is your subscription ID
+    Note right of s2m: Wait for updates
+    loop When there is an update
+        s->>d: "Service update" to (http://docker-ip:port)
+        d->>s2m: "Service update" to (http://sonos2mqtt-ip:port)
+        s2m->>s: Update received
+    end
+    Note right of s2m: Unsubscribe
+    s2m-->>s: Cancel subscription with ID?
+    s-->>s2m: Ok
+</pre>
+{% endraw %}
+
+### Event troubleshooting
+
+If you don't see any messages from your sonos speaker, check the output of the container first. It should give you some good pointers.
+
+We have a status page available for the event listener, at `http://ip:6329/status` where you should see a json document describing all the sonos subscriptions. If this doesn't work, try through the following steps one by one until it works:
+
+1. Verify `SONOS_LISTENER_HOST` is set to the host machine ip
+2. Verify port `6329` has been bound in docker (See the `docker-compose.yml` below)
+3. Create an exception for `6329` in the firewall
+4. Make sure port `6329` is not in use by another service
+
+<script src="{{ "/assets/mermaid-8.14.0/mermaid.min.js" | relative_url }}"></script>
+ <script>
+ mermaid.initialize({startOnLoad:true});
+</script>
