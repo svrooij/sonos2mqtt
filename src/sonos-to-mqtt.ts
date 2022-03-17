@@ -97,6 +97,9 @@ export class SonosToMqtt {
       }
       try {
         const response = await SonosCommandMapping.ExecuteControl(correctDevice, payload);
+        if (payload?.command === SonosCommands.Seek) {
+          await this.periodicallyUpdatePosition(correctDevice);
+        }
         if(payload.replyTopic) {
           this.mqtt.publish(`${correctDevice.Uuid}/${payload.replyTopic}`, JSON.stringify(response));
         }
