@@ -14,6 +14,7 @@ export interface SonosState extends SonosStateBase {
   name: string;
   groupName: string;
   coordinatorUuid: string;
+  members?: Member[];
   volume: ChannelValue<number>;
   mute: ChannelValue<boolean>;
   currentTrack: Track | string;
@@ -24,11 +25,11 @@ export interface SonosState extends SonosStateBase {
   playmode: string;
   bass: number;
   treble: number;
-  
+  crossfade: string;
 }
 
 interface SonosStateBase {
-  [key: string]: string | number | Track | ChannelValue<number> | ChannelValue<boolean> | ExtendedTransportState | PositionInfo | TrackWithQueueInfo;
+  [key: string]: string | boolean | number | Track | ChannelValue<number> | ChannelValue<boolean> | ExtendedTransportState | PositionInfo | TrackWithQueueInfo | Member[] | undefined;
 }
 
 interface PositionInfo {
@@ -39,4 +40,9 @@ interface PositionInfo {
 interface TrackWithQueueInfo extends Track {
   QueueLength?: number;
   QueuePosition?: number;
+}
+
+interface Member {
+  Uuid: string;
+  Name: string;
 }

@@ -7,6 +7,7 @@ import { SmarthomeMqtt } from './smarthome-mqtt';
 import { SonosCommandMapping } from './sonos-command-mapping';
 import { SonosState } from './sonos-state';
 import { SonosCommands } from './sonos-commands';
+import { HaAutoDiscovery } from './ha-discovery';
 
 export class SonosToMqtt {
   private readonly sonosManager: SonosManager;
@@ -125,6 +126,7 @@ export class SonosToMqtt {
     this.sonosManager.Devices.forEach(async (d) => {
       const deviceDescription = await d.GetDeviceDescription();
       this.states.push({uuid: d.Uuid, model: deviceDescription.modelName, name: d.Name, groupName: d.GroupName, coordinatorUuid: d.Coordinator.Uuid})
+      this.updateMembers(d);
       d.Events.on(SonosEvents.AVTransport, (data) => {
         this.updateStateWithAv(d.Uuid, data);
         this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/avtransport`,data)
@@ -134,6 +136,7 @@ export class SonosToMqtt {
         this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/renderingcontrol`,data)
       })
       d.Events.on(SonosEvents.GroupName, (groupName) => {
+        this.updateMembers(d);
         this.updateState(d.Uuid, { groupName });
         if(this.config.distinct === true) {
           this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/group`, groupName)
@@ -154,7 +157,7 @@ export class SonosToMqtt {
         if (transportState === TransportState.Playing || transportState === TransportState.Transitioning) {
           await this.periodicallyUpdatePosition(d);
         } else {
-          this.deletePosition(d.Uuid);
+          this.deleteProperty(d.Uuid, 'position');
           if(this.positionTimers[d.Uuid]) clearTimeout(this.positionTimers[d.Uuid]);
         }
       })
@@ -176,12 +179,7 @@ export class SonosToMqtt {
         d.Events.on(SonosEvents.Volume, (volume) => {
           this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/volume`, volume)
         })
-
       }
-
-      d.DevicePropertiesService.Events.on('serviceEvent', (data) => {
-        this.log.debug('device_properties %o', data);
-      })
     })
   }
 
@@ -189,37 +187,38 @@ export class SonosToMqtt {
     if(this.positionTimers[device.Uuid]) clearTimeout(this.positionTimers[device.Uuid]);
 
     const position = await device.AVTransportService.GetPositionInfo();
-    this.updateState(device.Uuid, { position: {Position: position.RelTime, LastUpdate: Date.now() }});
-    this.positionTimers[device.Uuid] = setTimeout(() => {
-      return this.periodicallyUpdatePosition(device);
-    }, 30000)
+    if (position.RelTime === 'NOT_IMPLEMENTED') {
+      this.deleteProperty(device.Uuid, 'position');
+    } else {
+      this.updateState(device.Uuid, { position: {Position: position.RelTime, LastUpdate: Date.now() }});
+      this.positionTimers[device.Uuid] = setTimeout(() => {
+        return this.periodicallyUpdatePosition(device);
+      }, 30000)
+    }
+  }
+
+  private updateMembers(device: SonosDevice): void {
+    let members = this.sonosManager.Devices
+      .filter(d => d.Coordinator.Uuid === device.Coordinator.Uuid)
+      .map(d => { return { Name: d.Name, Uuid: d.Uuid }});
+    
+      if (members.length > 1) {
+        members = members.sort((a, b) => a.Uuid === device.Coordinator.Uuid ? 0 : a.Uuid.localeCompare(b.Uuid));
+        this.updateState(device.Uuid, { members: members });
+      } else {
+        this.deleteProperty(device.Uuid, 'members');
+      }
+      
+    
   }
 
   private async publishDiscoveryMessages(): Promise<void> {
     for (const d of this.sonosManager.Devices) {
-      const description = await d.GetDeviceDescription();
-      const payload = {
-        available_commands: Object.values(SonosCommands),
-        command_topic: `${this.config.prefix}/${d.Uuid}/control`,
-        device: {
-          identifiers: [d.Uuid],
-          manufacturer: description.manufacturer,
-          model: description.modelName,
-          name: d.Name,
-          sw_version: description.softwareVersion,
-          connections: [["host", `${d.Host}:${d.Port}`]]
-        },
-        device_class: 'speaker',
-        icon: 'mdi:speaker',
-        json_attributes: true,
-        json_attributes_topic: `${this.config.prefix}/${d.Uuid}`,
-        name: d.Name,
-        state_topic: `${this.config.prefix}/${d.Uuid}`,
-        unique_id: `sonos2mqtt_${d.Uuid}_speaker`,
-        availability_topic: `${this.config.prefix}/connected`,
-        payload_available: '2'
-      };
-      this.mqtt.publishAutodiscovery(this.config.discoveryprefix ?? 'homeassistant', d.Uuid, payload);
+      const discoveryMessages = await HaAutoDiscovery.GenerateAutoDiscoveryMessages(d, this.config.prefix, this.config.discoveryprefix);
+      this.log.debug("Publishing {msgCount} discovery messages for {uuid}", discoveryMessages.length, d.Uuid)
+      for(const message of discoveryMessages) {
+        this.mqtt.publishAutoDiscovery(message);
+      }
     }
   }
 
@@ -238,6 +237,7 @@ export class SonosToMqtt {
         enqueuedMetadata: { ...data.EnqueuedTransportURIMetaData, QueueLength: data.NumberOfTracks, QueuePosition: data.CurrentTrack },
         nextTrack: data.NextTrackMetaData,
         playmode: data.CurrentPlayMode,
+        crossfade: SonosToMqtt.BoolToOnOff(data.CurrentCrossfadeMode)
       })
     }
   }
@@ -300,10 +300,10 @@ export class SonosToMqtt {
     }
   }
 
-  private deletePosition(uuid: string): void {
+  private deleteProperty(uuid: string, key: 'position' | 'members'): void {
     const index = this.states.findIndex(s => s.uuid === uuid)
     if(index !== -1) {
-      delete this.states[index]['position'];
+      delete this.states[index][key];
     }
   }
 
@@ -313,5 +313,11 @@ export class SonosToMqtt {
 
   private static CleanName (name: string): string {
     return name.toLowerCase().replace(/\s/g, '-')
+  }
+
+  private static BoolToOnOff(input?: boolean): string | undefined {
+    return input === undefined
+      ? undefined
+      : (input === true ? 'On': 'Off')
   }
 }

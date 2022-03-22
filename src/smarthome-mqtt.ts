@@ -4,6 +4,7 @@ import TypedEmitter from 'typed-emitter';
 import {EventEmitter} from 'events'
 import { DeviceControl } from './device-control'
 import {StaticLogger} from './static-logger'
+import { AutoDiscoveryMessage } from './ha-discovery';
 
 interface MqttEvents {
   connected: (connected: boolean) => void;
@@ -74,11 +75,9 @@ export class SmarthomeMqtt{
     this.mqttClient?.publish(topic, payload, options)
   }
 
-  publishAutodiscovery(prefix: string, uuid: string, input: unknown): void {
-    const payload = typeof input !== 'string' ? JSON.stringify(input) : input;
-
-    const topic = `${prefix}/media_player/${uuid}/sonos/config`;
-    this.mqttClient?.publish(topic, payload, { qos:0, retain: true });
+  publishAutoDiscovery(message: AutoDiscoveryMessage): void {
+    const payload = JSON.stringify(message.payload);
+    this.mqttClient?.publish(message.topic, payload, { retain: true, qos: 0});
   }
 
   publishStatus(status: '0' | '1' | '2'): void {

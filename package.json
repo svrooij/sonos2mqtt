@@ -17,6 +17,8 @@
   "preferGlobal": true,
   "scripts": {
     "build": "tsc",
+    "help": "node ./lib/index.js --help",
+    "lint-fix": "eslint ./src/*.ts --fix",
     "serve-docs": "docker-compose -f ./docs/docker-compose.yml up jekyll",
     "test": "eslint ./src/*.ts"
   },

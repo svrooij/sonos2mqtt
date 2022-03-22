@@ -8,20 +8,21 @@ on:
       - main
       - development
       - beta
-      - auto-build
-    paths-ignore:
-      - 'docs/**'
-      - 'README.md'
-      - '.all-contributorsrc'
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'Dockerfile*'
   pull_request:
     branches:
       - master
       - main
       - beta
-    paths-ignore:
-      - 'docs/**'
-      - 'README.md'
-      - '.all-contributorsrc'
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'Dockerfile*'
 
 jobs:
   # Install dependencies, run tests and try to build
@@ -30,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [12, 14, 16]
+        node: [14, 16]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -38,10 +39,12 @@ jobs:
           node-version: ${{ matrix.node }}
       - name: Install depencencies
         run: npm ci
-      - name: Run tests
-        run: npm test
       - name: Build library
         run: npm run build
+      - name: Run tests
+        run: npm test
+      - name: Run --help
+        run: npm run help
 
   # Release to NPM if its not a pull request
   npm-release:

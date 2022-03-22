@@ -27,6 +27,9 @@ export class SonosCommandMapping {
           return SonosCommandMapping.ExecuteCommand(device, payload.cmd as SonosCommands, payload.val)
         break;
 
+      case SonosCommands.Crossfade:
+        return await device.AVTransportService.SetCrossfadeMode({ InstanceID: 0, CrossfadeMode: SonosCommandMapping.PayloadToBool(payload) })
+
       case SonosCommands.JoinGroup:
         if(typeof payload === 'string')
           return await device.JoinGroup(payload)
@@ -36,7 +39,7 @@ export class SonosCommandMapping {
         return await device.AVTransportService.BecomeCoordinatorOfStandaloneGroup()
 
       case SonosCommands.Mute:
-        return await device.RenderingControlService.SetMute({ InstanceID: 0, Channel: 'Master', DesiredMute: true })
+        return await device.RenderingControlService.SetMute({ InstanceID: 0, Channel: 'Master', DesiredMute: SonosCommandMapping.PayloadToBool(payload) })
 
       case SonosCommands.Next:
         return await device.AVTransportService.Next();
@@ -97,7 +100,7 @@ export class SonosCommandMapping {
         break;
 
       case SonosCommands.SetNightmode:
-        return await device.SetNightMode(String(payload) === 'On');
+        return await device.SetNightMode(SonosCommandMapping.PayloadToBool(payload));
 
       case SonosCommands.SetTransportUri:
         return await device.SetAVTransportURI(payload)
@@ -168,5 +171,12 @@ export class SonosCommandMapping {
       default:
         throw new Error(`Command '${command}' not implemented`)
     }
+  }
+
+  private static PayloadToBool(payload: unknown, undefinedValue = true): boolean {
+    const input = payload as any;
+    if (input === undefined)
+      return undefinedValue;
+    return input === true || input === 'true' || input === 'On' || input === 'ON' || input === 'on' || input === 1
   }
 }
