@@ -26,7 +26,7 @@ export class SonosToMqtt {
     if(this.config.device !== undefined) {
       success = await this.sonosManager.InitializeFromDevice(this.config.device);
     } else {
-      success = await this.sonosManager.InitializeWithDiscovery();
+      success = await this.sonosManager.InitializeWithDiscovery(this.config.wait);
     }
     success = success && this.sonosManager.Devices.length > 0;
 

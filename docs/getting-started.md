@@ -43,6 +43,8 @@ Options:
                          https://svrooij.io/sonos2mqtt/getting-started.html#configuration
                                                              [default: "mqtt://127.0.0.1"]
       --clientid         Specify the client id to be used
+      --wait             Number of seconds to search for a speaker, until exit
+                                                                    [number] [default: 30]
       --log              Set the loglevel
                      [choices: "warning", "information", "debug"] [default: "information"]
   -d, --distinct         Publish distinct track states          [boolean] [default: false]
@@ -55,7 +57,7 @@ Options:
       --discoveryprefix  The prefix for the discovery messages  [default: "homeassistant"]
       --friendlynames    Use device name or uuid in topics (except the united topic,
                          always uuid)                            [choices: "name", "uuid"]
-      --version          Show version number                                     [boolean]
+      --version          Show version number  
 ```
 
 You can configure the **mqtt** url by setting a supported [URL](https://nodejs.org/api/url.html#url_constructor_new_url_input_base).
