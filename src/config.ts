@@ -7,6 +7,7 @@ import { StaticLogger } from './static-logger';
 export interface Config {
   mqtt: string;
   prefix: string;
+  wait: number;
   distinct: boolean;
   device?: string;
   ttslang?: string;
@@ -21,6 +22,7 @@ export interface Config {
 const defaultConfig: Config = {
   mqtt: 'mqtt://127.0.0.1',
   prefix: 'sonos',
+  wait: 30,
   distinct: false,
   discovery: true,
   discoveryprefix: 'homeassistant',
@@ -30,7 +32,7 @@ const defaultConfig: Config = {
 
 export class ConfigLoader {
   static LoadConfig(): Config {
-    const config = {...defaultConfig,...(ConfigLoader.LoadConfigFromFile() ?? ConfigLoader.LoadConfigFromArguments())};
+    const config = {...defaultConfig, ...(ConfigLoader.LoadConfigFromFile() ?? ConfigLoader.LoadConfigFromArguments())};
 
     if (config.ttsendpoint !== undefined && process.env.SONOS_TTS_ENDPOINT === undefined) {
       process.env.SONOS_TTS_ENDPOINT = config.ttsendpoint
@@ -62,6 +64,7 @@ export class ConfigLoader {
       .describe('prefix', 'instance name. used as prefix for all topics')
       .describe('mqtt', 'mqtt broker url. See https://svrooij.io/sonos2mqtt/getting-started.html#configuration')
       .describe('clientid', 'Specify the client id to be used')
+      .describe('wait', 'Number of seconds to search for a speaker, until exit')
       .describe('log', 'Set the loglevel')
       .describe('d', 'Publish distinct track states')
       .describe('h', 'show help')
@@ -76,12 +79,14 @@ export class ConfigLoader {
         h: 'help',
         d: 'distinct'
       })
+      .number('wait')
       .boolean('d')
       .boolean('discovery')
       .default({
         mqtt: 'mqtt://127.0.0.1',
         prefix: 'sonos',
         d: false,
+        wait: 30,
         'ttslang': 'en-US',
         'ttsendpoint': undefined,
         discovery: false,

@@ -2,6 +2,7 @@ export enum SonosCommands {
   AdvancedCommand = 'adv-command',
   ClearQueue = 'clearqueue',
   Command = 'command',
+  Crossfade = 'crossfade',
   JoinGroup = 'joingroup',
   LeaveGroup = 'leavegroup',
   Mute = 'mute',
@@ -16,6 +17,7 @@ export enum SonosCommands {
   PlayMode = 'playmode',
   Previous = 'previous',
   Queue = 'queue',
+  Repeat = 'repeat',
   Seek = 'seek',
   SelectTrack = 'selecttrack',
   SetBass = 'setbass',
@@ -24,6 +26,7 @@ export enum SonosCommands {
   SetNightmode = 'setnightmode',
   SetTransportUri = 'setavtransporturi',
   SetTreble = 'settreble',
+  Shuffle = 'shuffle',
   Sleep = 'sleep',
   Speak = 'speak',
   /**
