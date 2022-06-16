@@ -23,17 +23,17 @@
     "test": "eslint ./src/*.ts"
   },
   "dependencies": {
-    "@svrooij/sonos": "^2.5.0-beta.8",
-    "mqtt": "4.2.8",
-    "serilogger": "^0.3.1",
+    "@svrooij/sonos": "^2.5.0",
+    "mqtt": "4.3.7",
+    "serilogger": "^0.4.1",
     "yalm": "4.1.0",
-    "yargs": "17.1.1"
+    "yargs": "17.5.1"
   },
   "devDependencies": {
     "@types/debug": "4.1.7",
-    "@types/node": "^14.14.21",
-    "@types/yargs": "17.0.2",
-    "@types/ws": "^7.4.7",
+    "@types/node": "^16.11.7",
+    "@types/yargs": "17.0.10",
+    "@types/ws": "^8.5.3",
     "@typescript-eslint/eslint-plugin": "4.31.0",
     "@typescript-eslint/parser": "4.31.1",
     "eslint": "7.32.0",
