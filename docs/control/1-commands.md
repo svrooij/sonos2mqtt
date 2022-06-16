@@ -42,6 +42,7 @@ All these commands are crafted specially to be used in sonos2mqtt.
 |`playmode`|:twisted_rightwards_arrows:|Change the playmode, when using queue|`NORMAL`, `REPEAT_ALL`, `SHUFFLE` or `SHUFFLE_NOREPEAT`.|
 |`previous`|:rewind:|Go to previous song in queue| |
 |`queue`|:heavy_plus_sign:|Add a song to the queue|Track uri|
+|`repeat`| |Switch repeat|boolean `true`, `false`|
 |`seek`|:clock330:|Seek in the current track|Time like `0:02:45`|
 |`selecttrack`||Select another track in the current queue|number|
 |`setbass`||Set bass level|number between -10 and 10|
@@ -50,6 +51,7 @@ All these commands are crafted specially to be used in sonos2mqtt.
 |`setnightmode`|:moon:|Enable or disable nightmode|`On`, `Off`|
 |`setavtransporturi`|:abcd:|Set the current playback uri, for advanced cases.|playback or track uri (check out the trackUri topic to find the required value)|
 |`settreble`||Set treble level|number between -10 and 10|
+|`shuffle`| |Switch shuffle|boolean `true`, `false`|
 |`sleep`|:zzz:|Set a sleeptimer for x minutes|number|
 |`speak`|:speech_balloon:|Generate text-to-speech file and play as notification :tada:|see [text-to-speech](notifications.html#text-to-speech)|
 |`stop`|:no_entry_sign:|Stop Playback| |

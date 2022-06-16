@@ -26,6 +26,8 @@ export interface SonosState extends SonosStateBase {
   bass: number;
   treble: number;
   crossfade: string;
+  shuffle: boolean;
+  repeat: boolean;
 }
 
 interface SonosStateBase {

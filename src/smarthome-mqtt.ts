@@ -66,12 +66,12 @@ export class SmarthomeMqtt{
     this.mqttClient?.end()
   }
 
-  publish(topic: string, payload: string | any, options: IClientPublishOptions = {} as IClientPublishOptions): void {
+  publish(topic: string, payload: string | any, options: IClientPublishOptions = {} as IClientPublishOptions, camelConvert = false): void {
     topic = `${this.prefix}/${topic}`
     if(typeof payload === 'number') payload = payload.toString();
     if(typeof payload === 'boolean') payload = payload === true ? 'true': 'false'
     this.log.verbose('Mqtt publish to {topic} {payload}', topic, payload)
-    if(typeof payload !== 'string') payload = JSON.stringify(payload);
+    if(typeof payload !== 'string') payload = JSON.stringify(camelConvert ? SmarthomeMqtt.toCamel(payload) : payload);
     this.mqttClient?.publish(topic, payload, options)
   }
 
@@ -128,5 +128,32 @@ export class SmarthomeMqtt{
     } catch {
     }
     return payload
+  }
+
+  private static keepOriginal = ['Master', 'LF', 'RF'];
+  private static toCamel(o: unknown): unknown {
+    let newO, origKey, newKey, value
+    if (o instanceof Array) {
+      return o.map(function(value) {
+          if (typeof value === "object") {
+            value = SmarthomeMqtt.toCamel(value)
+          }
+          return value
+      })
+    } else {
+      newO = {} as {[key: string]:any};
+      const oc = o as {[key: string]:any};
+      for (origKey in oc) {
+        if (oc.hasOwnProperty(origKey)) {
+          newKey = this.keepOriginal.includes(origKey) ? origKey : (origKey.charAt(0).toLowerCase() + origKey.slice(1) || origKey).toString()
+          value = oc[origKey]
+          if (value instanceof Array || typeof value === 'object') {
+            value = SmarthomeMqtt.toCamel(value)
+          }
+          newO[newKey] = value
+        }
+      }
+    }
+    return newO
   }
 }

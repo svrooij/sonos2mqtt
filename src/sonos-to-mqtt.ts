@@ -129,11 +129,11 @@ export class SonosToMqtt {
       this.updateMembers(d);
       d.Events.on(SonosEvents.AVTransport, (data) => {
         this.updateStateWithAv(d.Uuid, data);
-        this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/avtransport`,data)
+        this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/avtransport`, data)
       })
       d.Events.on(SonosEvents.RenderingControl, (data) => {
         this.updateStateWithRenderingControl(d.Uuid, data);
-        this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/renderingcontrol`,data)
+        this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/renderingcontrol`, data)
       })
       d.Events.on(SonosEvents.GroupName, (groupName) => {
         this.updateMembers(d);
@@ -231,12 +231,17 @@ export class SonosToMqtt {
    * @memberof SonosToMqtt
    */
   private updateStateWithAv(uuid: string, data: AVTransportServiceEvent): void {
-    if (typeof data.EnqueuedTransportURIMetaData === 'object' && typeof data.CurrentTrackMetaData === 'object') {
+    if (typeof data.CurrentTrackMetaData === 'object') {
+      const enqueuedMetadata = typeof data.EnqueuedTransportURIMetaData === 'object'
+      ? { ...data.EnqueuedTransportURIMetaData, QueueLength: data.NumberOfTracks, QueuePosition: data.CurrentTrack }
+      : { QueueLength: data.NumberOfTracks, QueuePosition: data.CurrentTrack };
       this.updateState(uuid, {
         currentTrack: data.CurrentTrackMetaData,
-        enqueuedMetadata: { ...data.EnqueuedTransportURIMetaData, QueueLength: data.NumberOfTracks, QueuePosition: data.CurrentTrack },
+        enqueuedMetadata: enqueuedMetadata,
         nextTrack: data.NextTrackMetaData,
         playmode: data.CurrentPlayMode,
+        repeat: SonosCommandMapping.PlaymodeToRepeat(data.CurrentPlayMode),
+        shuffle: SonosCommandMapping.PlaymodeToShuffle(data.CurrentPlayMode),
         crossfade: SonosToMqtt.BoolToOnOff(data.CurrentCrossfadeMode)
       })
     }
@@ -295,7 +300,7 @@ export class SonosToMqtt {
       // Publish new state on a 400 ms delay. For changes that happen in rapid succession.
       this.stateTimers[uuid] = setTimeout(() => {
         this.log.verbose('Publishing state for {uuid}', this.states[index].uuid)
-        this.mqtt.publish(this.states[index].uuid ?? '', this.states[index], { qos: 0, retain: true });
+        this.mqtt.publish(this.states[index].uuid ?? '', this.states[index], { qos: 0, retain: true }, this.config.discovery);
       }, 400)
     }
   }

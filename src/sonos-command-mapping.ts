@@ -45,6 +45,8 @@ export class SonosCommandMapping {
         return await device.AVTransportService.Next();
 
       case SonosCommands.Notify:
+        if (typeof payload === 'string')
+          return await device.PlayNotification({ trackUri: payload });
         return await device.PlayNotification(payload);
       
       case SonosCommands.NotifyTwo:
@@ -68,6 +70,9 @@ export class SonosCommandMapping {
         if(typeof payload === 'string')
           return await device.AddUriToQueue(payload);
         return await device.AddUriToQueue(payload.trackUri, payload.positionInQueue, payload.enqueueAsNext)
+
+      case SonosCommands.Repeat:
+        return await device.AVTransportService.SetPlayMode({InstanceID:0, NewPlayMode: SonosCommandMapping.ComputePlayMode(device.CurrentPlayMode, 'repeat', (typeof payload === 'boolean' ? payload : true)) });
 
       case SonosCommands.Seek:
         return await device.SeekPosition(payload)
@@ -113,6 +118,9 @@ export class SonosCommandMapping {
           });
         break;
 
+      case SonosCommands.Shuffle:
+        return await device.AVTransportService.SetPlayMode({InstanceID:0, NewPlayMode: SonosCommandMapping.ComputePlayMode(device.CurrentPlayMode, 'shuffle', (typeof payload === 'boolean' ? payload : true)) });
+      
       case SonosCommands.Sleep:
         if(typeof payload === 'number') {
           if(payload >= 1 && payload <= 60){
@@ -151,7 +159,7 @@ export class SonosCommandMapping {
         return await device.TogglePlayback();
 
       case SonosCommands.Unmute:
-        return device.RenderingControlService.SetMute({ InstanceID: 0, Channel: 'Master', DesiredMute: false })
+        return await device.RenderingControlService.SetMute({ InstanceID: 0, Channel: 'Master', DesiredMute: false })
 
       case SonosCommands.Volume:
         if(typeof payload === 'number')
@@ -178,5 +186,32 @@ export class SonosCommandMapping {
     if (input === undefined)
       return undefinedValue;
     return input === true || input === 'true' || input === 'On' || input === 'ON' || input === 'on' || input === 1
+  }
+
+  private static ComputePlayMode(currentPlaymode: PlayMode | undefined, change: 'repeat' | 'shuffle', on: boolean): PlayMode {
+    const repeat = change === 'repeat' ? on : SonosCommandMapping.PlaymodeToRepeat(currentPlaymode);
+    const shuffle = change === 'shuffle' ? on : SonosCommandMapping.PlaymodeToShuffle(currentPlaymode);
+
+    if (shuffle === undefined || repeat === undefined) {
+      return PlayMode.Normal;
+    }
+
+    if(shuffle === true) {
+      return repeat === true ? PlayMode.Shuffle : PlayMode.ShuffleNoRepeat
+    } else {
+      return repeat === true ? PlayMode.RepeatAll : PlayMode.Normal
+    }
+  }
+
+  public static PlaymodeToRepeat(input?: string): boolean | undefined {
+    return input === undefined
+    ? undefined
+    : input === 'SHUFFLE' || input === 'REPEAT_ALL';
+  }
+
+  public static PlaymodeToShuffle(input?: string): boolean | undefined {
+    return input === undefined
+    ? undefined
+    : input.includes('SHUFFLE');
   }
 }
