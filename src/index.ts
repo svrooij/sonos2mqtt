@@ -11,15 +11,18 @@ const sonosToMqtt = new SonosToMqtt(ConfigLoader.LoadConfig())
 const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json')).toString())
 StaticLogger.Default().info(`Starting ${pkg.name} v${pkg.version}`)
 
+const stop = function () {
+  StaticLogger.Default().info('Shutdown sonos2mqtt, please wait.')
+  sonosToMqtt.stop()
+  setTimeout(() => { process.exit(0) }, 800)
+}
+
 sonosToMqtt
   .start()
   .then(success => {
     if(success) {
-      process.on('SIGINT', async () => {
-        StaticLogger.Default().info('Shutdown sonos2mqtt, please wait.')
-        sonosToMqtt.stop()
-        setTimeout(() => { process.exit(0) }, 800)
-      })
+      process.on('SIGINT', () => stop())
+      process.on('SIGTERM', () => stop())
     }
   })
   .catch(err => {
