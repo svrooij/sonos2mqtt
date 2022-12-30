@@ -13,7 +13,7 @@ export interface Config {
   ttslang?: string;
   ttsendpoint?: string;
   discovery: boolean;
-  discoveryprefix: string;
+  // discoveryprefix: string;
   log: string;
   clientid?: string;
   friendlynames: 'name' | 'uuid';
@@ -25,7 +25,7 @@ const defaultConfig: Config = {
   wait: 30,
   distinct: false,
   discovery: true,
-  discoveryprefix: 'homeassistant',
+  // discoveryprefix: 'homeassistant',
   log: 'information',
   friendlynames: 'name'
 }
@@ -72,7 +72,7 @@ export class ConfigLoader {
       .describe('ttsendpoint', 'Default endpoint for text-to-speech')
       .describe('device', 'Start with one known IP instead of device discovery.')
       .describe('discovery', 'Emit retained auto-discovery messages for each player.')
-      .describe('discoveryprefix', 'The prefix for the discovery messages')
+      // .describe('discoveryprefix', 'The prefix for the discovery messages')
       .describe('friendlynames', 'Use device name or uuid in topics (except the united topic, always uuid)')
       .choices('friendlynames', ['name', 'uuid'])
       .alias({
@@ -90,7 +90,7 @@ export class ConfigLoader {
         'ttslang': 'en-US',
         'ttsendpoint': undefined,
         discovery: false,
-        discoveryprefix: 'homeassistant',
+        // discoveryprefix: 'homeassistant',
         log: 'information'
       })
       .choices('log', ['warning', 'information', 'debug'])

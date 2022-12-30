@@ -214,7 +214,7 @@ export class SonosToMqtt {
 
   private async publishDiscoveryMessages(): Promise<void> {
     for (const d of this.sonosManager.Devices) {
-      const discoveryMessages = await HaAutoDiscovery.GenerateAutoDiscoveryMessages(d, this.config.prefix, this.config.discoveryprefix);
+      const discoveryMessages = await HaAutoDiscovery.GenerateAutoDiscoveryMessages(d, this.config.prefix);
       this.log.debug("Publishing {msgCount} discovery messages for {uuid}", discoveryMessages.length, d.Uuid)
       for(const message of discoveryMessages) {
         this.mqtt.publishAutoDiscovery(message);

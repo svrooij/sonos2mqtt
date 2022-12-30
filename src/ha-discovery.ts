@@ -1,4 +1,5 @@
 import { SonosDevice } from "@svrooij/sonos/lib";
+import DeviceDescription from "@svrooij/sonos/lib/models/device-description";
 
 interface AutoDiscoveryDevice {
   identifiers?: string[];
@@ -35,20 +36,20 @@ export interface AutoDiscoveryMessage {
 }
 
 export class HaAutoDiscovery {
-  private static deviceDescriptionForSonos(sonos: SonosDevice, description: any): AutoDiscoveryDevice {
+  private static deviceDescriptionForSonos(sonos: SonosDevice, description: DeviceDescription, prefix: string): AutoDiscoveryDevice {
     return {
       identifiers: [sonos.Uuid],
       manufacturer: description.manufacturer,
       model: description.modelName,
       name: sonos.Name,
       sw_version: description.softwareVersion,
-      connections: [["host", `${sonos.Host}:${sonos.Port}`]]
+      connections: [["host", `${sonos.Host}:${sonos.Port}`], ["mqtt", `${prefix}/${sonos.Uuid}`]]
     };
   }
 
-  private static autoDiscoverMediaPlayer(name: string, uuid: string, device: AutoDiscoveryDevice, prefix: string, discoveryPrefix: string): AutoDiscoveryMessage {
+  private static autoDiscoverMediaPlayer(name: string, uuid: string, device: AutoDiscoveryDevice, prefix: string): AutoDiscoveryMessage {
     return {
-      topic: `${discoveryPrefix}/media_player/${uuid}/${prefix}/config`,
+      topic: `sonos2mqtt/discovery/${prefix}/${uuid}`,
       payload: {
         device: device,
         device_class: 'speaker',
@@ -56,14 +57,15 @@ export class HaAutoDiscovery {
         name: name,
         state_topic: `${prefix}/${uuid}`,
         command_topic: `${prefix}/${uuid}/control`,
-        unique_id: `sonos2mqtt_${uuid}_speaker`
+        unique_id: `sonos2mqtt_${uuid}_speaker`,
+        availability_topic: `${prefix}/connected`
       }
     } as AutoDiscoveryMessage
   }
 
   private static autoDiscoverCrossfadeSwitch(name: string, uuid: string, device: AutoDiscoveryDevice, prefix: string, discoveryPrefix: string): AutoDiscoveryMessage {
     return {
-      topic: `${discoveryPrefix}/switch/${uuid}_crossfade/${prefix}/config`,
+      topic: `${discoveryPrefix}/switch/${prefix}/${uuid}_crossfade/config`,
       payload: {
         device: device,
         device_class: 'switch',
@@ -79,12 +81,12 @@ export class HaAutoDiscovery {
     } as AutoDiscoveryMessage
   }
 
-  public static async GenerateAutoDiscoveryMessages(sonos: SonosDevice, prefix = 'sonos', discoveryPrefix = 'homeassistant'): Promise<AutoDiscoveryMessage[]> {
+  public static async GenerateAutoDiscoveryMessages(sonos: SonosDevice, prefix = 'sonos'): Promise<AutoDiscoveryMessage[]> {
     const description = await sonos.GetDeviceDescription();
-    const deviceDescription = HaAutoDiscovery.deviceDescriptionForSonos(sonos, description);
+    const deviceDescription = HaAutoDiscovery.deviceDescriptionForSonos(sonos, description, prefix);
     return [
-      HaAutoDiscovery.autoDiscoverMediaPlayer(sonos.Name, sonos.Uuid, deviceDescription, prefix, discoveryPrefix),
-      HaAutoDiscovery.autoDiscoverCrossfadeSwitch(sonos.Name, sonos.Uuid, deviceDescription, prefix, discoveryPrefix)
+      HaAutoDiscovery.autoDiscoverMediaPlayer(sonos.Name, sonos.Uuid, deviceDescription, prefix),
+      //HaAutoDiscovery.autoDiscoverCrossfadeSwitch(sonos.Name, sonos.Uuid, deviceDescription, prefix, discoveryPrefix)
     ];
   }
 }
