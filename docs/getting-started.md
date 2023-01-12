@@ -57,6 +57,9 @@ Options:
       --discoveryprefix  The prefix for the discovery messages  [default: "homeassistant"]
       --friendlynames    Use device name or uuid in topics (except the united topic,
                          always uuid)                            [choices: "name", "uuid"]
+      --tvGroup        The UUID of the coordinator to which the Soundbar should be joined
+      --tvUuid         The UUID of the soundbar which should auto stop the tvGroup
+      --tvVolume       Volume the soundbar should go to when TV playback starts
       --version          Show version number  
 ```
 
@@ -150,6 +153,9 @@ SONOS2MQTT_MQTT=mqtt://ip_or_host_of_mqtt
 SONOS_LISTENER_HOST=192.168.x.x
 # Set text-to-speech endpoint (optional)
 # SONOS_TTS_ENDPOINT=https://tts.server.com/api/generate
+# SONOS2MQTT_TV_UUID=RINCON_xxx01400 # Group coordinator of livingroom which coordinates media playbar
+# SONOS2MQTT_TV_GROUP=RINCON_xxx01400 # Soundbar with Auto leave group when playback starts enabled
+# SONOS2MQTT_TV_VOLUME=25 # Optional default volume for Soundbar
 ```
 
 See [configuration](#configuration) for additional settings.

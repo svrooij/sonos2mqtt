@@ -13,10 +13,12 @@ export interface Config {
   ttslang?: string;
   ttsendpoint?: string;
   discovery: boolean;
-  // discoveryprefix: string;
   log: string;
   clientid?: string;
   friendlynames: 'name' | 'uuid';
+  tvGroup?: string;
+  tvUuid?: string;
+  tvVolume?: number;
 }
 
 const defaultConfig: Config = {
@@ -25,7 +27,6 @@ const defaultConfig: Config = {
   wait: 30,
   distinct: false,
   discovery: true,
-  // discoveryprefix: 'homeassistant',
   log: 'information',
   friendlynames: 'name'
 }
@@ -72,9 +73,12 @@ export class ConfigLoader {
       .describe('ttsendpoint', 'Default endpoint for text-to-speech')
       .describe('device', 'Start with one known IP instead of device discovery.')
       .describe('discovery', 'Emit retained auto-discovery messages for each player.')
-      // .describe('discoveryprefix', 'The prefix for the discovery messages')
       .describe('friendlynames', 'Use device name or uuid in topics (except the united topic, always uuid)')
       .choices('friendlynames', ['name', 'uuid'])
+      .describe('tvGroup', 'The UUID of the coordinator to which the Soundbar should be joined')
+      .describe('tvUuid', 'The UUID of the soundbar which should auto stop the tvGroup')
+      .describe('tvVolume', 'Volume the soundbar should go to when TV playback starts')
+      .number('tv_volume')
       .alias({
         h: 'help',
         d: 'distinct'
@@ -90,7 +94,6 @@ export class ConfigLoader {
         'ttslang': 'en-US',
         'ttsendpoint': undefined,
         discovery: false,
-        // discoveryprefix: 'homeassistant',
         log: 'information'
       })
       .choices('log', ['warning', 'information', 'debug'])
