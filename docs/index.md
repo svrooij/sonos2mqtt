@@ -19,12 +19,10 @@ permalink: /
 
 [![github issues][badge_issues]][link_issues]
 [![docker pulls][badge_docker]][link_docker]
-[![Downloads/week](https://img.shields.io/npm/dw/sonos2mqtt.svg?style=flat-square)](https://npmjs.org/package/sonos2mqtt)
-[![License](https://img.shields.io/npm/l/sonos2mqtt.svg?style=flat-square)](https://github.com/svrooij/sonos2mqtt/blob/master/package.json)
+[![Downloads/week](https://img.shields.io/npm/dw/sonos2mqtt.svg?style=for-the-badge)](https://npmjs.org/package/sonos2mqtt)
+[![License](https://img.shields.io/npm/l/sonos2mqtt.svg?style=for-the-badge)](https://github.com/svrooij/sonos2mqtt/blob/master/package.json)
 [![Support me on Github][badge_sponsor]][link_sponsor]
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
+[![All Contributors][badge_contrib]](#contributors-)
 
 This node application is a bridge between the Sonos and a mqtt server. The status of all your sonos devices will be published to mqtt and you can control the sonos speakers over mqtt.
 
@@ -35,8 +33,6 @@ This library is in no way connected to [Sonos](//en.wikipedia.org/wiki/Sonos). I
 - Using local push for immediate state changes.
 - Talking straight to the sonos device (no cloud involved).
 - Supporting **all** sonos actions
-
----
 
 ## Documentation
 
@@ -111,15 +107,16 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 Contributions of any kind welcome!
 
 [badge_build]: https://github.com/svrooij/sonos2mqtt/workflows/Run%20tests%20and%20publish/badge.svg
-[badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt
-[badge_discord]: https://img.shields.io/discord/782374564054564875?style=flat-square
-[badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt?style=flat-square
-[badge_npm]: https://img.shields.io/npm/v/sonos2mqtt?style=flat-square
-[badge_sonos-cli]: https://img.shields.io/badge/sonos-cli-blue?style=flat-square
-[badge_sonos-docs]: https://img.shields.io/badge/sonos-api-blue?style=flat-square
-[badge_sonos-mqtt]: https://img.shields.io/badge/sonos-mqtt-blue?style=flat-square
-[badge_sonos-typescript]: https://img.shields.io/badge/sonos-typescript-blue?style=flat-square
-[badge_sponsor]: https://img.shields.io/badge/Sponsor-on%20Github-red?style=flat-square
+[badge_contrib]: https://img.shields.io/github/all-contributors/svrooij/sonos2mqtt?style=for-the-badge
+[badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt?style=for-the-badge&logo=docker
+[badge_discord]: https://img.shields.io/discord/782374564054564875?style=for-the-badge&logo=discord
+[badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt?style=for-the-badge&logo=github
+[badge_npm]: https://img.shields.io/npm/v/sonos2mqtt?style=for-the-badge
+[badge_sonos-cli]: https://img.shields.io/badge/sonos-cli-blue?style=for-the-badge&logo=sonos
+[badge_sonos-docs]: https://img.shields.io/badge/sonos-api-blue?style=for-the-badge&logo=sonos
+[badge_sonos-mqtt]: https://img.shields.io/badge/sonos-mqtt-blue?style=for-the-badge&logo=sonos
+[badge_sonos-typescript]: https://img.shields.io/badge/sonos-typescript-blue?style=for-the-badge&logo=sonos
+[badge_sponsor]: https://img.shields.io/github/sponsors/svrooij?style=for-the-badge&logo=github
 
 [link_build]: https://github.com/svrooij/sonos2mqtt/actions
 [link_discord]: https://discord.gg/VMtG6Ft36J
