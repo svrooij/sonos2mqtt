@@ -1,6 +1,7 @@
 import { SonosManager, SonosEvents, SonosDevice, } from '@svrooij/sonos'
 import { AVTransportServiceEvent, RenderingControlServiceEvent } from '@svrooij/sonos/lib/services';
-import { TransportState } from '@svrooij/sonos/lib/models';
+import { PlayMode, TransportState } from '@svrooij/sonos/lib/models';
+import  PlayModeHelper from '@svrooij/sonos/lib/helpers/playmode-helper';
 import { Config } from './config'
 import { StaticLogger } from './static-logger'
 import { SmarthomeMqtt } from './smarthome-mqtt';
@@ -16,6 +17,8 @@ export class SonosToMqtt {
   private readonly states: Array<Partial<SonosState>> = [];
   private readonly positionTimers: {[key: string]: NodeJS.Timeout} = {};
   private readonly stateTimers: {[key: string]: NodeJS.Timeout} = {};
+  private previousTvVolume?: number;
+  private readonly _soundbarTrackUri = 'x-sonos-htastream:RINCON_'
   constructor(private config: Config) {
     this.sonosManager = new SonosManager();
     this.mqtt = new SmarthomeMqtt(config.mqtt, config.prefix, config.clientid);
@@ -40,6 +43,13 @@ export class SonosToMqtt {
       if(this.config.discovery === true) {
         this.publishDiscoveryMessages();
       }
+
+      if (this.config.tvGroup !== undefined && this.config.tvUuid !== undefined) {
+        if (this.sonosManager.Devices.some(d => d.Uuid === this.config.tvGroup) && this.sonosManager.Devices.some(d => d.Uuid === this.config.tvUuid)) {
+          this.setupTvMonitoring(this.config.tvUuid, this.config.tvGroup);
+        }
+      }
+
     }
     return success;
   }
@@ -183,6 +193,46 @@ export class SonosToMqtt {
     })
   }
 
+  private setupTvMonitoring(soundbar_uuid: string, coordinator_uuid: string): void {
+    this.log.info('Setting up TV monitoring')
+    const coordinator = this.sonosManager.Devices.find(d => d.Uuid=== coordinator_uuid);
+    const soundbar = this.sonosManager.Devices.find(d => d.Uuid === soundbar_uuid);
+    if (coordinator === undefined || soundbar === undefined) {
+      return;
+    }
+    soundbar.Events.on('currentTrackUri', async (trackUri) => {
+      if (trackUri.startsWith(this._soundbarTrackUri)) {
+        this.log.info('Soundbar changed to TV audio')
+        await coordinator?.Pause();
+        if (this.config.tvVolume !== undefined && this.config.tvVolume > 0 && this.config.tvVolume <= 100) {
+          this.previousTvVolume = soundbar?.Volume
+          await soundbar?.SetVolume(this.config.tvVolume)
+        }
+      }
+    });
+
+    coordinator.Events.on('simpleTransportState', async (newState) => {
+      if (newState === TransportState.Playing && soundbar?.CurrentTrackUri?.startsWith(this._soundbarTrackUri)) {
+        this.log.info('Joining soundbar to coordinator');
+        if (this.previousTvVolume !== undefined) {
+          await soundbar?.SetVolume(this.previousTvVolume)
+        }
+        await soundbar?.AVTransportService.SetAVTransportURI({InstanceID: 0, CurrentURI: `x-rincon:${coordinator_uuid}`, CurrentURIMetaData: ''})
+      }
+    });
+
+
+    // soundbar.Events.on('playbackStopped', async () => {
+    //   this.log.info('Soundbar %s stopped playback', soundbar_uuid);
+    //   if (this.previousTvVolume !== undefined) {
+    //     await soundbar?.SetVolume(this.previousTvVolume)
+    //   }
+    //   await soundbar?.AVTransportService.SetAVTransportURI({InstanceID: 0, CurrentURI: `x-rincon:${coordinator_uuid}`, CurrentURIMetaData: ''})
+    // })
+
+
+  }
+
   private async periodicallyUpdatePosition(device: SonosDevice): Promise<void> {
     if(this.positionTimers[device.Uuid]) clearTimeout(this.positionTimers[device.Uuid]);
 
@@ -240,8 +290,8 @@ export class SonosToMqtt {
         enqueuedMetadata: enqueuedMetadata,
         nextTrack: data.NextTrackMetaData,
         playmode: data.CurrentPlayMode,
-        repeat: SonosCommandMapping.PlaymodeToRepeat(data.CurrentPlayMode),
-        shuffle: SonosCommandMapping.PlaymodeToShuffle(data.CurrentPlayMode),
+        repeat: PlayModeHelper.ComputeRepeat(data.CurrentPlayMode ?? PlayMode.Normal),
+        shuffle: PlayModeHelper.ComputeShuffle(data.CurrentPlayMode ?? PlayMode.Normal),
         crossfade: SonosToMqtt.BoolToOnOff(data.CurrentCrossfadeMode)
       })
     }
