@@ -285,15 +285,18 @@ export class SonosToMqtt {
       const enqueuedMetadata = typeof data.EnqueuedTransportURIMetaData === 'object'
       ? { ...data.EnqueuedTransportURIMetaData, QueueLength: data.NumberOfTracks, QueuePosition: data.CurrentTrack }
       : { QueueLength: data.NumberOfTracks, QueuePosition: data.CurrentTrack };
-      this.updateState(uuid, {
+      const update = {
         currentTrack: data.CurrentTrackMetaData,
         enqueuedMetadata: enqueuedMetadata,
         nextTrack: data.NextTrackMetaData,
         playmode: data.CurrentPlayMode,
         repeat: PlayModeHelper.ComputeRepeat(data.CurrentPlayMode ?? PlayMode.Normal),
         shuffle: PlayModeHelper.ComputeShuffle(data.CurrentPlayMode ?? PlayMode.Normal),
-        crossfade: SonosToMqtt.BoolToOnOff(data.CurrentCrossfadeMode)
-      })
+        crossfade: SonosToMqtt.BoolToOnOff(data.CurrentCrossfadeMode),
+        alarmRunning: data.AlarmRunning === true
+      } as SonosState;
+      
+      this.updateState(uuid, update)
     }
   }
 
@@ -310,8 +313,8 @@ export class SonosToMqtt {
       volume: data.Volume,
       mute: data.Mute,
       bass: data.Bass,
-      treble: data.Treble
-    })
+      treble: data.Treble,
+    } as SonosState)
   }
 
   /**
@@ -334,6 +337,10 @@ export class SonosToMqtt {
           const currentValue = this.states[index][key];
           if (typeof value === 'object' && typeof currentValue === 'object') {
             this.states[index][key] = { ...currentValue, ...value }
+            continue;
+          }
+          if (value === -1 || (typeof value === 'string' && value === '')) {
+            this.states[index][key] = undefined;
             continue;
           }
           

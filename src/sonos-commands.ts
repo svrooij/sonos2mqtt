@@ -23,11 +23,12 @@ export enum SonosCommands {
   SetBass = 'setbass',
   SetButtonLockState = 'setbuttonlockstate',
   SetLEDState = 'setledstate',
-  SetNightmode = 'setnightmode',
+  SetNightMode = 'setnightmode',
   SetTransportUri = 'setavtransporturi',
   SetTreble = 'settreble',
   Shuffle = 'shuffle',
   Sleep = 'sleep',
+  Snooze = 'snooze',
   Speak = 'speak',
   /**
    * @deprecated Experimental see https://github.com/svrooij/node-sonos-ts/issues/119

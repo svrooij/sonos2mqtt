@@ -28,6 +28,7 @@ export interface SonosState extends SonosStateBase {
   crossfade: string;
   shuffle: boolean;
   repeat: Repeat;
+  alarmRunning: boolean;
 }
 
 interface SonosStateBase {

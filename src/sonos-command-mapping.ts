@@ -112,7 +112,7 @@ export class SonosCommandMapping {
           });
         break;
 
-      case SonosCommands.SetNightmode:
+      case SonosCommands.SetNightMode:
         return await device.SetNightMode(SonosCommandMapping.PayloadToBool(payload));
 
       case SonosCommands.SetTransportUri:
@@ -136,9 +136,21 @@ export class SonosCommandMapping {
           }
         } else if (typeof payload === 'string') {
           return await device.AVTransportService.ConfigureSleepTimer({InstanceID: 0, NewSleepTimerDuration: payload})
+        } else if (payload === undefined) {
+          // Turn off sleep timer
+          return await device.AVTransportService.ConfigureSleepTimer({ InstanceID: 0, NewSleepTimerDuration: '' });
         }
         break;
-
+      
+      case SonosCommands.Snooze:
+        if(typeof payload === 'number') {
+          if(payload >= 1 && payload <= 60){
+            return await device.AVTransportService.SnoozeAlarm({InstanceID: 0, Duration: `00:${payload.toString().padStart(2,'0')}:00`})
+          }
+        } else if (typeof payload === 'string') {
+          return await device.AVTransportService.SnoozeAlarm({InstanceID: 0, Duration: payload})
+        }
+        break;
       case SonosCommands.Speak:
         if(typeof payload === "object") {
           return await device.PlayTTS(payload)
@@ -187,6 +199,7 @@ export class SonosCommandMapping {
       default:
         throw new Error(`Command '${command}' not implemented`)
     }
+    throw new Error(`Command '${command}' needs a specific payload`)
   }
 
   private static PayloadToBool(payload: unknown, undefinedValue = true): boolean {

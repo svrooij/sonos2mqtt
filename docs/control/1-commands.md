@@ -52,7 +52,8 @@ All these commands are crafted specially to be used in sonos2mqtt.
 |`setavtransporturi`|:abcd:|Set the current playback uri, for advanced cases.|playback or track uri (check out the trackUri topic to find the required value)|
 |`settreble`||Set treble level|number between -10 and 10|
 |`shuffle`| |Switch shuffle|boolean `true`, `false`|
-|`sleep`|:zzz:|Set a sleeptimer for x minutes|number|
+|`sleep`|:zzz:|Set a sleep timer for x minutes|number or `hh:mm:ss`|
+|`snooze`|:zzz:|Snooze running alarm for x minutes|number or `hh:mm:ss`|
 |`speak`|:speech_balloon:|Generate text-to-speech file and play as notification :tada:|see [text-to-speech](notifications.html#text-to-speech)|
 |`stop`|:no_entry_sign:|Stop Playback| |
 |`switchtoline`||Switch to line-in (on supported devices)| |
