@@ -136,7 +136,7 @@ export class SonosCommandMapping {
           }
         } else if (typeof payload === 'string') {
           return await device.AVTransportService.ConfigureSleepTimer({InstanceID: 0, NewSleepTimerDuration: payload})
-        } else if (payload === undefined) {
+        } else if (!payload) {
           // Turn off sleep timer
           return await device.AVTransportService.ConfigureSleepTimer({ InstanceID: 0, NewSleepTimerDuration: '' });
         }

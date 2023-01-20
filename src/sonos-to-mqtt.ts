@@ -84,7 +84,7 @@ export class SonosToMqtt {
           return Promise.all(this.sonosManager.Devices
             .filter(d => d.Coordinator.Uuid === d.Uuid)
             .map(d => d.Pause().catch(err =>{
-              this.log.warn('Device %s emitted an error %o', d.Uuid, err);
+              this.log.warn('Device {uuid} emitted an error {error}', d.Uuid, err);
             })));
         
         case 'listalarm': // This typ-o is still there for backward compatibility 
