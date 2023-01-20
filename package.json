@@ -1,10 +1,10 @@
 {
   "name": "sonos2mqtt",
   "version": "0.0.0-development",
-  "description": "A smarthome bridge between your sonos system and a mqtt server.",
+  "description": "Control and monitor Sonos speakers through MQTT",
   "main": "lib/index.js",
   "license": "MIT",
-  "author": "Stephan van Rooij <github@svrooij.nl> (https://svrooij.nl)",
+  "author": "Stephan van Rooij <sonos2mqtt@svrooij.io> (https://svrooij.io)",
   "bin": {
     "sonos2mqtt": "lib/index.js"
   },
@@ -18,12 +18,13 @@
   "scripts": {
     "build": "tsc",
     "help": "node ./lib/index.js --help",
-    "lint-fix": "eslint ./src/*.ts --fix",
+    "lint": "eslint ./src/*.ts",
+    "lint:fix": "eslint ./src/*.ts --fix",
     "serve-docs": "docker-compose -f ./docs/docker-compose.yml up jekyll",
-    "test": "eslint ./src/*.ts"
+    "test": "npm run lint"
   },
   "dependencies": {
-    "@svrooij/sonos": "^2.6.0-beta.2",
+    "@svrooij/sonos": "^2.6.0-beta.3",
     "mqtt": "4.3.7",
     "serilogger": "^0.4.1",
     "yalm": "4.1.0",
