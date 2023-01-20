@@ -106,7 +106,6 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
 Contributions of any kind welcome!
 
-[badge_build]: https://github.com/svrooij/sonos2mqtt/workflows/Run%20tests%20and%20publish/badge.svg
 [badge_contrib]: https://img.shields.io/github/all-contributors/svrooij/sonos2mqtt?style=for-the-badge
 [badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt?style=for-the-badge&logo=docker
 [badge_discord]: https://img.shields.io/discord/782374564054564875?style=for-the-badge&logo=discord
@@ -118,7 +117,6 @@ Contributions of any kind welcome!
 [badge_sonos-typescript]: https://img.shields.io/badge/sonos-typescript-blue?style=for-the-badge&logo=sonos
 [badge_sponsor]: https://img.shields.io/github/sponsors/svrooij?style=for-the-badge&logo=github
 
-[link_build]: https://github.com/svrooij/sonos2mqtt/actions
 [link_discord]: https://discord.gg/VMtG6Ft36J
 [link_docker]: https://hub.docker.com/r/svrooij/sonos2mqtt
 [link_issues]: https://github.com/svrooij/sonos2mqtt/issues

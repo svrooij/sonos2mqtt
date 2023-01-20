@@ -54,7 +54,6 @@ Options:
       --device           Start with one known IP instead of device discovery.
       --discovery        Emit retained auto-discovery messages for each player.
                                                                 [boolean] [default: false]
-      --discoveryprefix  The prefix for the discovery messages  [default: "homeassistant"]
       --friendlynames    Use device name or uuid in topics (except the united topic,
                          always uuid)                            [choices: "name", "uuid"]
       --tvGroup        The UUID of the coordinator to which the Soundbar should be joined
