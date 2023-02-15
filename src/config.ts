@@ -19,6 +19,7 @@ export interface Config {
   tvGroup?: string;
   tvUuid?: string;
   tvVolume?: number;
+  experimental?: boolean;
 }
 
 const defaultConfig: Config = {
@@ -26,9 +27,10 @@ const defaultConfig: Config = {
   prefix: 'sonos',
   wait: 30,
   distinct: false,
-  discovery: true,
+  discovery: false,
   log: 'information',
-  friendlynames: 'name'
+  friendlynames: 'name',
+  experimental: false,
 }
 
 export class ConfigLoader {
@@ -63,9 +65,9 @@ export class ConfigLoader {
     return yargs
       .usage(pkg.name + ' ' + pkg.version + '\n' + pkg.description + '\n\nUsage: $0 [options]')
       .describe('prefix', 'instance name. used as prefix for all topics')
-      .describe('mqtt', 'mqtt broker url. See https://svrooij.io/sonos2mqtt/getting-started.html#configuration')
+      .describe('mqtt', 'mqtt broker url. See https://sonos2mqtt.svrooij.io/getting-started.html#configuration')
       .describe('clientid', 'Specify the client id to be used')
-      .describe('wait', 'Number of seconds to search for a speaker, until exit')
+      .describe('wait', 'Number of seconds to search for speakers')
       .describe('log', 'Set the loglevel')
       .describe('d', 'Publish distinct track states')
       .describe('h', 'show help')
@@ -79,6 +81,8 @@ export class ConfigLoader {
       .describe('tvUuid', 'The UUID of the soundbar which should auto stop the tvGroup')
       .describe('tvVolume', 'Volume the soundbar should go to when TV playback starts')
       .number('tv_volume')
+      .describe('experimental', 'Activate some cutting edge features')
+      .boolean('experimental')
       .alias({
         h: 'help',
         d: 'distinct'
@@ -89,12 +93,10 @@ export class ConfigLoader {
       .default({
         mqtt: 'mqtt://127.0.0.1',
         prefix: 'sonos',
-        d: false,
         wait: 30,
         'ttslang': 'en-US',
         'ttsendpoint': undefined,
-        discovery: false,
-        log: 'information'
+        log: 'information',
       })
       .choices('log', ['warning', 'information', 'debug'])
       .wrap(90)

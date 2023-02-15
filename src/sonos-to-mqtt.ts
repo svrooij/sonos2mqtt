@@ -35,6 +35,9 @@ export class SonosToMqtt {
 
     if (success) {
       this.log.info('Found {numDevices} sonos speakers', this.sonosManager.Devices.length)
+      if (this.config.experimental === true) {
+        this.log.info('Experimental features activated, please provide feedback on notifications. https://github.com/svrooij/sonos2mqtt/discussions/191')
+      }
       this.setupMqttEvents()
       this.setupSonosEvents()
       this.mqtt.connect()
@@ -111,7 +114,7 @@ export class SonosToMqtt {
         return;
       }
       try {
-        const response = await SonosCommandMapping.ExecuteControl(correctDevice, payload);
+        const response = await SonosCommandMapping.ExecuteControl(correctDevice, payload, this.config.experimental === true);
         if (payload?.command === SonosCommands.Seek) {
           await this.periodicallyUpdatePosition(correctDevice);
         }

@@ -33,33 +33,30 @@ Every setting of this library can be set with environment variables prefixed wit
 
 ```bash
 sonos2mqtt 0.0.0-development
-A smarthome bridge between your sonos system and a mqtt server.
+Control and monitor Sonos speakers through MQTT
 
 Usage: index.js [options]
 
 Options:
-      --prefix           instance name. used as prefix for all topics   [default: "sonos"]
-      --mqtt             mqtt broker url. See
-                         https://svrooij.io/sonos2mqtt/getting-started.html#configuration
+      --prefix         instance name. used as prefix for all topics     [default: "sonos"]
+      --mqtt           mqtt broker url. See
+                       https://sonos2mqtt.svrooij.io/getting-started.html#configuration
                                                              [default: "mqtt://127.0.0.1"]
-      --clientid         Specify the client id to be used
-      --wait             Number of seconds to search for a speaker, until exit
-                                                                    [number] [default: 30]
-      --log              Set the loglevel
-                     [choices: "warning", "information", "debug"] [default: "information"]
-  -d, --distinct         Publish distinct track states          [boolean] [default: false]
-  -h, --help             Show help                                               [boolean]
-      --ttslang          Default TTS language                           [default: "en-US"]
-      --ttsendpoint      Default endpoint for text-to-speech
-      --device           Start with one known IP instead of device discovery.
-      --discovery        Emit retained auto-discovery messages for each player.
-                                                                [boolean] [default: false]
-      --friendlynames    Use device name or uuid in topics (except the united topic,
-                         always uuid)                            [choices: "name", "uuid"]
+      --clientid       Specify the client id to be used
+      --wait           Number of seconds to search for speakers     [number] [default: 30]
+      --log            Set the loglevel       [choices: "warning", "information", "debug"]
+  -d, --distinct       Publish distinct track states                             [boolean]
+  -h, --help           Show help                                                 [boolean]
+      --ttslang        Default TTS language                             [default: "en-US"]
+      --ttsendpoint    Default endpoint for text-to-speech
+      --device         Start with one known IP instead of device discovery.
+      --discovery      Emit retained auto-discovery messages for each player.    [boolean]
+      --friendlynames  Use device name or uuid in topics         [choices: "name", "uuid"]
       --tvGroup        The UUID of the coordinator to which the Soundbar should be joined
       --tvUuid         The UUID of the soundbar which should auto stop the tvGroup
       --tvVolume       Volume the soundbar should go to when TV playback starts
-      --version          Show version number  
+      --experimental   Activate some cutting edge features                       [boolean]
+      --version        Show version number                                       [boolean]
 ```
 
 You can configure the **mqtt** url by setting a supported [URL](https://nodejs.org/api/url.html#url_constructor_new_url_input_base).
