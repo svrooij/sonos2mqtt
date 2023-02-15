@@ -1,5 +1,6 @@
 import { SonosDevice } from "@svrooij/sonos/lib";
 import DeviceDescription from "@svrooij/sonos/lib/models/device-description";
+import { GetZoneInfoResponse } from "@svrooij/sonos/lib/services";
 
 interface AutoDiscoveryDevice {
   identifiers?: string[];
@@ -36,14 +37,18 @@ export interface AutoDiscoveryMessage {
 }
 
 export class HaAutoDiscovery {
-  private static deviceDescriptionForSonos(sonos: SonosDevice, description: DeviceDescription, prefix: string): AutoDiscoveryDevice {
+  private static deviceDescriptionForSonos(sonos: SonosDevice, description: DeviceDescription, zoneInfo: GetZoneInfoResponse, prefix: string): AutoDiscoveryDevice {
     return {
       identifiers: [sonos.Uuid],
       manufacturer: description.manufacturer,
       model: description.modelName,
       name: sonos.Name,
       sw_version: description.softwareVersion,
-      connections: [["host", `${sonos.Host}:${sonos.Port}`], ["mqtt", `${prefix}/${sonos.Uuid}`]]
+      connections: [
+        ["host", `${sonos.Host}:${sonos.Port}`],
+        ["mqtt", `${prefix}/${sonos.Uuid}`],
+        ["mac", `${zoneInfo.MACAddress}`],
+      ]
     };
   }
 
@@ -53,7 +58,7 @@ export class HaAutoDiscovery {
       payload: {
         device: device,
         device_class: 'speaker',
-        icon: 'mdi:speaker',
+        icon: device.model?.includes('Playbar') ? 'mdi:soundbar' : 'mdi:speaker',
         name: name,
         state_topic: `${prefix}/${uuid}`,
         command_topic: `${prefix}/${uuid}/control`,
@@ -83,7 +88,8 @@ export class HaAutoDiscovery {
 
   public static async GenerateAutoDiscoveryMessages(sonos: SonosDevice, prefix = 'sonos'): Promise<AutoDiscoveryMessage[]> {
     const description = await sonos.GetDeviceDescription();
-    const deviceDescription = HaAutoDiscovery.deviceDescriptionForSonos(sonos, description, prefix);
+    const zoneInfo = await sonos.DevicePropertiesService.GetZoneInfo();
+    const deviceDescription = HaAutoDiscovery.deviceDescriptionForSonos(sonos, description, zoneInfo, prefix);
     return [
       HaAutoDiscovery.autoDiscoverMediaPlayer(sonos.Name, sonos.Uuid, deviceDescription, prefix),
       //HaAutoDiscovery.autoDiscoverCrossfadeSwitch(sonos.Name, sonos.Uuid, deviceDescription, prefix, discoveryPrefix)

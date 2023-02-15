@@ -4,14 +4,14 @@ import { DeviceControl } from "./device-control";
 import { SonosCommands } from "./sonos-commands";
 
 export class SonosCommandMapping {
-  static async ExecuteControl(device: SonosDevice, control: DeviceControl): Promise<any> {
+  static async ExecuteControl(device: SonosDevice, control: DeviceControl, experimental = false): Promise<any> {
     if(control.command !== undefined) {
-      return await SonosCommandMapping.ExecuteCommand(device, control.command, control.input)
+      return await SonosCommandMapping.ExecuteCommand(device, control.command, control.input, experimental)
     } else if(control.sonosCommand !== undefined) {
       return await device.ExecuteCommand(control.sonosCommand, control.input)
     }
   }
-  static async ExecuteCommand(device: SonosDevice, command: SonosCommands, input: unknown): Promise<any> {
+  static async ExecuteCommand(device: SonosDevice, command: SonosCommands, input: unknown, experimental = false): Promise<any> {
     const payload = input as any;
     switch(command) {
       case SonosCommands.AdvancedCommand:
@@ -24,7 +24,7 @@ export class SonosCommandMapping {
 
       case SonosCommands.Command:
         if (payload.cmd && Object.values(SonosCommands).some(v => v === payload.cmd))
-          return SonosCommandMapping.ExecuteCommand(device, payload.cmd as SonosCommands, payload.val)
+          return SonosCommandMapping.ExecuteCommand(device, payload.cmd as SonosCommands, payload.val, experimental)
         break;
 
       case SonosCommands.Crossfade:
@@ -46,8 +46,8 @@ export class SonosCommandMapping {
 
       case SonosCommands.Notify:
         if (typeof payload === 'string')
-          return await device.PlayNotification({ trackUri: payload });
-        return await device.PlayNotification(payload);
+          return experimental ? await device.PlayNotificationAudioClip({ trackUri: payload }) : await device.PlayNotification({ trackUri: payload });
+        return experimental ? await device.PlayNotificationAudioClip(payload) : await device.PlayNotification(payload);
       
       case SonosCommands.NotifyTwo:
         return await device.PlayNotificationTwo(payload);
@@ -153,7 +153,7 @@ export class SonosCommandMapping {
         break;
       case SonosCommands.Speak:
         if(typeof payload === "object") {
-          return await device.PlayTTS(payload)
+          return experimental ? await device.PlayTTSAudioClip(payload) : await device.PlayTTS(payload)
         }
         break;
       
