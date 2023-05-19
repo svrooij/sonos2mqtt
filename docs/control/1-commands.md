@@ -32,6 +32,9 @@ All these commands are crafted specially to be used in sonos2mqtt.
 
 |Command| |Description|Input|
 |-------|-|-----------|-------|
+|`groupvolume`|:speaker:|Set the group volume to a value|number (between 1 and 100)|
+|`groupvolumedown`|:heavy_minus_sign:|Decrease group volume by 2 or input number|optional number|
+|`groupvolumeup`|:heavy_plus_sign:|Increase group volume by 2 or input number|optional number|
 |`joingroup`||Join another group by name|name of other device|
 |`leavegroup`||Remove current device from the group it's in| |
 |`mute`|:speaker:|Mute the volume| |
@@ -62,7 +65,7 @@ All these commands are crafted specially to be used in sonos2mqtt.
 |`toggle`||Toggle between pause and play| |
 |`unmute`|:mute:|Unmute the volume| |
 |`volume`|:speaker:|Set the volume to a value|number (between 1 and 100)|
-|`volumedown`|:heavy_minus_sign:|Decrease volume with 5 or number|optional number|
-|`volumeup`|:heavy_plus_sign:|Increase volume with 5 or number|optional number|
+|`volumedown`|:heavy_minus_sign:|Decrease volume by 2 or input number|optional number|
+|`volumeup`|:heavy_plus_sign:|Increase volume by 2 or input number|optional number|
 
 Check out the [commands](https://github.com/svrooij/sonos2mqtt/blob/master/src/sonos-commands.ts) or the [mapping](https://github.com/svrooij/sonos2mqtt/blob/master/src/sonos-command-mapping.ts) if you're interested in how this works.
