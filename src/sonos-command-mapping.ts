@@ -30,6 +30,21 @@ export class SonosCommandMapping {
       case SonosCommands.Crossfade:
         return await device.AVTransportService.SetCrossfadeMode({ InstanceID: 0, CrossfadeMode: SonosCommandMapping.PayloadToBool(payload) })
 
+      case SonosCommands.GroupVolume:
+        if(typeof payload === 'number')
+          return await device.Coordinator.GroupRenderingControlService.SetGroupVolume({ InstanceID: 0, DesiredVolume: payload })
+        break;
+
+      case SonosCommands.GroupVolumeDown:
+        return await device.GroupRenderingControlService.SetRelativeGroupVolume({ 
+          InstanceID: 0, 
+          Adjustment: ((typeof payload === 'number') ? payload : 2) * -1})
+          
+      case SonosCommands.GroupVolumeUp:
+        return await device.GroupRenderingControlService.SetRelativeGroupVolume({ 
+          InstanceID: 0,
+          Adjustment: ((typeof payload === 'number') ? payload : 2)})
+
       case SonosCommands.JoinGroup:
         if(typeof payload === 'string')
           return await device.JoinGroup(payload)
@@ -149,6 +164,9 @@ export class SonosCommandMapping {
           }
         } else if (typeof payload === 'string') {
           return await device.AVTransportService.SnoozeAlarm({InstanceID: 0, Duration: payload})
+        } else if (!payload) {
+          // Cancel snoozed alarm
+          return await device.AVTransportService.SnoozeAlarm({ InstanceID: 0, Duration: '' });
         }
         break;
       case SonosCommands.Speak:
@@ -189,12 +207,12 @@ export class SonosCommandMapping {
       case SonosCommands.VolumeDown:
         return await device.RenderingControlService.SetRelativeVolume({ 
           InstanceID: 0, Channel: 'Master', 
-          Adjustment: ((typeof payload === 'number') ? payload : 4) * -1})
+          Adjustment: ((typeof payload === 'number') ? payload : 2) * -1})
           
       case SonosCommands.VolumeUp:
         return await device.RenderingControlService.SetRelativeVolume({ 
           InstanceID: 0, Channel: 'Master', 
-          Adjustment: ((typeof payload === 'number') ? payload : 4)})
+          Adjustment: ((typeof payload === 'number') ? payload : 2)})
       
       default:
         throw new Error(`Command '${command}' not implemented`)
