@@ -5,7 +5,6 @@
 [![Sonos api documentation][badge_sonos-docs]][link_sonos-docs]
 [![Sonos typescript this library][badge_sonos-typescript]][link_sonos-typescript]
 [![Sonos cli][badge_sonos-cli]][link_sonos-cli]
-[![Join us on Discord][badge_discord]][link_discord]
 
 [![github issues][badge_issues]][link_issues]
 [![docker pulls][badge_docker]][link_docker]
@@ -31,7 +30,7 @@ Check out the other bridges in the [software list](https://github.com/mqtt-smart
 
 ## Documentation
 
-See: [https://svrooij.github.io/sonos2mqtt](https://svrooij.github.io/sonos2mqtt)
+See: [https://sonos2mqtt.svrooij.io/](https://sonos2mqtt.svrooij.io)
 
 ## Node-sonos-ts
 
@@ -80,10 +79,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
 Contributions of any kind welcome!
 
-[badge_build]: https://github.com/svrooij/sonos2mqtt/workflows/Run%20tests%20and%20release%20npm%20package/badge.svg
 [badge_contrib]: https://img.shields.io/github/all-contributors/svrooij/sonos2mqtt?style=for-the-badge
 [badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt?style=for-the-badge
-[badge_discord]: https://img.shields.io/discord/782374564054564875?style=for-the-badge
 [badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt?style=for-the-badge
 [badge_npm]: https://img.shields.io/npm/v/sonos2mqtt?style=for-the-badge
 [badge_sonos-cli]: https://img.shields.io/badge/sonos-cli-blue?style=for-the-badge
@@ -93,13 +90,11 @@ Contributions of any kind welcome!
 [badge_sponsor]: https://img.shields.io/github/sponsors/svrooij?style=for-the-badge&logo=github
 
 
-[link_build]: https://github.com/svrooij/sonos2mqtt/actions
-[link_discord]: https://discord.gg/VMtG6Ft36J
 [link_docker]: https://hub.docker.com/r/svrooij/sonos2mqtt
 [link_issues]: https://github.com/svrooij/sonos2mqtt/issues
 [link_npm]: https://www.npmjs.com/package/sonos2mqtt
 [link_sonos-cli]: https://github.com/svrooij/sonos-cli
-[link_sonos-docs]: https://svrooij.io/sonos-api-docs
-[link_sonos-mqtt]: https://svrooij.io/sonos2mqtt
-[link_sonos-typescript]: https://svrooij.io/node-sonos-ts
+[link_sonos-docs]: https://sonos.svrooij.io/
+[link_sonos-mqtt]: https://sonos2mqtt.svrooij.io/
+[link_sonos-typescript]: https://sonos-ts.svrooij.io/
 [link_sponsor]: https://github.com/sponsors/svrooij
