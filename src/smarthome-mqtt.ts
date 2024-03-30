@@ -6,7 +6,7 @@ import { DeviceControl } from './device-control'
 import {StaticLogger} from './static-logger'
 import { AutoDiscoveryMessage } from './ha-discovery';
 
-interface MqttEvents {
+type MqttEvents = {
   connected: (connected: boolean) => void;
   generic: (command: string, payload?: any | undefined) => void;
   deviceControl: (uuid: string, payload: DeviceControl) => void;
@@ -16,7 +16,7 @@ export class SmarthomeMqtt{
   private readonly log = StaticLogger.CreateLoggerForSource('sonos2mqtt.SmarthomeMqtt')
   private readonly uri: URL
   private mqttClient?: MqttClient;
-  public readonly Events: TypedEmitter<MqttEvents> = new EventEmitter();
+  public readonly Events: TypedEmitter<MqttEvents> = new EventEmitter() as TypedEmitter<MqttEvents>;
   constructor(mqttUrl: string, private readonly prefix: string = 'sonos', private readonly clientId?: string) {
     this.uri = new URL(mqttUrl)
   }
@@ -25,7 +25,7 @@ export class SmarthomeMqtt{
     this.mqttClient = mqtt.connect(this.uri.toString(), {
       will: {
         topic: `${this.prefix}/connected`,
-        payload: '0',
+        payload: Buffer.from('0'),
         qos: 0,
         retain: true
       },
