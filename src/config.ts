@@ -20,6 +20,17 @@ export interface Config {
   tvUuid?: string;
   tvVolume?: number;
   experimental?: boolean;
+  secure?: SecureConfig;
+}
+
+export interface SecureConfig {
+  key?: string | string[] | Buffer | Buffer[] | any[];
+  keyPath?: string;
+  cert?: string | string[] | Buffer | Buffer[];
+  certPath?: string;
+  ca?: string | string[] | Buffer | Buffer[];
+  caPaths?: string | string[];
+  rejectUnauthorized?: boolean;
 }
 
 const defaultConfig: Config = {
@@ -34,9 +45,10 @@ const defaultConfig: Config = {
 }
 
 export class ConfigLoader {
-  static LoadConfig(): Config {
-    const config = {...defaultConfig, ...(ConfigLoader.LoadConfigFromFile() ?? ConfigLoader.LoadConfigFromArguments())};
-
+  static async LoadConfig(): Promise<Config> {
+    const extraConfig = ConfigLoader.LoadConfigFromFile() ?? await ConfigLoader.LoadConfigFromArguments();
+    const config = {...defaultConfig, ...extraConfig};
+    
     if (config.ttsendpoint !== undefined && process.env.SONOS_TTS_ENDPOINT === undefined) {
       process.env.SONOS_TTS_ENDPOINT = config.ttsendpoint
     }
@@ -60,12 +72,18 @@ export class ConfigLoader {
     return;
   }
 
-  private static LoadConfigFromArguments(): Partial<Config> {
+  private static async LoadConfigFromArguments(): Promise<Partial<Config>> {
     const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json')).toString())
-    return yargs
+    const config = await yargs
       .usage(pkg.name + ' ' + pkg.version + '\n' + pkg.description + '\n\nUsage: $0 [options]')
       .describe('prefix', 'instance name. used as prefix for all topics')
       .describe('mqtt', 'mqtt broker url. See https://sonos2mqtt.svrooij.io/getting-started.html#configuration')
+      .describe('mqtt_cert_path', 'Path to the certificate file for secure mqtt connections.')
+      
+      .describe('mqtt_key_path', 'Path to the key file for secure mqtt connections.')
+      .describe('mqtt_ca_path', 'Path to the ca file for secure mqtt connections.')
+      .describe('mqtt_reject_unauthorized', 'Reject unauthorized connections.')
+      .boolean('mqtt_reject_unauthorized')
       .describe('clientid', 'Specify the client id to be used')
       .describe('wait', 'Number of seconds to search for speakers')
       .describe('log', 'Set the loglevel')
@@ -103,6 +121,17 @@ export class ConfigLoader {
       .version()
       .help('help')
       .env('SONOS2MQTT')
-      .argv as Partial<Config>
+      .argv;
+    
+
+    if (config.mqtt_cert_path !== undefined || config.mqtt_key_path !== undefined || config.mqtt_ca_path !== undefined || config.mqtt_reject_unauthorized === true) {
+      config.secure = {
+        keyPath: config.mqtt_key_path,
+        certPath: config.mqtt_cert_path,
+        caPaths: config.mqtt_ca_path,
+        rejectUnauthorized: config.mqtt_reject_unauthorized
+      }
+    }
+    return config as Partial<Config>;
   }
 }

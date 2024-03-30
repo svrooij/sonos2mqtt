@@ -1,11 +1,11 @@
-FROM node:16-alpine3.15 as build
+FROM node:lts-alpine as build
 WORKDIR /usr/src/app
 COPY package*.json tsconfig.json ./
 RUN npm ci
 COPY ./src ./src
 RUN npm run build
 
-FROM node:16-alpine3.15 as prod
+FROM node:lts-alpine as prod
 ARG BUILD_DATE=unknown
 ARG BUILD_VERSION=0.0.0-development
 ARG VCS_REF=not-set

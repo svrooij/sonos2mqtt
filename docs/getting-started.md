@@ -105,6 +105,10 @@ services:
       - SONOS2MQTT_DEVICE=192.168.50.4 # Service discovery doesn't work very well inside docker, so start with one device.
       - SONOS2MQTT_MQTT=mqtt://emqx:1883 # EMQX is a nice mqtt broker
       # - SONOS2MQTT_DISTINCT=true # if your want distinct topics
+      # - SONOS2MQTT_MQTT_CA_PATH=/path/to/ca.crt # If you use a self-signed certificate
+      # - SONOS2MQTT_MQTT_CERT_PATH=/path/to/cert.crt # If you want a secure connection
+      # - SONOS2MQTT_MQTT_KEY_PATH=/path/to/key.key # If you want a secure connection
+      # - SONOS2MQTT_MQTT_REJECT_UNAUTHORIZED=true # If you use official signed certificates
       - SONOS_LISTENER_HOST=192.168.50.44 # Docker host IP
       - SONOS_TTS_ENDPOINT=http://sonos-tts:5601/api/generate # If you deployed the TTS with the same docker-compose
     depends_on:

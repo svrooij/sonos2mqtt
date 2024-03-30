@@ -21,7 +21,7 @@ export class SonosToMqtt {
   private readonly _soundbarTrackUri = 'x-sonos-htastream:RINCON_'
   constructor(private config: Config) {
     this.sonosManager = new SonosManager();
-    this.mqtt = new SmarthomeMqtt(config.mqtt, config.prefix, config.clientid);
+    this.mqtt = new SmarthomeMqtt(config.mqtt, config.prefix, config.clientid, config.secure);
   }
 
   async start(): Promise<boolean> {
@@ -321,6 +321,7 @@ export class SonosToMqtt {
       mute: data.Mute,
       bass: data.Bass,
       treble: data.Treble,
+      loudness: data.Loudness === true
     } as SonosState)
   }
 
