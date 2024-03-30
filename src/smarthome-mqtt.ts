@@ -20,7 +20,8 @@ export class SmarthomeMqtt{
   private readonly security?: SecureConfig;
   public readonly Events: TypedEmitter<MqttEvents> = new EventEmitter() as TypedEmitter<MqttEvents>;
   constructor(mqttUrl: string, private readonly prefix: string = 'sonos', private readonly clientId?: string, security?: SecureConfig) {
-    this.uri = new URL(mqttUrl)
+    this.uri = new URL(mqttUrl);
+    this.security = security;
   }
 
   connect(): void {
