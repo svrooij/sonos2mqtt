@@ -62,7 +62,8 @@
 
     /* Advanced Options */
     // "resolveJsonModule": true,
-    "forceConsistentCasingInFileNames": true  /* Disallow inconsistently-cased references to the same file. */
+    "forceConsistentCasingInFileNames": true,  /* Disallow inconsistently-cased references to the same file. */
+    "skipLibCheck": true,                     /* Skip type checking of declaration files. */
   },
   "include": ["src"],
   "exclude": ["node_modules", "**/__tests__/*"],

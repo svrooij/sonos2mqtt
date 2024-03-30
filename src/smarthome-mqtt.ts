@@ -5,6 +5,7 @@ import {EventEmitter} from 'events'
 import { DeviceControl } from './device-control'
 import {StaticLogger} from './static-logger'
 import { AutoDiscoveryMessage } from './ha-discovery';
+import { SecureConfig } from './config';
 
 type MqttEvents = {
   connected: (connected: boolean) => void;
@@ -16,8 +17,9 @@ export class SmarthomeMqtt{
   private readonly log = StaticLogger.CreateLoggerForSource('sonos2mqtt.SmarthomeMqtt')
   private readonly uri: URL
   private mqttClient?: MqttClient;
+  private readonly security?: SecureConfig;
   public readonly Events: TypedEmitter<MqttEvents> = new EventEmitter() as TypedEmitter<MqttEvents>;
-  constructor(mqttUrl: string, private readonly prefix: string = 'sonos', private readonly clientId?: string) {
+  constructor(mqttUrl: string, private readonly prefix: string = 'sonos', private readonly clientId?: string, security?: SecureConfig) {
     this.uri = new URL(mqttUrl)
   }
 
@@ -30,7 +32,14 @@ export class SmarthomeMqtt{
         retain: true
       },
       keepalive: 60000,
-      clientId: this.clientId
+      clientId: this.clientId,
+      rejectUnauthorized: (this.uri.protocol === 'mqtts' || this.uri.protocol === 'ssl') && this.security?.rejectUnauthorized === true,
+      ca: this.security?.ca,
+      key: this.security?.key,
+      cert: this.security?.cert,
+      caPaths: this.security?.caPaths,
+      keyPath: this.security?.keyPath,
+      certPath: this.security?.certPath,
     });
     this.mqttClient.on('connect',() => {
       this.log.debug('Connected to server {server}', this.uri.host)
