@@ -321,6 +321,7 @@ export class SonosToMqtt {
       mute: data.Mute,
       bass: data.Bass,
       treble: data.Treble,
+      loudness: data.Loudness === true
     } as SonosState)
   }
 
