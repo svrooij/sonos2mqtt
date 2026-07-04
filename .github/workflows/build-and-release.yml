@@ -18,6 +18,7 @@ on:
       - master
       - main
       - beta
+      - feature/2025-update
     paths:
       - 'src/**'
       - 'package.json'
