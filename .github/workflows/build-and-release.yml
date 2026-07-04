@@ -56,6 +56,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
+      packages: write
     outputs:
       version: ${{ steps.get_version.outputs.version }}
     steps:
@@ -104,6 +105,9 @@ jobs:
     runs-on: ubuntu-latest
     name: Container release
     needs: [npm-release]
+    permissions:
+      packages: write
+      contents: read
     steps:
       - uses: actions/checkout@v7
 
