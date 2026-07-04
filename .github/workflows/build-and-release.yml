@@ -73,7 +73,12 @@ jobs:
       - name: Set package version
         run: npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version
       - name: Publish to NPM
-        run: npm publish
+        run: |
+          if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
+            npm publish --tag beta
+          else
+            npm publish
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Setup node for GitHub Package Registry
@@ -85,7 +90,11 @@ jobs:
       - name: Publish to GitHub Package Registry
         run: |
           sed -i 's+"name": "sonos2mqtt"+"name": "@svrooij/sonos2mqtt"+g' package**.json
-          npm publish
+          if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
+            npm publish --tag beta
+          else
+            npm publish
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
