@@ -24,7 +24,8 @@
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
     "serve-docs": "docker-compose -f ./docs/docker-compose.yml up jekyll",
-    "test": "npm run lint && npm run build"
+    "test": "npm run lint && npm run build && npm run test:unit",
+    "test:unit": "vitest run"
   },
   "dependencies": {
     "@svrooij/sonos": "^2.6.0-beta.12",
@@ -39,9 +40,11 @@
     "@types/node": "^26.0.0",
     "@types/ws": "^8.18.1",
     "@types/yargs": "^17.0.35",
+    "aedes": "^1.1.1",
     "eslint": "^9.39.4",
     "typescript": "^5.4.0",
-    "typescript-eslint": "^8.62.1"
+    "typescript-eslint": "^8.62.1",
+    "vitest": "^4.1.9"
   },
   "repository": {
     "type": "git",
