@@ -5,7 +5,13 @@
 # COPY ./src ./src
 # RUN npm run build
 
-FROM node:22-slim as prod
+# Use node:26-alpine for amd64/arm64; node:22-slim for arm/v7 (Alpine dropped 32-bit ARM support)
+FROM node:26-alpine AS base-amd64
+FROM node:26-alpine AS base-arm64
+FROM node:22-slim AS base-arm
+
+ARG TARGETARCH
+FROM base-${TARGETARCH} AS prod
 ENV SONOS2MQTT_RUNNING_IN_CONTAINER=true
 WORKDIR /usr/src/app
 
