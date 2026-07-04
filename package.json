@@ -15,6 +15,9 @@
     "music control"
   ],
   "preferGlobal": true,
+  "engines": {
+    "node": ">=26"
+  },
   "scripts": {
     "build": "tsc --skipLibCheck",
     "help": "node ./lib/index.js --help",
@@ -33,7 +36,7 @@
   },
   "devDependencies": {
     "@types/debug": "4.1.12",
-    "@types/node": "^22.20.0",
+    "@types/node": "^26.0.0",
     "@types/ws": "^8.18.1",
     "@types/yargs": "^17.0.35",
     "eslint": "^9.39.4",
