@@ -5,7 +5,7 @@
 # COPY ./src ./src
 # RUN npm run build
 
-FROM node:26-alpine as prod
+FROM node:22-slim as prod
 ENV SONOS2MQTT_RUNNING_IN_CONTAINER=true
 WORKDIR /usr/src/app
 
