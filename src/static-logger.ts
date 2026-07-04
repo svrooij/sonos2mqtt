@@ -3,7 +3,6 @@ import {LoggerConfiguration, ColoredConsoleSink, DynamicLevelSwitch, LogEventLev
 export class StaticLogger {
   private static instance: Logger;
   private static levelSwitch = new DynamicLevelSwitch(LogEventLevel.information);
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
   public static Default(): Logger {
