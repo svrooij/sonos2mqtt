@@ -53,6 +53,9 @@ jobs:
     name: NPM Release
     if: github.event_name == 'release'
     needs: [test]
+    permissions:
+      id-token: write
+      contents: read
     outputs:
       version: ${{ steps.get_version.outputs.version }}
     steps:
@@ -75,12 +78,10 @@ jobs:
       - name: Publish to NPM
         run: |
           if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
-            npm publish --tag beta
+            npm publish --provenance --tag beta
           else
-            npm publish
+            npm publish --provenance
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Setup node for GitHub Package Registry
         uses: actions/setup-node@v6
         with:
