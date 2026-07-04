@@ -125,6 +125,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Get version from tag
+        id: get_version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Publish container as latest
         if: github.event.release.prerelease == false
         run: |
@@ -133,9 +139,9 @@ jobs:
             --push \
             -f ./Dockerfile.npm \
             -t ghcr.io/svrooij/sonos2mqtt:latest \
-            -t ghcr.io/svrooij/sonos2mqtt:${{ needs.npm-release.outputs.version }} \
+            -t ghcr.io/svrooij/sonos2mqtt:${{ steps.get_version.outputs.version }} \
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg BUILD_VERSION=${{ needs.npm-release.outputs.version }} \
+            --build-arg BUILD_VERSION=${{ steps.get_version.outputs.version }} \
             --build-arg VSC_REF=$(echo ${GITHUB_SHA} | cut -c1-8) \
             .
 
@@ -147,8 +153,8 @@ jobs:
             --push \
             -f ./Dockerfile.npm \
             -t ghcr.io/svrooij/sonos2mqtt:beta \
-            -t ghcr.io/svrooij/sonos2mqtt:${{ needs.npm-release.outputs.version }} \
+            -t ghcr.io/svrooij/sonos2mqtt:${{ steps.get_version.outputs.version }} \
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg BUILD_VERSION=${{ needs.npm-release.outputs.version }} \
+            --build-arg BUILD_VERSION=${{ steps.get_version.outputs.version }} \
             --build-arg VSC_REF=$(echo ${GITHUB_SHA} | cut -c1-8) \
             .
