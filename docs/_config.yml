@@ -27,7 +27,7 @@ repository: https://github.com/svrooij/sonos2mqtt
 # Build settings
 markdown: kramdown
 # remote_theme: pmarsceill/just-the-docs
-remote_theme: svrooij/just-the-docs@plausible
+remote_theme: svrooij/just-the-docs@plausible-2026
 plugins:
   - jekyll-feed
   - jemoji

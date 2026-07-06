@@ -23,7 +23,8 @@
     "help": "node ./lib/index.js --help",
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
-    "serve-docs": "docker-compose -f ./docs/docker-compose.yml up jekyll",
+    "serve-docs": "docker compose -f ./docs/docker-compose.yml up jekyll",
+    "start-docs-container": "docker compose -f ./docs/docker-compose.yml run --entrypoint /bin/sh jekyll",
     "test": "npm run lint && npm run build && npm run test:unit",
     "test:unit": "vitest run"
   },
