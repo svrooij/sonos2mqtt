@@ -82,7 +82,7 @@ jobs:
       - name: Publish to GitHub Package Registry
         run: |
           sed -i 's+"name": "sonos2mqtt"+"name": "@svrooij/sonos2mqtt"+g' package**.json
-          npm publish --provenance --tag ${{ github.event.release.prerelease && 'beta' || 'latest' }}
+          npm publish --access public --provenance --tag ${{ github.event.release.prerelease && 'beta' || 'latest' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
