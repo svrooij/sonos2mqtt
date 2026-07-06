@@ -49,13 +49,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/svrooij/sonos2mqtt.git"
+    "url": "git+https://github.com/svrooij/sonos2mqtt.git"
   },
   "bugs": {
     "url": "https://github.com/svrooij/sonos2mqtt/issues"
   },
   "funding": {
-    "type": "Github sponsor",
+    "type": "github",
     "url": "https://github.com/sponsors/svrooij"
   },
   "files": [

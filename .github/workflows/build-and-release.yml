@@ -59,10 +59,6 @@ jobs:
         with:
           node-version: 26
           registry-url: 'https://registry.npmjs.org'
-      - name: Install dependencies
-        run: npm ci
-      - name: Build library
-        run: npm run build
       - name: Get version from tag
         id: get_version
         run: |
@@ -70,13 +66,13 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
       - name: Set package version
         run: npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version
+      - name: Install dependencies
+        run: npm ci
+      - name: Build library
+        run: npm run build
+
       - name: Publish to NPM
-        run: |
-          if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
-            npm publish --provenance --tag beta
-          else
-            npm publish --provenance --tag latest
-          fi
+        run: npm publish --provenance --tag ${{ github.event.release.prerelease && 'beta' || 'latest' }}
       - name: Setup node for GitHub Package Registry
         uses: actions/setup-node@v6
         with:
@@ -86,11 +82,7 @@ jobs:
       - name: Publish to GitHub Package Registry
         run: |
           sed -i 's+"name": "sonos2mqtt"+"name": "@svrooij/sonos2mqtt"+g' package**.json
-          if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
-            npm publish --tag beta
-          else
-            npm publish --tag latest
-          fi
+          npm publish --provenance --tag ${{ github.event.release.prerelease && 'beta' || 'latest' }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
