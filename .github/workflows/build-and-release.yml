@@ -4,10 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
       - main
-      - development
-      - beta
     paths:
       - 'src/**'
       - 'package.json'
@@ -15,10 +12,7 @@ on:
       - 'Dockerfile*'
   pull_request:
     branches:
-      - master
       - main
-      - beta
-      - feature/2025-update
     paths:
       - 'src/**'
       - 'package.json'
@@ -34,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [24,26]
+        node: [26, 24]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
@@ -81,7 +75,7 @@ jobs:
           if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
             npm publish --provenance --tag beta
           else
-            npm publish --provenance
+            npm publish --provenance --tag latest
           fi
       - name: Setup node for GitHub Package Registry
         uses: actions/setup-node@v6
@@ -95,7 +89,7 @@ jobs:
           if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
             npm publish --tag beta
           else
-            npm publish
+            npm publish --tag latest
           fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
