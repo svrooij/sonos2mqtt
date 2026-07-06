@@ -16,7 +16,7 @@
   ],
   "preferGlobal": true,
   "engines": {
-    "node": ">=26"
+    "node": ">=24"
   },
   "scripts": {
     "build": "tsc --skipLibCheck",
@@ -28,7 +28,7 @@
     "test:unit": "vitest run"
   },
   "dependencies": {
-    "@svrooij/sonos": "^2.6.0-beta.12",
+    "@svrooij/sonos": "^2.7.0-beta.3",
     "mqtt": "5.10.3",
     "serilogger": "^0.5.0",
     "typed-emitter": "^2.1.0",
@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@types/debug": "4.1.12",
-    "@types/node": "^26.0.0",
+    "@types/node": "^24.0.0",
     "@types/ws": "^8.18.1",
     "@types/yargs": "^17.0.35",
     "aedes": "^1.1.1",
