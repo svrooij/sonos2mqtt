@@ -4,24 +4,22 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
       - main
-      - development
-      - beta
-      - auto-build
-    paths-ignore:
-      - 'docs/**'
-      - 'README.md'
-      - '.all-contributorsrc'
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'Dockerfile*'
   pull_request:
     branches:
-      - master
       - main
-      - beta
-    paths-ignore:
-      - 'docs/**'
-      - 'README.md'
-      - '.all-contributorsrc'
+    paths:
+      - 'src/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'Dockerfile*'
+  release:
+    types: [published]
 
 jobs:
   # Install dependencies, run tests and try to build
@@ -30,123 +28,115 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [12, 14, 16]
+        node: [26, 24]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node }}
-      - name: Install depencencies
+      - name: Install dependencies
         run: npm ci
-      - name: Run tests
+      - name: Run tests (lint + build)
         run: npm test
-      - name: Build library
-        run: npm run build
+      - name: Run --help
+        run: npm run help
 
-  # Release to NPM if its not a pull request
+  # Release to NPM only on manual release creation
   npm-release:
     runs-on: ubuntu-latest
     name: NPM Release
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'release'
     needs: [test]
+    permissions:
+      id-token: write
+      contents: read
+      packages: write
     outputs:
-      released: ${{ steps.semantic.outputs.new_release_published }}
-      version: ${{ steps.semantic.outputs.new_release_version }}
+      version: ${{ steps.get_version.outputs.version }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v6
         with:
-          node-version: 16
-      - name: Install depencencies
+          node-version: 26
+          registry-url: 'https://registry.npmjs.org'
+      - name: Get version from tag
+        id: get_version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: Set package version
+        run: npm version ${{ steps.get_version.outputs.version }} --no-git-tag-version
+      - name: Install dependencies
         run: npm ci
       - name: Build library
         run: npm run build
-      - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v2
-        id: semantic
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Setup node for Github Registry
-        if: steps.semantic.outputs.new_release_published == 'true'
-        uses: actions/setup-node@v2
+
+      - name: Publish to NPM
+        run: npm publish --provenance --tag ${{ github.event.release.prerelease && 'beta' || 'latest' }}
+      - name: Setup node for GitHub Package Registry
+        uses: actions/setup-node@v6
         with:
-          node-version: 16
+          node-version: 26
           registry-url: 'https://npm.pkg.github.com'
           scope: 'svrooij'
-      - name: Publish To GitHub Package Registry
-        if: steps.semantic.outputs.new_release_published == 'true'
+      - name: Publish to GitHub Package Registry
         run: |
           sed -i 's+"name": "sonos2mqtt"+"name": "@svrooij/sonos2mqtt"+g' package**.json
-          npm publish
+          npm publish --access public --provenance --tag ${{ github.event.release.prerelease && 'beta' || 'latest' }}
         env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Release container if it released to npm.
+  # Release container after npm release
   container-release:
     runs-on: ubuntu-latest
     name: Container release
     needs: [npm-release]
-    if: needs.npm-release.outputs.released == 'true'
+    permissions:
+      packages: write
+      contents: read
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
 
-      -
-        name: Set up QEMU (multi platform)
-        uses: docker/setup-qemu-action@v1
+      - name: Set up QEMU (multi platform)
+        uses: docker/setup-qemu-action@v4
         with:
-          platforms: all
+          platforms: linux/amd64,linux/arm64
 
-      -
-        name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v1
-        with:
-          version: latest
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
 
-      -
-        name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
-      -
-        name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish container as latest
-        if: github.ref == 'refs/heads/master'
+      - name: Get version from tag
+        id: get_version
         run: |
-          docker buildx build \
-            --platform linux/amd64,linux/arm/v7,linux/arm64 \
-            --push \
-            -f ./Dockerfile.npm \
-            -t $GITHUB_REPOSITORY:latest \
-            -t $GITHUB_REPOSITORY:${{ needs.npm-release.outputs.version }} \
-            -t ghcr.io/svrooij/sonos2mqtt:latest \
-            -t ghcr.io/svrooij/sonos2mqtt:${{ needs.npm-release.outputs.version }} \
-            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg BUILD_VERSION=${{ needs.npm-release.outputs.version }} \
-            --build-arg VSC_REF=$(echo ${GITHUB_SHA} | cut -c1-8) \
-            .
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Publish container as beta
-        if: github.ref != 'refs/heads/master'
-        run: |
-          docker buildx build \
-            --platform linux/amd64,linux/arm/v7,linux/arm64 \
-            --push \
-            -f ./Dockerfile.npm \
-            -t $GITHUB_REPOSITORY:beta \
-            -t $GITHUB_REPOSITORY:${{ needs.npm-release.outputs.version }} \
-            -t ghcr.io/svrooij/sonos2mqtt:beta \
-            -t ghcr.io/svrooij/sonos2mqtt:${{ needs.npm-release.outputs.version }} \
-            --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-            --build-arg BUILD_VERSION=${{ needs.npm-release.outputs.version }} \
-            --build-arg VSC_REF=$(echo ${GITHUB_SHA} | cut -c1-8) \
-            .
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/svrooij/sonos2mqtt
+          tags: |
+            type=raw,value=latest,enable=${{ github.event.release.prerelease == false }}
+            type=raw,value=beta,enable=${{ github.event.release.prerelease == true }}
+            type=raw,value=${{ steps.get_version.outputs.version }}
+
+      - name: Build and push container
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile.npm
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          build-args: |
+            BUILD_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
+            BUILD_VERSION=${{ steps.get_version.outputs.version }}
+            VCS_REF=${{ github.sha }}

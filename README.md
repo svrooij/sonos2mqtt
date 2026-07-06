@@ -5,12 +5,11 @@
 [![Sonos api documentation][badge_sonos-docs]][link_sonos-docs]
 [![Sonos typescript this library][badge_sonos-typescript]][link_sonos-typescript]
 [![Sonos cli][badge_sonos-cli]][link_sonos-cli]
-[![Join us on Discord][badge_discord]][link_discord]
 
 [![github issues][badge_issues]][link_issues]
 [![docker pulls][badge_docker]][link_docker]
-[![Downloads/week](https://img.shields.io/npm/dw/sonos2mqtt.svg?style=flat-square)](https://npmjs.org/package/sonos2mqtt)
-[![License](https://img.shields.io/npm/l/sonos2mqtt.svg?style=flat-square)](https://github.com/svrooij/sonos2mqtt/blob/master/package.json)
+[![Downloads/week](https://img.shields.io/npm/dw/sonos2mqtt.svg?style=for-the-badge)](https://npmjs.org/package/sonos2mqtt)
+[![License](https://img.shields.io/npm/l/sonos2mqtt.svg?style=for-the-badge)](https://github.com/svrooij/sonos2mqtt/blob/master/package.json)
 [![Support me on Github][badge_sponsor]][link_sponsor]
 
 <!-- [![npm](https://img.shields.io/npm/v/sonos2mqtt.svg?style=flat-square)](https://www.npmjs.com/package/sonos2mqtt)
@@ -18,11 +17,10 @@
 [![Support me on Github][badge_sponsor]][link_sponsor]
 [![github issues][badge_issues]][link_issues]
 [![Run build and publish][badge_build]][link_build] -->
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
-[![mqtt-smarthome](https://img.shields.io/badge/mqtt-smarthome-blue.svg?style=flat-square)](https://github.com/mqtt-smarthome/mqtt-smarthome)
-[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square)](https://github.com/semantic-release/semantic-release)
+[![All Contributors][badge_contrib]](#contributors-)
+
+[![mqtt-smarthome](https://img.shields.io/badge/mqtt-smarthome-blue.svg?style=for-the-badge)](https://github.com/mqtt-smarthome/mqtt-smarthome)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=for-the-badge)](https://github.com/semantic-release/semantic-release)
 
 This node application is a bridge between the Sonos and a mqtt server. The status of all your sonos devices will be published to mqtt and you can control the sonos speakers over mqtt.
 
@@ -32,7 +30,7 @@ Check out the other bridges in the [software list](https://github.com/mqtt-smart
 
 ## Documentation
 
-See: [https://svrooij.github.io/sonos2mqtt](https://svrooij.github.io/sonos2mqtt)
+See: [https://sonos2mqtt.svrooij.io/](https://sonos2mqtt.svrooij.io)
 
 ## Node-sonos-ts
 
@@ -81,24 +79,22 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
 Contributions of any kind welcome!
 
-[badge_build]: https://github.com/svrooij/sonos2mqtt/workflows/Run%20tests%20and%20release%20npm%20package/badge.svg
-[badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt
-[badge_discord]: https://img.shields.io/discord/782374564054564875?style=flat-square
-[badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt?style=flat-square
-[badge_npm]: https://img.shields.io/npm/v/sonos2mqtt?style=flat-square
-[badge_sonos-cli]: https://img.shields.io/badge/sonos-cli-blue?style=flat-square
-[badge_sonos-docs]: https://img.shields.io/badge/sonos-api-blue?style=flat-square
-[badge_sonos-mqtt]: https://img.shields.io/badge/sonos-mqtt-blue?style=flat-square
-[badge_sonos-typescript]: https://img.shields.io/badge/sonos-typescript-blue?style=flat-square
-[badge_sponsor]: https://img.shields.io/badge/Sponsor-on%20Github-red?style=flat-square
+[badge_contrib]: https://img.shields.io/github/all-contributors/svrooij/sonos2mqtt?style=for-the-badge
+[badge_docker]: https://img.shields.io/docker/pulls/svrooij/sonos2mqtt?style=for-the-badge
+[badge_issues]: https://img.shields.io/github/issues/svrooij/sonos2mqtt?style=for-the-badge
+[badge_npm]: https://img.shields.io/npm/v/sonos2mqtt?style=for-the-badge
+[badge_sonos-cli]: https://img.shields.io/badge/sonos-cli-blue?style=for-the-badge
+[badge_sonos-docs]: https://img.shields.io/badge/sonos-api-blue?style=for-the-badge
+[badge_sonos-mqtt]: https://img.shields.io/badge/sonos-mqtt-blue?style=for-the-badge
+[badge_sonos-typescript]: https://img.shields.io/badge/sonos-typescript-blue?style=for-the-badge
+[badge_sponsor]: https://img.shields.io/github/sponsors/svrooij?style=for-the-badge&logo=github
 
-[link_build]: https://github.com/svrooij/sonos2mqtt/actions
-[link_discord]: https://discord.gg/VMtG6Ft36J
+
 [link_docker]: https://hub.docker.com/r/svrooij/sonos2mqtt
 [link_issues]: https://github.com/svrooij/sonos2mqtt/issues
 [link_npm]: https://www.npmjs.com/package/sonos2mqtt
 [link_sonos-cli]: https://github.com/svrooij/sonos-cli
-[link_sonos-docs]: https://svrooij.io/sonos-api-docs
-[link_sonos-mqtt]: https://svrooij.io/sonos2mqtt
-[link_sonos-typescript]: https://svrooij.io/node-sonos-ts
+[link_sonos-docs]: https://sonos.svrooij.io/
+[link_sonos-mqtt]: https://sonos2mqtt.svrooij.io/
+[link_sonos-typescript]: https://sonos-ts.svrooij.io/
 [link_sponsor]: https://github.com/sponsors/svrooij

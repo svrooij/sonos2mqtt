@@ -1,10 +1,10 @@
 {
   "name": "sonos2mqtt",
   "version": "0.0.0-development",
-  "description": "A smarthome bridge between your sonos system and a mqtt server.",
+  "description": "Control and monitor Sonos speakers through MQTT",
   "main": "lib/index.js",
   "license": "MIT",
-  "author": "Stephan van Rooij <github@svrooij.nl> (https://svrooij.nl)",
+  "author": "Stephan van Rooij <sonos2mqtt@svrooij.io> (https://svrooij.io)",
   "bin": {
     "sonos2mqtt": "lib/index.js"
   },
@@ -15,42 +15,47 @@
     "music control"
   ],
   "preferGlobal": true,
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
-    "build": "tsc",
-    "serve-docs": "docker-compose -f ./docs/docker-compose.yml up jekyll",
-    "test": "eslint ./src/*.ts"
+    "build": "tsc --skipLibCheck",
+    "help": "node ./lib/index.js --help",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint ./src --fix",
+    "serve-docs": "docker compose -f ./docs/docker-compose.yml up jekyll",
+    "start-docs-container": "docker compose -f ./docs/docker-compose.yml run --entrypoint /bin/sh jekyll",
+    "test": "npm run lint && npm run build && npm run test:unit",
+    "test:unit": "vitest run"
   },
   "dependencies": {
-    "@svrooij/sonos": "^2.5.0-beta.7",
-    "mqtt": "4.2.8",
-    "serilogger": "^0.3.1",
+    "@svrooij/sonos": "^2.7.0-beta.3",
+    "mqtt": "5.10.3",
+    "serilogger": "^0.5.0",
+    "typed-emitter": "^2.1.0",
     "yalm": "4.1.0",
-    "yargs": "17.1.1"
+    "yargs": "17.7.2"
   },
   "devDependencies": {
-    "@types/debug": "4.1.7",
-    "@types/node": "^14.14.21",
-    "@types/yargs": "17.0.2",
-    "@types/ws": "^7.4.7",
-    "@typescript-eslint/eslint-plugin": "4.31.0",
-    "@typescript-eslint/parser": "4.31.1",
-    "eslint": "7.32.0",
-    "pre-commit": "1.2.2",
-    "typescript": "3.9.5"
+    "@types/debug": "4.1.12",
+    "@types/node": "^24.0.0",
+    "@types/ws": "^8.18.1",
+    "@types/yargs": "^17.0.35",
+    "aedes": "^1.1.1",
+    "eslint": "^9.39.4",
+    "typescript": "^5.4.0",
+    "typescript-eslint": "^8.62.1",
+    "vitest": "^4.1.9"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/svrooij/sonos2mqtt.git"
+    "url": "git+https://github.com/svrooij/sonos2mqtt.git"
   },
   "bugs": {
     "url": "https://github.com/svrooij/sonos2mqtt/issues"
   },
-  "pre-commit": [
-    "build",
-    "test"
-  ],
   "funding": {
-    "type": "Github sponsor",
+    "type": "github",
     "url": "https://github.com/sponsors/svrooij"
   },
   "files": [

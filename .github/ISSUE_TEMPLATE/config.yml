@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions
+    url: https://github.com/svrooij/sonos2mqtt/discussions/categories/q-a
+    about: For quick answers to your questions check out our community.
+  - name: Documentation
+    url: https://sonos2mqtt.svrooij.io
+    about: There is a lot of documentation available, make sure to check it out.
+  - name: Sonos library
+    url: https://github.com/svrooij/node-sonos-ts
+    about: Sonos2mqtt is just a mqtt wrapper around sonos-ts, documentation might overlap.

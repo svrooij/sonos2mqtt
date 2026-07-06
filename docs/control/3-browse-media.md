@@ -18,7 +18,7 @@ The sonos speaker has an extensive library for local and remote media. Sometimes
 
 ## Favorites
 
-You can get your favorites with the following command. This is a [command](https://svrooij.github.io/node-sonos-ts/sonos-device/methods.html#content) in the sonos control library which means case sensitive.
+You can get your favorites with the following command. This is a [command](https://sonos-ts.svrooij.io/sonos-device/methods.html#content) in the sonos control library which means case sensitive.
 
 Topic: `sonos/uuid_of_speaker/control`
 Payload:

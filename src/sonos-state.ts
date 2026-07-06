@@ -1,4 +1,4 @@
-import { Track, ChannelValue, ExtendedTransportState } from '@svrooij/sonos/lib/models'
+import { Track, ChannelValue, ExtendedTransportState, Repeat } from '@svrooij/sonos/lib/models'
 /**
  * Object that keeps the state of each device,
  * this is what is changed by the events and published to mqtt as a full object.
@@ -14,18 +14,39 @@ export interface SonosState extends SonosStateBase {
   name: string;
   groupName: string;
   coordinatorUuid: string;
+  members?: Member[];
   volume: ChannelValue<number>;
   mute: ChannelValue<boolean>;
   currentTrack: Track | string;
+  position: PositionInfo;
   nextTrack: Track | string;
-  enqueuedMetadata: Track | string;
+  enqueuedMetadata: TrackWithQueueInfo | string;
   transportState: ExtendedTransportState;
   playmode: string;
   bass: number;
   treble: number;
-  
+  crossfade: string;
+  loudness: boolean;
+  shuffle: boolean;
+  repeat: Repeat;
+  alarmRunning: boolean;
 }
 
 interface SonosStateBase {
-  [key: string]: string | number | Track | ChannelValue<number> | ChannelValue<boolean> | ExtendedTransportState;
+  [key: string]: string | boolean | number | Track | ChannelValue<number> | ChannelValue<boolean> | ExtendedTransportState | PositionInfo | TrackWithQueueInfo | Member[] | undefined;
+}
+
+interface PositionInfo {
+  Position: string;
+  LastUpdate: number;
+}
+
+interface TrackWithQueueInfo extends Track {
+  QueueLength?: number;
+  QueuePosition?: number;
+}
+
+interface Member {
+  Uuid: string;
+  Name: string;
 }
