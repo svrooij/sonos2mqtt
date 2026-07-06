@@ -140,3 +140,24 @@ jobs:
             BUILD_DATE=${{ fromJSON(steps.meta.outputs.json).labels['org.opencontainers.image.created'] }}
             BUILD_VERSION=${{ steps.get_version.outputs.version }}
             VCS_REF=${{ github.sha }}
+
+  # Append artifact links to the release notes after publishing
+  update-release-notes:
+    runs-on: ubuntu-latest
+    name: Update release notes
+    needs: [npm-release, container-release]
+    permissions:
+      contents: write
+    steps:
+      - name: Append release artifacts to notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.npm-release.outputs.version }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json body --jq '.body' > /tmp/release_notes.md
+          if ! grep -q '## Released artifacts' /tmp/release_notes.md; then
+            printf '\n## Released artifacts\n\n- [Docker container](https://github.com/%s/pkgs/container/sonos2mqtt/?tag=%s): `docker pull ghcr.io/svrooij/sonos2mqtt:%s`\n- [NPM package](https://www.npmjs.com/package/sonos2mqtt/v/%s)\n\nThese packages were published using [this](%s) action\n' \
+              "$GITHUB_REPOSITORY" "$VERSION" "$VERSION" "$VERSION" "$RUN_URL" >> /tmp/release_notes.md
+            gh release edit "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --notes-file /tmp/release_notes.md
+          fi
