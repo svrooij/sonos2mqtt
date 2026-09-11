@@ -146,29 +146,29 @@ export class SonosToMqtt {
       this.updateMembers(d);
       d.Events.on(SonosEvents.AVTransport, (data) => {
         this.updateStateWithAv(d.Uuid, data);
-        this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/avtransport`, data)
+        this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/avtransport`, data, { qos: 0, retain: true })
       })
       d.Events.on(SonosEvents.RenderingControl, (data) => {
         this.updateStateWithRenderingControl(d.Uuid, data);
-        this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/renderingcontrol`, data)
+        this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/renderingcontrol`, data, { qos: 0, retain: true })
       })
       d.Events.on(SonosEvents.GroupName, (groupName) => {
         this.updateMembers(d);
         this.updateState(d.Uuid, { groupName });
         if(this.config.distinct === true) {
-          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/group`, groupName)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/group`, groupName, { qos: 0, retain: true })
         }
       })
       d.Events.on(SonosEvents.Coordinator, (coordinatorUuid) => {
         this.updateState(d.Uuid, { coordinatorUuid });
         if(this.config.distinct === true) {
-          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/coordinator`, coordinatorUuid)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/coordinator`, coordinatorUuid, { qos: 0, retain: true })
         }
       })
       d.Events.on('transportState', async (transportState) => {
         this.updateState(d.Uuid, { transportState } );
         if (this.config.distinct === true) {
-          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/state`, transportState)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/state`, transportState, { qos: 0, retain: true })
         }
 
         if (transportState === TransportState.Playing || transportState === TransportState.Transitioning) {
@@ -180,7 +180,7 @@ export class SonosToMqtt {
       })
       d.Events.on(SonosEvents.CurrentTrackUri, async (trackUri) => {
         if (this.config.distinct === true) {
-          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/trackUri`, trackUri)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/trackUri`, trackUri, { qos: 0, retain: true })
         }
         if (d.CurrentTransportStateSimple == TransportState.Playing) {
           await this.periodicallyUpdatePosition(d);
@@ -188,13 +188,13 @@ export class SonosToMqtt {
       })
       if(this.config.distinct === true) {
         d.Events.on(SonosEvents.CurrentTrackMetadata, (track) => {
-          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/track`, track)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/track`, track, { qos: 0, retain: true })
         })
         d.Events.on(SonosEvents.Mute, (mute) => {
-          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/muted`, mute)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/muted`, mute, { qos: 0, retain: true })
         })
         d.Events.on(SonosEvents.Volume, (volume) => {
-          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/volume`, volume)
+          this.mqtt.publish(`status/${this.topicId(d.Name, d.Uuid)}/volume`, volume, { qos: 0, retain: true })
         })
       }
     })
