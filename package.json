@@ -29,7 +29,7 @@
     "test:unit": "vitest run"
   },
   "dependencies": {
-    "@svrooij/sonos": "^2.7.0-beta.3",
+    "@svrooij/sonos": "^2.7.1-beta.1",
     "mqtt": "5.10.3",
     "serilogger": "^0.5.0",
     "typed-emitter": "^2.1.0",
